@@ -1,0 +1,108 @@
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { DataSource } from 'typeorm';
+import request from 'supertest';
+import { App } from 'supertest/types';
+import { AppModule } from '../src/app.module';
+import { TokenVerifier } from '../src/modules/auth/application/ports/token-verifier.port';
+import { ExternalIdentity } from '../src/modules/auth/domain/external-identity';
+import { AuthProvider } from '../src/modules/users/domain/user';
+import { UserRepository } from '../src/modules/users/domain/user.repository';
+import { Role } from '../src/shared/enums/role.enum';
+
+/**
+ * Fake verifier so e2e tests don't depend on Dynamic.xyz. Maps opaque tokens
+ * to identities; the rest of the stack (guards, sync, DB, RBAC) is real.
+ */
+class FakeTokenVerifier extends TokenVerifier {
+  verify(token: string): Promise<ExternalIdentity> {
+    if (token === 'valid-token') {
+      return Promise.resolve({
+        provider: AuthProvider.DYNAMIC,
+        subject: 'e2e-subject',
+        email: 'e2e@test.dev',
+        walletAddress: '0xe2e',
+        displayName: 'E2E User',
+      });
+    }
+    return Promise.reject(new Error('invalid token'));
+  }
+}
+
+describe('Auth & RBAC (e2e)', () => {
+  let app: INestApplication<App>;
+  let userRepository: UserRepository;
+
+  beforeAll(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideProvider(TokenVerifier)
+      .useClass(FakeTokenVerifier)
+      .compile();
+
+    app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
+
+    // Ensure schema exists (migrations are the source of truth, synchronize is off).
+    const dataSource = app.get(DataSource);
+    await dataSource.runMigrations();
+
+    userRepository = app.get(UserRepository);
+    await app.init();
+  });
+
+  afterAll(async () => {
+    const dataSource = app.get(DataSource);
+    await dataSource.dropDatabase();
+    await app.close();
+  });
+
+  it('GET /health is public', () => {
+    return request(app.getHttpServer())
+      .get('/health')
+      .expect(200)
+      .expect({ status: 'ok' });
+  });
+
+  it('GET /users/me without a token is 401', () => {
+    return request(app.getHttpServer()).get('/users/me').expect(401);
+  });
+
+  it('GET /users/me with a valid token syncs and returns the user (default USER role)', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/users/me')
+      .set('Authorization', 'Bearer valid-token')
+      .expect(200);
+
+    const body = res.body as { provider: string; roles: Role[] };
+    expect(body.provider).toBe('dynamic');
+    expect(body.roles).toEqual([Role.USER]);
+  });
+
+  it('GET /users (admin only) is 403 for a USER', () => {
+    return request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', 'Bearer valid-token')
+      .expect(403);
+  });
+
+  it('GET /users (admin only) is 200 once the user is promoted to ADMIN', async () => {
+    const me = await userRepository.findByProviderSubject(
+      AuthProvider.DYNAMIC,
+      'e2e-subject',
+    );
+    await userRepository.updateRoles(me!.id, [Role.ADMIN]);
+
+    const res = await request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', 'Bearer valid-token')
+      .expect(200);
+
+    const list = res.body as unknown[];
+    expect(Array.isArray(list)).toBe(true);
+    expect(list.length).toBeGreaterThanOrEqual(1);
+  });
+});

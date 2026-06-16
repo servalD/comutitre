@@ -1,0 +1,46 @@
+name: Trivy security scan
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  scan-repo:
+    name: Filesystem & config scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Generate a SARIF report (non-blocking) and publish it to code scanning.
+      - name: Trivy scan (SARIF)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,misconfig,secret
+          format: sarif
+          output: trivy-results.sarif
+          severity: HIGH,CRITICAL
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+
+      # Gate the build: fail on HIGH/CRITICAL findings (including Dockerfiles
+      # and compose files via misconfig scanning).
+      - name: Trivy scan (gate)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,misconfig,secret
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'

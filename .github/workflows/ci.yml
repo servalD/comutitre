@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  back:
+    name: Back (lint, build, test, e2e)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: back
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: comutitre_test
+          POSTGRES_USER: comutitre_test
+          POSTGRES_PASSWORD: comutitre_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U comutitre_test -d comutitre_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: back/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm test
+
+      - name: e2e tests
+        run: pnpm test:e2e
+        env:
+          NODE_ENV: test
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5433
+          DATABASE_NAME: comutitre_test
+          DATABASE_USER: comutitre_test
+          DATABASE_PASSWORD: comutitre_test
+          APP_JWT_SECRET: ci-secret-at-least-16-characters
+          APP_JWT_EXPIRES_IN: 1h
+          DYNAMIC_ENVIRONMENT_ID: ci-environment-id
+          FRANCECONNECT_MODE: mock
+          FRONTEND_URL: http://localhost:5173
+
+  front:
+    name: Front (lint, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: front/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build

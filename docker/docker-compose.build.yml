@@ -1,0 +1,16 @@
+# Builds the production images locally (and is reused by CI).
+#   BACK_IMAGE=... FRONT_IMAGE=... docker compose -f docker/docker-compose.build.yml build
+services:
+  back:
+    image: ${BACK_IMAGE:-ghcr.io/your-org/comutitre-back:latest}
+    build:
+      context: ../back
+      dockerfile: Dockerfile
+      target: runner
+
+  front:
+    image: ${FRONT_IMAGE:-ghcr.io/your-org/comutitre-front:latest}
+    build:
+      context: ../front
+      dockerfile: Dockerfile
+      target: runner
