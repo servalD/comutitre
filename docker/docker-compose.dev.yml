@@ -9,8 +9,11 @@ services:
     command: sh -c "corepack enable && pnpm install && pnpm migration:run && pnpm start:dev"
     volumes:
       - ../back:/app
+      - /app/node_modules
     ports:
       - '3000:3000'
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
     env_file:
       - ../.env.dev
     depends_on:
@@ -26,8 +29,11 @@ services:
     command: sh -c "corepack enable && pnpm install && pnpm dev --host"
     volumes:
       - ../front:/app
+      - /app/node_modules
     ports:
       - '5173:5173'
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
     env_file:
       - ../front/.env.example
     tty: true
@@ -38,16 +44,12 @@ services:
     container_name: comutitre_db_dev
     env_file:
       - ../.env.dev
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - '5432:5432'
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 5s
       timeout: 5s
       retries: 5
