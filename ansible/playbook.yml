@@ -6,6 +6,40 @@
 # Install Docker via geerlingguy.docker ; tout le reste (swarm, secrets, stack)
 # via la CLI docker (modules built-in), sans community.docker.
 
+- name: Sécuriser SSH avec fail2ban
+  hosts: swarm_managers
+  become: true
+  tasks:
+    - name: Installer fail2ban
+      ansible.builtin.apt:
+        name: fail2ban
+        state: present
+        update_cache: true
+
+    - name: Configurer la jail SSH
+      ansible.builtin.copy:
+        dest: /etc/fail2ban/jail.d/sshd.local
+        mode: '0644'
+        content: |
+          [sshd]
+          enabled  = true
+          maxretry = 5
+          findtime = 10m
+          bantime  = 1h
+      notify: Redémarrer fail2ban
+
+    - name: Activer et démarrer fail2ban
+      ansible.builtin.systemd:
+        name: fail2ban
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Redémarrer fail2ban
+      ansible.builtin.systemd:
+        name: fail2ban
+        state: restarted
+
 - name: Installer Docker sur tous les nœuds
   hosts: swarm_managers
   become: true

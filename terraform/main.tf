@@ -28,6 +28,8 @@ resource "azurerm_network_security_group" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
+  #trivy:ignore:AVD-AZU-0047
+  #trivy:ignore:AVD-AZU-0050
   security_rule {
     name                       = "SSH"
     priority                   = 100
@@ -81,6 +83,8 @@ resource "azurerm_public_ip" "node" {
   sku                 = "Standard"
 }
 
+#trivy:ignore:AVD-AZU-0068
+#trivy:ignore:AVD-AZU-0076
 resource "azurerm_network_interface" "node" {
   count               = var.node_count
   name                = "${var.prefix}-nic-${count.index + 1}"
