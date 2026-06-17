@@ -9,6 +9,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService<Env, true>);
 
+  // Toutes les routes sont préfixées par /api : front et back cohabitent derrière
+  // la même IP via Traefik, séparés par chemin (/ -> front, /api -> back).
+  // /health reste à la racine pour le healthcheck du conteneur.
+  app.setGlobalPrefix('api', { exclude: ['health'] });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -29,7 +34,8 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
+  // Sous /api/docs pour être routé vers le back par Traefik (PathPrefix /api).
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(config.get('PORT', { infer: true }));
 }

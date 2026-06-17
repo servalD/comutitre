@@ -1,0 +1,7 @@
+# Copier en group_vars/vault.yml puis chiffrer :
+#   cp group_vars/vault.yml.example group_vars/vault.yml
+#   ansible-vault encrypt group_vars/vault.yml
+# Lancer le playbook avec : ansible-playbook playbook.yml --ask-vault-pass
+vault_db_password: change-me-strong-db-password
+vault_app_jwt_secret: change-me-run-openssl-rand-base64-32
+vault_franceconnect_client_secret: your-franceconnect-client-secret

@@ -64,3 +64,41 @@ jobs:
         run: |
           docker push ${{ steps.img.outputs.image }}:${{ github.sha }}
           docker push ${{ steps.img.outputs.image }}:latest
+
+  deploy:
+    name: Deploy to Swarm
+    needs: images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: azureuser
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            owner="${{ github.repository_owner }}"
+            SHA="${{ github.sha }}"
+            BACK_IMAGE="ghcr.io/${owner,,}/comutitre-back:${SHA}"
+            FRONT_IMAGE="ghcr.io/${owner,,}/comutitre-front:${SHA}"
+
+            # 1. Migrations avec la nouvelle image du back
+            docker service update --image "${BACK_IMAGE}" --force comutitre_migrate
+
+            # Attendre que les migrations se terminent (max 2 min)
+            for i in $(seq 1 24); do
+              state=$(docker service ps comutitre_migrate --format '{{.CurrentState}}' | head -1)
+              echo "migrate: $state"
+              if echo "$state" | grep -q "^Complete"; then break; fi
+              if echo "$state" | grep -qE "^Failed|^Rejected"; then
+                echo "Migration failed!" && exit 1
+              fi
+              sleep 5
+            done
+
+            # 2. Rolling update du backend (start-first + healthcheck + rollback auto si KO)
+            docker service update --image "${BACK_IMAGE}" comutitre_back
+
+            # 3. Rolling update du frontend
+            docker service update --image "${FRONT_IMAGE}" comutitre_front

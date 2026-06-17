@@ -1,74 +1,61 @@
-# Docker, Compose & Swarm
+# Docker — images & Compose local
 
-Per-app Dockerfiles live next to each app (`back/Dockerfile`, `front/Dockerfile`). This folder
-holds the Compose files and the Swarm stack.
+Les Dockerfiles sont dans chaque app (`back/Dockerfile`, `front/Dockerfile`). Ce dossier contient les fichiers Compose et le stack Swarm.
 
-## Images (hardening)
+## Images
 
-Both images are multi-stage and run **non-root**:
+Les deux images sont multi-stage et tournent **non-root** :
 
-- **back** — `node:22-alpine`; builds, prunes to prod deps, runs as `node`; `HEALTHCHECK` on
-  `/health`.
-- **front** — builds the Vite bundle, served by **`nginx-unprivileged`** (uid 101, port `8080`)
-  with `nginx.conf` (SPA fallback + security headers).
+| Image | Base | Port | Healthcheck |
+| --- | --- | --- | --- |
+| `comutitre-back` | `node:22-alpine`, user `node` | 3000 | `GET /health` |
+| `comutitre-front` | `nginx-unprivileged:1.27-alpine`, uid 101 | 8080 | `GET /` |
 
-## Compose files
+## Fichiers Compose
 
-| File | Purpose |
+| Fichier | Usage |
 | --- | --- |
-| `docker-compose.dev.yml` | Live-reload dev: back (watch), front (vite), Postgres. Uses `../.env.dev`. |
-| `docker-compose.test.yml` | Ephemeral Postgres (tmpfs) on `:5433` for e2e. |
-| `docker-compose.prod.yml` | Single-host prod: `migrate` → `back` → `front` → `db`. Uses `../.env.prod`. |
-| `docker-compose.build.yml` | Builds the prod images locally / in CI. |
+| `docker-compose.dev.yml` | Dev live-reload : back (watch), front (vite), Postgres. Lit `../.env.dev`. |
+| `docker-compose.test.yml` | Postgres éphémère (tmpfs) sur `:5433` pour les tests e2e. |
+| `docker-compose.build.yml` | Build des images de prod en local ou en CI. |
 
-### Dev
+## Dev
 
 ```bash
-cp ../.env.dev.example ../.env.dev   # then edit
-docker compose -f docker-compose.dev.yml up
+cp .env.dev.example .env.dev   # remplir DYNAMIC_ENVIRONMENT_ID etc.
+docker compose -f docker/docker-compose.dev.yml up
+# back  → http://localhost:3000  (GET /health, swagger sur /api/docs)
+# front → http://localhost:5173
 ```
 
-### Test (e2e)
+## Tests e2e
 
 ```bash
-docker compose -f docker-compose.test.yml up -d
-cp ../.env.test.example ../.env.test
-pnpm --dir ../back test:e2e
-docker compose -f docker-compose.test.yml down
+docker compose -f docker/docker-compose.test.yml up -d
+cp .env.test.example .env.test
+pnpm --dir back test:e2e
+docker compose -f docker/docker-compose.test.yml down
 ```
 
-### Prod (single host)
+## Build des images de prod
 
 ```bash
-cp ../.env.prod.example ../.env.prod   # fill secrets
 export BACK_IMAGE=ghcr.io/<owner>/comutitre-back:<tag>
 export FRONT_IMAGE=ghcr.io/<owner>/comutitre-front:<tag>
-docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker/docker-compose.build.yml build
 ```
 
-The `migrate` service applies migrations and exits; `back` only starts once it completes.
+En CI, c'est le job `Release` (`.github/workflows/release.yml`) qui build, scan Trivy et push vers GHCR à chaque merge sur `main`.
 
-## Production with Docker Swarm
+## Stack Swarm — `stack.swarm.yml`
 
-`stack.prod.yml` is Swarm-native: replicas, rolling `update_config` (start-first), resource limits,
-healthchecks, overlay networks, and **Docker secrets** for the DB password and app JWT secret
-(mounted as files, consumed via the `<NAME>_FILE` convention).
+Voir [`../terraform/README.md`](../terraform/README.md) et [`../ansible/README.md`](../ansible/README.md) pour le provisionnement complet.
 
-```bash
-# Initialize a swarm (once):
-docker swarm init
+Routage Traefik (par chemin, cert Let's Encrypt sur IP publique) :
 
-# Create the secrets (once):
-printf '%s' "$(openssl rand -base64 32)" | docker secret create comutitre_app_jwt_secret -
-printf '%s' 'your-strong-db-password'    | docker secret create comutitre_db_password -
-
-# Deploy:
-export BACK_IMAGE=ghcr.io/<owner>/comutitre-back:<tag>
-export FRONT_IMAGE=ghcr.io/<owner>/comutitre-front:<tag>
-export DYNAMIC_ENVIRONMENT_ID=... FRANCECONNECT_CLIENT_ID=... # etc.
-docker stack deploy -c stack.prod.yml comutitre
-
-# Inspect / tear down:
-docker stack services comutitre
-docker stack rm comutitre
-```
+| Chemin | Service |
+| --- | --- |
+| `/.well-known/acme-challenge/*` (HTTP) | `certbot` standalone (port 8080 interne) |
+| `/api/*` (HTTPS) | `back` |
+| `/*` (HTTPS) | `front` |
+| HTTP (reste) | redirect → HTTPS |

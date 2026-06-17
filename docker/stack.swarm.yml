@@ -1,0 +1,233 @@
+# Docker Swarm production stack — Traefik (TLS terminé) devant front/back/db.
+#
+# Le certificat HTTPS est émis par certbot pour l'ADRESSE IP publique du nœud
+# d'ingress (profil Let's Encrypt "shortlived", 6 jours) — Traefik ne sachant
+# pas émettre de cert pour une IP. Traefik consomme le cert via son file
+# provider (`/etc/traefik/dynamic/tls.yml`) et le recharge à chaud (watch).
+#
+# Cert IP unique => pas de sous-domaines : routage par préfixe de chemin
+#   /api/*  -> back        /*  -> front
+#   /.well-known/acme-challenge/*  -> certbot standalone (port 8080 interne)
+#
+# traefik / certbot sont épinglés sur le nœud labellisé `ingress=true`
+# (où pointe l'IP du certificat). Déploiement :
+#   docker stack deploy -c docker/stack.swarm.yml comutitre
+#
+# Secrets (à créer une fois sur un manager) :
+#   printf '%s' "$(openssl rand -base64 32)" | docker secret create comutitre_app_jwt_secret -
+#   printf '%s' 'strong-db-password'         | docker secret create comutitre_db_password -
+version: '3.9'
+
+services:
+  traefik:
+    image: traefik:v3
+    command:
+      - --configfile=/etc/traefik/traefik.yml
+    ports:
+      - target: 80
+        published: 80
+        mode: host
+      - target: 443
+        published: 443
+        mode: host
+    environment:
+      DOCKER_API_VERSION: "1.44"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/comutitre/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - /opt/comutitre/traefik/dynamic:/etc/traefik/dynamic:ro
+      - /opt/comutitre/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.ingress == true
+      restart_policy:
+        condition: on-failure
+
+  certbot:
+    image: certbot/certbot:latest
+    entrypoint: /entrypoint.sh
+    environment:
+      PUBLIC_IP: ${INGRESS_IP}
+    volumes:
+      - /opt/comutitre/letsencrypt:/etc/letsencrypt
+      - /opt/comutitre/traefik/dynamic:/etc/traefik/dynamic
+      - /opt/comutitre/certbot/entrypoint.sh:/entrypoint.sh:ro
+      - /opt/comutitre/certbot/deploy-hook.sh:/deploy-hook.sh:ro
+    networks:
+      - frontend
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.ingress == true
+      restart_policy:
+        condition: any
+        delay: 30s
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=comutitre_frontend
+        - traefik.http.routers.acme.rule=PathPrefix(`/.well-known/acme-challenge/`)
+        - traefik.http.routers.acme.entrypoints=web
+        - traefik.http.routers.acme.priority=100
+        - traefik.http.services.acme.loadbalancer.server.port=8080
+
+  migrate:
+    image: ${BACK_IMAGE:-ghcr.io/servald/comutitre-back:latest}
+    command: node node_modules/typeorm/cli.js migration:run -d dist/infrastructure/database/typeorm.config.js
+    environment:
+      NODE_ENV: production
+      DATABASE_HOST: db
+      DATABASE_PORT: '5432'
+      DATABASE_NAME: comutitre
+      DATABASE_USER: comutitre
+      DATABASE_PASSWORD_FILE: /run/secrets/comutitre_db_password
+    secrets:
+      - comutitre_db_password
+    networks:
+      - backend
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 15s
+        max_attempts: 5
+      replicas: 1
+
+  back:
+    image: ${BACK_IMAGE:-ghcr.io/servald/comutitre-back:latest}
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://comutitre.example.com}
+      FRONTEND_URL: ${FRONTEND_URL:-https://comutitre.example.com}
+      DATABASE_HOST: db
+      DATABASE_PORT: '5432'
+      DATABASE_NAME: comutitre
+      DATABASE_USER: comutitre
+      DATABASE_PASSWORD_FILE: /run/secrets/comutitre_db_password
+      APP_JWT_SECRET_FILE: /run/secrets/comutitre_app_jwt_secret
+      APP_JWT_EXPIRES_IN: 1h
+      DYNAMIC_ENVIRONMENT_ID: ${DYNAMIC_ENVIRONMENT_ID}
+      FRANCECONNECT_MODE: ${FRANCECONNECT_MODE:-live}
+      FRANCECONNECT_CLIENT_ID: ${FRANCECONNECT_CLIENT_ID}
+      FRANCECONNECT_CLIENT_SECRET: ${FRANCECONNECT_CLIENT_SECRET}
+      FRANCECONNECT_ISSUER_URL: ${FRANCECONNECT_ISSUER_URL}
+      FRANCECONNECT_REDIRECT_URI: ${FRANCECONNECT_REDIRECT_URI}
+    secrets:
+      - comutitre_db_password
+      - comutitre_app_jwt_secret
+    networks:
+      - backend
+      - frontend
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3000/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+        monitor: 30s
+      rollback_config:
+        order: start-first
+        parallelism: 1
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.10'
+          memory: 128M
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=comutitre_frontend
+        - traefik.http.routers.back.rule=PathPrefix(`/api`)
+        - traefik.http.routers.back.entrypoints=websecure
+        - traefik.http.routers.back.tls=true
+        - traefik.http.routers.back.priority=10
+        - traefik.http.services.back.loadbalancer.server.port=3000
+
+  front:
+    image: ${FRONT_IMAGE:-ghcr.io/servald/comutitre-front:latest}
+    networks:
+      - frontend
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:8080/ || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        parallelism: 1
+        failure_action: rollback
+        monitor: 30s
+      rollback_config:
+        order: start-first
+        parallelism: 1
+        delay: 5s
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=comutitre_frontend
+        - traefik.http.routers.front.rule=PathPrefix(`/`)
+        - traefik.http.routers.front.entrypoints=websecure
+        - traefik.http.routers.front.tls=true
+        - traefik.http.routers.front.priority=1
+        - traefik.http.services.front.loadbalancer.server.port=8080
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: comutitre
+      POSTGRES_USER: comutitre
+      POSTGRES_PASSWORD_FILE: /run/secrets/comutitre_db_password
+    secrets:
+      - comutitre_db_password
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U comutitre -d comutitre']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+secrets:
+  comutitre_db_password:
+    external: true
+  comutitre_app_jwt_secret:
+    external: true
+
+networks:
+  frontend:
+    driver: overlay
+  backend:
+    driver: overlay
+
+volumes:
+  postgres_prod_data:

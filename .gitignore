@@ -45,3 +45,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+
+# ansible — inventaire généré par terraform, rôles galaxy, vault déchiffré
+ansible/inventory.ini
+ansible/roles/
+ansible/group_vars/vault.yml

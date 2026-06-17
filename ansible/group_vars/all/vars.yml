@@ -1,0 +1,21 @@
+# Variables non-secrètes. Les secrets sont dans group_vars/vault.yml (ansible-vault).
+# `ingress_ip` est fourni par l'inventaire généré par Terraform.
+# (certbot s'enregistre sans email : --register-unsafely-without-email)
+
+# --- Images applicatives (GHCR public, poussées par .github/workflows/release.yml) ---
+back_image: ghcr.io/servald/comutitre-back:latest
+front_image: ghcr.io/servald/comutitre-front:latest
+
+# --- Config back (non secrètes) ---
+dynamic_environment_id: your-production-dynamic-environment-id
+franceconnect_mode: live
+franceconnect_client_id: your-franceconnect-client-id
+franceconnect_issuer_url: https://app.franceconnect.gouv.fr/api/v2
+
+# --- geerlingguy.docker ---
+docker_install_compose_plugin: true
+docker_users:
+  - "{{ ansible_user }}"
+
+# Répertoire de config sur le nœud d'ingress (bind-mounts de la stack).
+config_dir: /opt/comutitre

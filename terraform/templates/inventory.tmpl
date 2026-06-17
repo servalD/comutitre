@@ -1,0 +1,15 @@
+[swarm_managers]
+%{ for n in nodes ~}
+${n.name} ansible_host=${n.public_ip} private_ip=${n.private_ip}%{ if n.leader } swarm_leader=true ingress=true%{ endif }
+%{ endfor ~}
+
+[swarm_leader]
+%{ for n in nodes ~}
+%{ if n.leader ~}${n.name}
+%{ endif ~}
+%{ endfor ~}
+
+[swarm_managers:vars]
+ansible_user=${admin_username}
+ansible_ssh_private_key_file=${ssh_private_key_path}
+ingress_ip=${ingress_ip}

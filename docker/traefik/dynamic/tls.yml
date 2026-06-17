@@ -1,0 +1,33 @@
+# Config dynamique Traefik (file provider, watch=true).
+# certbot écrit le certificat de l'IP dans /etc/letsencrypt/live/comutitre/
+# (nom fixe grâce à `--cert-name comutitre`). Le deploy-hook de certbot
+# `touch` ce fichier après chaque renouvellement => Traefik recharge à chaud
+# et relit le certificat.
+
+tls:
+  certificates:
+    - certFile: /etc/letsencrypt/live/comutitre/fullchain.pem
+      keyFile: /etc/letsencrypt/live/comutitre/privkey.pem
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /etc/letsencrypt/live/comutitre/fullchain.pem
+        keyFile: /etc/letsencrypt/live/comutitre/privkey.pem
+
+http:
+  middlewares:
+    https-redirect:
+      redirectScheme:
+        scheme: https
+        permanent: true
+  routers:
+    # Catch-all HTTP -> HTTPS. Priorité basse : le routeur ACME (labels swarm,
+    # priorité 100 sur l'entrypoint web) passe avant pour /.well-known/acme-challenge/.
+    http-catchall:
+      rule: PathPrefix(`/`)
+      entryPoints:
+        - web
+      priority: 1
+      middlewares:
+        - https-redirect
+      service: noop@internal

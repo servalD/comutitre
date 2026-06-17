@@ -1,0 +1,143 @@
+# Configure les VMs Azure en cluster Docker Swarm et déploie la stack Comutitre.
+#
+#   ansible-galaxy install -r requirements.yml -p roles
+#   ansible-playbook playbook.yml --ask-vault-pass
+#
+# Install Docker via geerlingguy.docker ; tout le reste (swarm, secrets, stack)
+# via la CLI docker (modules built-in), sans community.docker.
+
+- name: Installer Docker sur tous les nœuds
+  hosts: swarm_managers
+  become: true
+  roles:
+    - geerlingguy.docker
+
+- name: Monter le Swarm et déployer la stack
+  hosts: swarm_managers
+  become: true
+  vars:
+    leader: "{{ groups['swarm_leader'][0] }}"
+    is_leader: "{{ swarm_leader | default(false) | bool }}"
+  tasks:
+    # --- Initialisation du Swarm ---
+    - name: Initialiser le Swarm (leader)
+      ansible.builtin.command: docker swarm init --advertise-addr {{ private_ip }}
+      register: swarm_init
+      changed_when: "'Swarm initialized' in swarm_init.stdout"
+      failed_when:
+        - swarm_init.rc != 0
+        - "'already part of a swarm' not in swarm_init.stderr"
+      when: is_leader
+
+    - name: Récupérer le token de join manager (leader)
+      ansible.builtin.command: docker swarm join-token -q manager
+      register: manager_token
+      changed_when: false
+      when: is_leader
+
+    - name: Publier le token comme fact (leader)
+      ansible.builtin.set_fact:
+        swarm_manager_token: "{{ manager_token.stdout }}"
+      when: is_leader
+
+    - name: Joindre le Swarm en manager (autres nœuds)
+      ansible.builtin.command: >-
+        docker swarm join
+        --token {{ hostvars[leader].swarm_manager_token }}
+        {{ hostvars[leader].private_ip }}:2377
+      register: swarm_join
+      changed_when: "'This node joined' in swarm_join.stdout"
+      failed_when:
+        - swarm_join.rc != 0
+        - "'already part of a swarm' not in swarm_join.stderr"
+      when: not is_leader
+
+    # --- Label du nœud d'ingress ---
+    - name: Récupérer l'ID du nœud local (leader)
+      ansible.builtin.command: docker info --format '{{ "{{ .Swarm.NodeID }}" }}'
+      register: node_id
+      changed_when: false
+      when: is_leader
+
+    - name: Labelliser le nœud d'ingress (leader)
+      ansible.builtin.command: docker node update --label-add ingress=true {{ node_id.stdout }}
+      changed_when: true
+      when: is_leader
+
+    # --- Secrets Docker ---
+    - name: Créer le secret comutitre_db_password (leader)
+      ansible.builtin.command: docker secret create comutitre_db_password -
+      args:
+        stdin: "{{ vault_db_password }}"
+      register: secret_db
+      changed_when: secret_db.rc == 0
+      failed_when:
+        - secret_db.rc != 0
+        - "'already exists' not in secret_db.stderr"
+      when: is_leader
+
+    - name: Créer le secret comutitre_app_jwt_secret (leader)
+      ansible.builtin.command: docker secret create comutitre_app_jwt_secret -
+      args:
+        stdin: "{{ vault_app_jwt_secret }}"
+      register: secret_jwt
+      changed_when: secret_jwt.rc == 0
+      failed_when:
+        - secret_jwt.rc != 0
+        - "'already exists' not in secret_jwt.stderr"
+      when: is_leader
+
+    # --- Config Traefik / certbot + stack (leader uniquement) ---
+    - name: Créer les répertoires de config (leader)
+      ansible.builtin.file:
+        path: "{{ config_dir }}/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - traefik/dynamic
+        - certbot
+        - letsencrypt
+      when: is_leader
+
+    - name: Copier traefik.yml et la config dynamique (leader)
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../docker/traefik/"
+        dest: "{{ config_dir }}/traefik/"
+        mode: '0644'
+      when: is_leader
+
+    - name: Copier les scripts certbot (leader)
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../docker/certbot/{{ item }}"
+        dest: "{{ config_dir }}/certbot/{{ item }}"
+        mode: '0755'
+      loop:
+        - entrypoint.sh
+        - deploy-hook.sh
+      when: is_leader
+
+    - name: Copier la stack Swarm (leader)
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../docker/stack.swarm.yml"
+        dest: "{{ config_dir }}/stack.swarm.yml"
+        mode: '0644'
+      when: is_leader
+
+    - name: Déployer la stack (leader)
+      ansible.builtin.command: >-
+        docker stack deploy --detach=true
+        -c {{ config_dir }}/stack.swarm.yml comutitre
+      changed_when: true
+      when: is_leader
+      environment:
+        INGRESS_IP: "{{ ingress_ip }}"
+        BACK_IMAGE: "{{ back_image }}"
+        FRONT_IMAGE: "{{ front_image }}"
+        CORS_ORIGIN: "https://{{ ingress_ip }}"
+        FRONTEND_URL: "https://{{ ingress_ip }}"
+        DYNAMIC_ENVIRONMENT_ID: "{{ dynamic_environment_id }}"
+        FRANCECONNECT_MODE: "{{ franceconnect_mode }}"
+        FRANCECONNECT_CLIENT_ID: "{{ franceconnect_client_id }}"
+        FRANCECONNECT_CLIENT_SECRET: "{{ vault_franceconnect_client_secret }}"
+        FRANCECONNECT_ISSUER_URL: "{{ franceconnect_issuer_url }}"
+        FRANCECONNECT_REDIRECT_URI: "https://{{ ingress_ip }}/api/auth/franceconnect/callback"

@@ -1,0 +1,5 @@
+# Installer avec : ansible-galaxy install -r requirements.yml -p roles
+# Seul geerlingguy.docker est utilisé ; l'orchestration Swarm passe par la CLI docker
+# (modules built-in command/shell), sans la collection community.docker.
+roles:
+  - name: geerlingguy.docker

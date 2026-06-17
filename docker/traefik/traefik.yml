@@ -1,0 +1,29 @@
+# Traefik v3 — configuration statique.
+# Le TLS est servi via le file provider (dynamic/tls.yml), pas via un resolver
+# ACME : le certificat est émis par certbot pour l'IP publique (profil shortlived).
+# La redirection HTTP->HTTPS et le store TLS par défaut sont en config dynamique
+# pour laisser passer le challenge ACME sur l'entrypoint `web`.
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+entryPoints:
+  web:
+    address: ':80'
+  websecure:
+    address: ':443'
+
+providers:
+  swarm:
+    endpoint: 'unix:///var/run/docker.sock'
+    exposedByDefault: false
+    network: comutitre_frontend
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+log:
+  level: INFO
+
+accessLog: {}

@@ -37,8 +37,7 @@ pnpm migration:revert
 | --- | --- |
 | dev | `pnpm migration:run` (ts-node) |
 | e2e | `dataSource.runMigrations()` in the test bootstrap |
-| prod (compose) | the `migrate` service runs before the app starts |
-| prod (swarm) | the `migrate` service in `stack.prod.yml` |
+| prod (swarm) | the `migrate` service in `stack.swarm.yml`, run via CI before rolling update |
 
 ## Conventions
 
