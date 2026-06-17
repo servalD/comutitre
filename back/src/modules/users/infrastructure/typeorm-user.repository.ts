@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthProvider, User } from '../domain/user';
-import { UpsertUserParams, UserRepository } from '../domain/user.repository';
+import {
+  CreateLocalUserParams,
+  LocalUserCredentials,
+  UpsertUserParams,
+  UserRepository,
+} from '../domain/user.repository';
 import { Role } from '../../../shared/enums/role.enum';
 import { UserOrmEntity } from './user.orm-entity';
 
@@ -71,6 +76,34 @@ export class TypeOrmUserRepository extends UserRepository {
     await this.repository.update({ id }, { roles });
     const entity = await this.repository.findOneOrFail({ where: { id } });
     return this.toDomain(entity);
+  }
+
+  async findLocalByEmail(email: string): Promise<LocalUserCredentials | null> {
+    const entity = await this.repository
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.provider = :provider AND user.email = :email', {
+        provider: AuthProvider.LOCAL,
+        email,
+      })
+      .getOne();
+
+    if (!entity) return null;
+    return { user: this.toDomain(entity), passwordHash: entity.passwordHash! };
+  }
+
+  async createLocal(params: CreateLocalUserParams): Promise<User> {
+    const created = this.repository.create({
+      provider: AuthProvider.LOCAL,
+      providerSubject: params.email,
+      email: params.email,
+      walletAddress: null,
+      displayName: `${params.firstName} ${params.lastName}`.trim(),
+      passwordHash: params.passwordHash,
+      roles: [Role.USER],
+    });
+    const saved = await this.repository.save(created);
+    return this.toDomain(saved);
   }
 
   private toDomain(entity: UserOrmEntity): User {

@@ -18,7 +18,7 @@ Instable, capricieux, parfois payant ou avec portail captif.
 
 Métro, avion, montagne : la perte de connexion est la norme.
 
-> "Le réseau n'est pas un endroit sûr pour stocker vos données"  
+> "Le réseau n'est pas un endroit sûr pour stocker vos données"
 > — *Principles of Offline-First Development*
 
 ---
@@ -59,19 +59,19 @@ Le **Offline-First** est un paradigme de conception où l'application est pensé
 
 ## Le manifeste Offline-First
 
-1. **Local d'abord**  
+1. **Local d'abord**
    Les opérations s'exécutent d'abord localement. L'utilisateur n'attend jamais le réseau.
 
-2. **Sync en arrière-plan**  
+2. **Sync en arrière-plan**
    La synchronisation avec le serveur se fait de manière asynchrone et transparente.
 
-3. **Gestion des conflits**  
+3. **Gestion des conflits**
    Stratégies de résolution de conflits : Last-Write-Wins, CRDT, Operational Transform.
 
-4. **Progression**  
+4. **Progression**
    L'application fonctionne même hors-ligne : le réseau est une amélioration, pas une nécessité.
 
-5. **Expérience utilisateur**  
+5. **Expérience utilisateur**
    L'utilisateur ne doit jamais être bloqué par l'absence de réseau.
 
 ---
@@ -228,13 +228,13 @@ Un **Service Worker** est un script JavaScript qui :
 
 ## Cycle de vie d'un Service Worker
 
-1. **Installation**  
+1. **Installation**
    Téléchargement du script. Idéal pour pré-cacher les ressources.
 
-2. **Activation**  
+2. **Activation**
    Nettoyage des anciens caches. Prise de contrôle des pages.
 
-3. **Fonctionnement**  
+3. **Fonctionnement**
    Interception des requêtes, gestion du cache, synchronisation.
 
 Flux simplifié :

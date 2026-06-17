@@ -7,6 +7,8 @@ import { TokenVerifier } from './application/ports/token-verifier.port';
 import { AuthenticateBearerUseCase } from './application/use-cases/authenticate-bearer.use-case';
 import { FranceConnectLoginUseCase } from './application/use-cases/franceconnect-login.use-case';
 import { FranceConnectCallbackUseCase } from './application/use-cases/franceconnect-callback.use-case';
+import { RegisterUseCase } from './application/use-cases/register.use-case';
+import { LoginWithCredentialsUseCase } from './application/use-cases/login-with-credentials.use-case';
 import { AppJwtService } from './infrastructure/app-jwt.service';
 import { CompositeTokenVerifier } from './infrastructure/composite-token-verifier';
 import { DynamicTokenVerifier } from './infrastructure/dynamic-token-verifier';
@@ -37,6 +39,8 @@ import { FranceConnectPublicCallbackController } from './presentation/franceconn
     AuthenticateBearerUseCase,
     FranceConnectLoginUseCase,
     FranceConnectCallbackUseCase,
+    RegisterUseCase,
+    LoginWithCredentialsUseCase,
   ],
   // AuthenticateBearerUseCase is consumed by the global AuthGuard (AppModule).
   exports: [AuthenticateBearerUseCase],

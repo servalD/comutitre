@@ -7,6 +7,7 @@ import { Role } from '../../../shared/enums/role.enum';
 export enum AuthProvider {
   DYNAMIC = 'dynamic',
   FRANCECONNECT = 'franceconnect',
+  LOCAL = 'local',
 }
 
 /**
