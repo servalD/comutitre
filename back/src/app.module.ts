@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { validateEnv } from './infrastructure/config/env.validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { MobilityModule } from './modules/mobility/mobility.module';
 import { UsersModule } from './modules/users/users.module';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
@@ -18,6 +19,7 @@ import { HealthController } from './health.controller';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    MobilityModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -39,7 +39,9 @@ export class AuthController {
   /** Step 1: redirect the user to FranceConnect to authenticate. */
   @Public()
   @Get('franceconnect/login')
-  @ApiOperation({ summary: 'Redirige vers FranceConnect pour authentification' })
+  @ApiOperation({
+    summary: 'Redirige vers FranceConnect pour authentification',
+  })
   login(@Res() res: Response): void {
     const { authorizationUrl } = this.franceConnectLogin.execute();
     res.redirect(authorizationUrl);
@@ -48,7 +50,9 @@ export class AuthController {
   /** Step 2: FranceConnect redirects here; we issue an app token and hand it to the front. */
   @Public()
   @Get('franceconnect/callback')
-  @ApiOperation({ summary: 'Callback FranceConnect : émet un token applicatif' })
+  @ApiOperation({
+    summary: 'Callback FranceConnect : émet un token applicatif',
+  })
   async callback(
     @Query('code') code: string,
     @Res() res: Response,
