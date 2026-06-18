@@ -303,6 +303,12 @@ export class FoundSupportCaseResponse {
   @ApiPropertyOptional({ enum: FoundSupportFinalStatus, nullable: true })
   finalStatus: FoundSupportFinalStatus | null;
 
+  @ApiPropertyOptional({ format: 'date-time', nullable: true })
+  closedAt: string | null;
+
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  closedByAgentId: string | null;
+
   @ApiProperty({ type: String, isArray: true })
   userMessage: string[];
 }
@@ -448,6 +454,8 @@ export const toFoundSupportCaseResponse = (
   notificationStrategy: item.notificationStrategy,
   pickupDeadline: item.pickupDeadline?.toISOString() ?? null,
   finalStatus: item.finalStatus,
+  closedAt: item.closedAt?.toISOString() ?? null,
+  closedByAgentId: item.closedByAgentId,
   userMessage: item.userMessage,
 });
 

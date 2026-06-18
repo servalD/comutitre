@@ -220,6 +220,8 @@ export interface FoundSupportCase {
   notificationStrategy: FoundSupportNotificationStrategy
   pickupDeadline: string | null
   finalStatus: FoundSupportFinalStatus | null
+  closedAt: string | null
+  closedByAgentId: string | null
   userMessage: string[]
 }
 

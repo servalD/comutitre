@@ -174,7 +174,14 @@ function AdminDossiersContent({ token }: { token: string }) {
       });
       setFoundClosure(result);
       setFoundCase((prev) =>
-        prev ? { ...prev, finalStatus: result.finalStatus } : prev,
+        prev
+          ? {
+              ...prev,
+              finalStatus: result.finalStatus,
+              closedAt: result.closedAt,
+              closedByAgentId: result.closedByAgentId,
+            }
+          : prev,
       );
     } catch (err) {
       setFoundError(getErrorMessage(err));

@@ -130,6 +130,10 @@ describe('CloseFoundSupportCaseUseCase', () => {
       identityCheckPerformed: true,
       withdrawalProofReference: 'proof-123',
     });
+    expect(result.closedAt).toBeInstanceOf(Date);
+    expect(result.closedByAgentId).toBe('agent-1');
+    expect(result.withdrawnAt).toBeInstanceOf(Date);
+    expect(result.withdrawnByAgentId).toBe('agent-1');
     expect(statusUpdates).toEqual([
       { id: 'support-1', status: SupportStatus.ACTIVE },
     ]);
@@ -142,8 +146,36 @@ describe('CloseFoundSupportCaseUseCase', () => {
     });
 
     expect(result.finalStatus).toBe(FoundSupportFinalStatus.NOT_CLAIMED);
+    expect(result.closedAt).toBeInstanceOf(Date);
+    expect(result.closedByAgentId).toBe('agent-1');
+    expect(result.withdrawnAt).toBeNull();
+    expect(result.withdrawnByAgentId).toBeNull();
     expect(statusUpdates).toEqual([
       { id: 'support-1', status: SupportStatus.SUPPORT_NON_RECLAME },
     ]);
+  });
+
+  it('closes a destroyed support and sets only closedAt/closedByAgentId', async () => {
+    const result = await useCase.execute(admin, 'event-1', {
+      finalStatus: FoundSupportFinalStatus.DESTROYED,
+    });
+
+    expect(result.finalStatus).toBe(FoundSupportFinalStatus.DESTROYED);
+    expect(result.closedAt).toBeInstanceOf(Date);
+    expect(result.closedByAgentId).toBe('agent-1');
+    expect(result.withdrawnAt).toBeNull();
+    expect(result.withdrawnByAgentId).toBeNull();
+  });
+
+  it('closes a sent_to_backoffice support and sets only closedAt/closedByAgentId', async () => {
+    const result = await useCase.execute(admin, 'event-1', {
+      finalStatus: FoundSupportFinalStatus.SENT_TO_BACKOFFICE,
+    });
+
+    expect(result.finalStatus).toBe(FoundSupportFinalStatus.SENT_TO_BACKOFFICE);
+    expect(result.closedAt).toBeInstanceOf(Date);
+    expect(result.closedByAgentId).toBe('agent-1');
+    expect(result.withdrawnAt).toBeNull();
+    expect(result.withdrawnByAgentId).toBeNull();
   });
 });

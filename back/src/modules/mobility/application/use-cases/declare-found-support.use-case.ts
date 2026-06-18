@@ -36,6 +36,8 @@ export interface FoundSupportCaseResult {
   notificationStrategy: FoundSupportNotificationStrategy;
   pickupDeadline: Date | null;
   finalStatus: FoundSupportFinalStatus | null;
+  closedAt: Date | null;
+  closedByAgentId: string | null;
   userMessage: string[];
 }
 
@@ -76,6 +78,8 @@ export class DeclareFoundSupportUseCase {
           FoundSupportNotificationStrategy.UNKNOWN_SUPPORT_NO_NOTIFICATION,
         pickupDeadline: null,
         finalStatus: null,
+        closedAt: null,
+        closedByAgentId: null,
         userMessage: [],
       };
     }
@@ -130,6 +134,8 @@ export class DeclareFoundSupportUseCase {
       notificationStrategy,
       pickupDeadline,
       finalStatus: null,
+      closedAt: null,
+      closedByAgentId: null,
       userMessage: USER_MESSAGE,
     };
   }
