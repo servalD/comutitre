@@ -10,7 +10,7 @@ import {
   rememberPostAuthRedirect,
   type AuthZone,
 } from '../auth/auth-zones'
-import styles from './PublicPages.module.css'
+import styles from './Login.module.css'
 
 interface LoginProps {
   zone?: AuthZone
@@ -23,6 +23,38 @@ function resolveAfterAuth(zone: AuthZone, from: string | undefined): string {
   return homeForZone(zone)
 }
 
+function MailIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="2" y="5" width="16" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M2 7l8 5.5L18 7" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function LockIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M7 9V7a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function EyeIcon({ visible }: { visible: boolean }) {
+  return visible ? (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <ellipse cx="10" cy="10" rx="7" ry="4.5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="10" cy="10" r="2" fill="currentColor" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M3 3l14 14M8.5 8.7A2 2 0 0011.3 11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M4.5 6C3 7.2 2 8.6 2 10c0 2.5 3.6 5.5 8 5.5 1.5 0 2.9-.4 4-1M16.5 13.5C17.9 12.3 18 11 18 10c0-2.5-3.6-5.5-8-5.5-.9 0-1.8.1-2.6.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export default function Login({ zone = 'mobility' }: LoginProps) {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -31,6 +63,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -73,80 +106,120 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
 
   return (
     <PublicAppFrame variant="white">
-      <main className={styles.pageLogin}>
-        <div className={styles.loginCard}>
-        <h1 className={styles.loginTitle}>Connexion</h1>
-
-        {error && (
-          <div className={styles.error} role="alert">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className={styles.form} noValidate>
-          <div className={styles.field}>
-            <label htmlFor="email" className={styles.label}>
-              Adresse e-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              className={styles.input}
-              placeholder="vous@exemple.fr"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="password" className={styles.label}>
-              Mot de passe
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className={styles.input}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button type="submit" className={styles.btnPrimary} disabled={loading}>
-            {loading && <span className={styles.spinner} aria-hidden="true" />}
-            {loading ? 'Connexion…' : 'Se connecter'}
-          </button>
-        </form>
-
-        <div className={styles.divider}>ou</div>
-
-        <button
-          type="button"
-          className={styles.btnFranceConnect}
-          onClick={handleFranceConnect}
-          disabled={loading}
-        >
+      <main className={styles.page}>
+        {/* Logo IDFM — ancré en haut */}
+        <div className={styles.logoWrap}>
           <img
-            src="/franceconnect-logo.svg"
-            alt=""
-            className={styles.fcLogo}
-            aria-hidden="true"
+            src="/images/idfm-mobilites-logo.png"
+            alt="Île-de-France Mobilités"
+            className={styles.logo}
           />
-          S&apos;identifier avec FranceConnect
-        </button>
+        </div>
 
-        <p className={styles.footer}>
-          Pas encore de compte ?{' '}
-          <Link to={registerForZone(zone)} className={styles.link}>
-            Créer un compte
-          </Link>
-        </p>
+        <div className={styles.card}>
+          <h1 className={styles.title}>Connexion</h1>
 
-        <p className={styles.legal}>
-          En vous connectant, vous acceptez les conditions générales d&apos;utilisation.
-        </p>
+          {error && (
+            <div className={styles.error} role="alert">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className={styles.form} noValidate>
+            {/* Email */}
+            <div className={styles.field}>
+              <label htmlFor="email" className={styles.label}>
+                Adresse e-mail
+              </label>
+              <div className={styles.inputWrap}>
+                <span className={styles.inputIcon}><MailIcon /></span>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className={styles.input}
+                  placeholder="exemple@email.fr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className={styles.field}>
+              <label htmlFor="password" className={styles.label}>
+                Mot de passe
+              </label>
+              <div className={styles.inputWrap}>
+                <span className={styles.inputIcon}><LockIcon /></span>
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  className={styles.input}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className={styles.eyeBtn}
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  <EyeIcon visible={showPassword} />
+                </button>
+              </div>
+            </div>
+
+            {/* Mot de passe oublié */}
+            <div className={styles.forgotRow}>
+              <a href="#" className={styles.forgotLink}>Mot de passe oublié ?</a>
+            </div>
+
+            <button type="submit" className={styles.btnPrimary} disabled={loading}>
+              {loading && <span className={styles.spinner} aria-hidden="true" />}
+              {loading ? 'Connexion…' : 'Se connecter'}
+            </button>
+          </form>
+
+          {/* Séparateur */}
+          <div className={styles.divider}><span>ou</span></div>
+
+          {/* FranceConnect */}
+          <button
+            type="button"
+            className={styles.btnFC}
+            onClick={handleFranceConnect}
+            disabled={loading}
+          >
+            <span className={styles.fcLogoWrap}>
+              <img
+                src="/images/logo-france-connect.png"
+                alt="FranceConnect"
+                className={styles.fcLogo}
+              />
+            </span>
+            <span>S&apos;identifier avec FranceConnect</span>
+          </button>
+
+          {/* Créer un compte */}
+          <p className={styles.createRow}>
+            <Link to={registerForZone(zone)} className={styles.createLink}>
+              Créer un compte <span aria-hidden="true">›</span>
+            </Link>
+          </p>
+
+          {/* CGU */}
+          <p className={styles.legal}>
+            En continuant vous acceptez les{' '}
+            <a href="https://www.comutitres.fr/cgu" className={styles.legalLink} target="_blank" rel="noopener noreferrer">
+              CGU
+            </a>
+          </p>
+
         </div>
       </main>
     </PublicAppFrame>
