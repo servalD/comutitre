@@ -57,6 +57,9 @@
 
 body {
   margin: 0;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  background: var(--color-background-tertiary, #f0f4f8);
+  color: var(--color-text-primary, #25303b);
 }
 
 h1,

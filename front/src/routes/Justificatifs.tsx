@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import MobileShell from '../components/MobileShell';
 import {
   justificatifsApi,
   JUSTIFICATIF_TYPES,
   clientStatusHint,
   type JustificatifResponse,
-  STATUS_COLORS,
   STATUS_LABELS,
 } from '../api/justificatifs';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,6 +15,13 @@ function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} o`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+}
+
+function statusBadgeClass(status: string): string {
+  if (status === 'accepte' || status === 'pre_qualifie') return styles.badgeOk;
+  if (status === 'en_cours_de_verification' || status === 'recu') return styles.badgePending;
+  if (status === 'a_revoir' || status === 'refuse') return styles.badgeFail;
+  return styles.badgeNeutral;
 }
 
 export default function Justificatifs() {
@@ -33,7 +40,7 @@ export default function Justificatifs() {
 
   const [selectedType, setSelectedType] = useState<string>(JUSTIFICATIF_TYPES[0].value);
   const fileRef = useRef<HTMLInputElement>(null);
-  const listSectionRef = useRef<HTMLElement>(null);
+  const listSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!token || !contractId) return;
@@ -58,21 +65,15 @@ export default function Justificatifs() {
     return () => clearTimeout(timer);
   }, [highlightId]);
 
-  // Rafraîchir tant qu'un document est en cours de vérification YouSign
   const hasPendingVerification = items.some(
     (j) => j.status === 'en_cours_de_verification',
   );
 
   useEffect(() => {
     if (!token || !contractId || !hasPendingVerification) return;
-
     const interval = setInterval(() => {
-      justificatifsApi
-        .list(token, contractId)
-        .then(setItems)
-        .catch(() => {});
+      justificatifsApi.list(token, contractId).then(setItems).catch(() => {});
     }, 3000);
-
     return () => clearInterval(interval);
   }, [token, contractId, hasPendingVerification]);
 
@@ -155,51 +156,61 @@ export default function Justificatifs() {
 
   if (!contractId) {
     return (
-      <div className={styles.page}>
-        <div className={styles.empty}>
-          <p>Aucun contrat sélectionné.</p>
-          <Link to="/" className={styles.btnBack}>← Tableau de bord</Link>
+      <MobileShell title="Justificatifs" activeTab="titres">
+        <div className={styles.screenBody}>
+          <div className={styles.empty}>
+            <p>Aucun contrat sélectionné.</p>
+            <Link to="/" className={styles.btnPrimary}>Retour au tableau de bord</Link>
+          </div>
         </div>
-      </div>
+      </MobileShell>
     );
   }
 
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
-        <Link to="/" className={styles.back}>← Tableau de bord</Link>
-        <h1 className={styles.title}>Mes justificatifs</h1>
-        <p className={styles.sub}>Contrat {contractId.slice(0, 8)}…</p>
-      </header>
+    <MobileShell
+      title="Justificatifs"
+      subtitle="Étape 3 sur 4"
+      step={3}
+      totalSteps={4}
+      activeTab="titres"
+      tabHrefs={{ titres: `/justificatifs?contractId=${contractId}` }}
+    >
+      <div className={styles.screenBody}>
+        <div className={styles.layoutGrid}>
+          {/* ── Upload ── */}
+          <form onSubmit={handleUpload} className={styles.uploadPanel}>
+            <p className={styles.sectionLabel}>Type de document</p>
+            <div className={styles.field}>
+              <select
+                className={styles.select}
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+              >
+                {JUSTIFICATIF_TYPES.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+            </div>
 
-      {/* Upload form */}
-      <section className={styles.card}>
-        <h2 className={styles.cardTitle}>Déposer un document</h2>
-        <form onSubmit={handleUpload} className={styles.form}>
-          <div className={styles.field}>
-            <label className={styles.label}>Type de document</label>
-            <select
-              className={styles.select}
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              {JUSTIFICATIF_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
+            <p className={styles.sectionLabel}>{selectedTypeLabel}</p>
 
-          <div className={styles.field}>
-            <label className={styles.label}>Fichier (PDF, JPEG ou PNG, 10 Mo max)</label>
-            <p className={styles.sandboxHint}>
-              La vérification automatique YouSign analyse l&apos;authenticité du document.
-              En environnement de test, seuls les fichiers nommés selon la convention YouSign
-              (ex. <code>verified_id_document_verification.pdf</code>) simulent un succès.
-            </p>
+            <div className={styles.iaCard}>
+              <span className={styles.iaIcon} aria-hidden="true">✦</span>
+              <div>
+                <p>
+                  Vérification automatique YouSign : authenticité du document et
+                  concordance des noms du porteur.
+                </p>
+                <small>
+                  Sandbox : nommez le fichier{' '}
+                  <code>verified_id_document_verification.pdf</code> pour simuler un succès.
+                </small>
+              </div>
+            </div>
+
             <div
-              className={`${styles.dropzone} ${isDragging ? styles.dropzoneDragging : ''} ${selectedFile ? styles.dropzoneHasFile : ''}`}
+              className={`${styles.docUpload} ${isDragging ? styles.docUploadDrag : ''} ${selectedFile ? styles.docUploadFilled : ''}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -214,108 +225,128 @@ export default function Justificatifs() {
               />
 
               {uploading ? (
-                <div className={styles.dropzoneUploading} aria-live="polite">
-                  <span className={styles.spinner} aria-hidden="true" />
-                  <span className={styles.dropzoneUploadingText}>Envoi en cours…</span>
-                  <span className={styles.dropzoneUploadingSub}>
-                    {selectedFile?.name}
-                  </span>
+                <div className={styles.uploadingState} aria-live="polite">
+                  <span className={styles.spinner} />
+                  <p>Envoi en cours…</p>
+                  <small>{selectedFile?.name}</small>
                 </div>
               ) : selectedFile ? (
-                <div className={styles.filePreview}>
-                  <span className={styles.filePreviewIcon} aria-hidden="true">📄</span>
-                  <div className={styles.filePreviewInfo}>
-                    <span className={styles.filePreviewName}>{selectedFile.name}</span>
-                    <span className={styles.filePreviewMeta}>
-                      {formatFileSize(selectedFile.size)} · {selectedTypeLabel}
-                    </span>
-                  </div>
+                <div className={styles.fileSelected}>
+                  <span className={styles.uploadIcon} aria-hidden="true">📄</span>
+                  <p className={styles.fileName}>{selectedFile.name}</p>
+                  <small>{formatFileSize(selectedFile.size)} · PDF, JPG ou PNG · max 10 Mo</small>
                   <button
                     type="button"
-                    className={styles.filePreviewRemove}
+                    className={styles.fileRemove}
                     onClick={(e) => { e.stopPropagation(); clearSelectedFile(); }}
-                    aria-label="Retirer le fichier"
                   >
-                    ✕
+                    Changer de fichier
                   </button>
                 </div>
               ) : (
-                <span className={styles.dropzoneHint}>
-                  Glissez-déposez ou cliquez pour choisir un fichier
-                </span>
+                <>
+                  <span className={styles.uploadIcon} aria-hidden="true">↑</span>
+                  <p>Déposer un fichier ou prendre en photo</p>
+                  <small>PDF, JPG, PNG · max 10 Mo</small>
+                </>
               )}
             </div>
-          </div>
 
-          {uploadError && (
-            <p className={styles.error} role="alert">{uploadError}</p>
-          )}
-
-          {uploadSuccess && (
-            <div className={styles.success} role="status">
-              <span className={styles.successIcon} aria-hidden="true">✓</span>
-              <div>
-                <strong>Document déposé avec succès</strong>
-                <p className={styles.successDetail}>
-                  {uploadSuccess.originalFilename} — {STATUS_LABELS[uploadSuccess.status] ?? uploadSuccess.status}
-                </p>
+            {uploadError && (
+              <div className={styles.warningCard} role="alert">
+                <span aria-hidden="true">⚠</span>
+                <p>{uploadError}</p>
               </div>
-            </div>
-          )}
+            )}
 
-          <button
-            type="submit"
-            className={styles.btnPrimary}
-            disabled={uploading || !selectedFile}
-          >
-            {uploading ? 'Envoi en cours…' : selectedFile ? 'Envoyer le document' : 'Choisir un fichier d\'abord'}
-          </button>
-        </form>
-      </section>
+            {uploadSuccess && (
+              <div className={styles.iaCardOk} role="status">
+                <span className={styles.iaIcon} aria-hidden="true">✓</span>
+                <div>
+                  <p>
+                    <strong>Document déposé</strong> — {uploadSuccess.originalFilename}
+                  </p>
+                  <small>
+                    {STATUS_LABELS[uploadSuccess.status] ?? uploadSuccess.status}
+                  </small>
+                </div>
+              </div>
+            )}
 
-      {/* List */}
-      <section className={styles.card} ref={listSectionRef}>
-        <h2 className={styles.cardTitle}>
-          Documents déposés
-          {!loading && items.length > 0 && (
-            <span className={styles.countBadge}>{items.length}</span>
-          )}
-        </h2>
-        {loading && <p className={styles.hint}>Chargement…</p>}
-        {!loading && items.length === 0 && (
-          <p className={styles.hint}>Aucun justificatif déposé pour ce contrat.</p>
-        )}
-        <ul className={styles.list}>
-          {items.map((j) => {
-            const hint = clientStatusHint(j);
-            return (
-            <li
-              key={j.id}
-              className={`${styles.item} ${highlightId === j.id ? styles.itemHighlight : ''}`}
+            <button
+              type="submit"
+              className={styles.btnPrimary}
+              disabled={uploading || !selectedFile}
             >
-              <div className={styles.itemLeft}>
-                <span className={styles.itemType}>
-                  {JUSTIFICATIF_TYPES.find((t) => t.value === j.type)?.label ?? j.type}
-                </span>
-                <span className={styles.itemFile}>{j.originalFilename}</span>
-                {hint && (
-                  <span className={styles.itemHint}>{hint}</span>
-                )}
-                {j.agentMotif && j.status !== 'a_revoir' && (
-                  <span className={styles.itemMotif}>Motif : {j.agentMotif}</span>
-                )}
+              {uploading ? 'Envoi en cours…' : 'Déposer le document →'}
+            </button>
+
+            <Link to="/" className={styles.humanLink}>
+              ← Retour au tableau de bord
+            </Link>
+          </form>
+
+          {/* ── Liste ── */}
+          <div className={styles.listPanel} ref={listSectionRef}>
+            <p className={styles.sectionLabel}>
+              Documents déposés
+              {!loading && items.length > 0 && (
+                <span className={styles.countPill}>{items.length}</span>
+              )}
+            </p>
+
+            {loading && <p className={styles.hint}>Chargement…</p>}
+
+            {!loading && items.length === 0 && (
+              <div className={styles.docUpload} style={{ cursor: 'default' }}>
+                <span className={styles.uploadIcon} aria-hidden="true">📋</span>
+                <p>Aucun justificatif pour ce contrat</p>
+                <small>Déposez votre premier document ci-contre</small>
               </div>
-              <span
-                className={styles.badge}
-                style={{ background: STATUS_COLORS[j.status] ?? '#1972D2' }}
-              >
-                {STATUS_LABELS[j.status] ?? j.status}
-              </span>
-            </li>
-            );
-          })}
-        </ul>
-      </section>
-    </div>
+            )}
+
+            <ul className={styles.docList}>
+              {items.map((j) => {
+                const hint = clientStatusHint(j);
+                const typeLabel =
+                  JUSTIFICATIF_TYPES.find((t) => t.value === j.type)?.label ?? j.type;
+                return (
+                  <li
+                    key={j.id}
+                    className={`${styles.profileCard} ${highlightId === j.id ? styles.profileCardHighlight : ''}`}
+                  >
+                    <div className={styles.docCardTop}>
+                      <span className={styles.docCardName}>{typeLabel}</span>
+                      <span className={`${styles.statusPill} ${statusBadgeClass(j.status)}`}>
+                        {STATUS_LABELS[j.status] ?? j.status}
+                      </span>
+                    </div>
+                    <p className={styles.docCardFile}>{j.originalFilename}</p>
+                    {hint && <p className={styles.docCardHint}>{hint}</p>}
+                    {j.agentMotif && j.status !== 'a_revoir' && (
+                      <p className={styles.docCardMotif}>Motif : {j.agentMotif}</p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+
+            {hasPendingVerification && (
+              <div className={styles.warningCard}>
+                <span aria-hidden="true">⏳</span>
+                <p>Analyse YouSign en cours — cette page se met à jour automatiquement.</p>
+              </div>
+            )}
+
+            <Link
+              to={`/contrat/${contractId}`}
+              className={styles.btnSecondary}
+            >
+              Passer à la signature →
+            </Link>
+          </div>
+        </div>
+      </div>
+    </MobileShell>
   );
 }

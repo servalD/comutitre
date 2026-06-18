@@ -1,0 +1,32 @@
+/* Charte Comutitres / IDFM — design tokens */
+:root {
+  --blue-idf: #64b5f6;
+  --blue-int: #1972d2;
+  --blue-focus: #0050aa;
+  --anthracite: #25303b;
+  --blue-light: #f5f9ff;
+  --blue-med: #deeeff;
+  --gray-dark: #53606e;
+  --gray-med: #dddddd;
+  --gray-light: #f0f0f0;
+  --white: #ffffff;
+  --green: #007d44;
+  --green-bg: #e7f6ee;
+  --orange: #f39224;
+  --orange-bg: #fff4e5;
+  --red: #c52625;
+  --red-bg: #fbeaea;
+
+  --color-text-primary: #25303b;
+  --color-text-secondary: #53606e;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f5f9ff;
+  --color-background-tertiary: #f0f4f8;
+  --color-border-primary: #deeeff;
+  --color-border-secondary: #c5d9f0;
+  --color-border-tertiary: #e8eef5;
+
+  --font-sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --shell-max-mobile: 480px;
+  --shell-max-desktop: 1120px;
+}
