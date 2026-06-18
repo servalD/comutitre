@@ -1,0 +1,163 @@
+.page {
+  min-height: 100vh;
+  background: #f5f9ff;
+  padding: 2rem 1.5rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 4rem;
+  color: #64b5f6;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.back {
+  color: #1972d2;
+  text-decoration: none;
+  font-size: 0.875rem;
+  flex: 1 1 100%;
+}
+.back:hover { text-decoration: underline; }
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #25303b;
+  margin: 0;
+  flex: 1;
+}
+
+.statusBadge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(37, 48, 59, 0.07);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #25303b;
+  margin: 0 0 1.25rem;
+}
+.cardHeader .cardTitle { margin: 0; }
+
+.grid { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #f5f9ff;
+  font-size: 0.9375rem;
+}
+.row span { color: #64b5f6; }
+.row strong { color: #25303b; }
+
+.hint { color: #64b5f6; font-size: 0.9rem; margin: 0; }
+
+.btnSecondary {
+  padding: 0.5rem 1rem;
+  background: #deeeff;
+  color: #1972d2;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.btnSecondary:hover { background: #c0d9f5; }
+
+.docList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.625rem; }
+
+.docItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  border: 1.5px solid #deeeff;
+  border-radius: 8px;
+  background: #f5f9ff;
+}
+
+.docName { color: #25303b; font-size: 0.875rem; }
+
+.docBadge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cgvuBox {
+  background: #f5f9ff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border-left: 4px solid #1972d2;
+}
+
+.cgvuText { color: #25303b; font-size: 0.9rem; line-height: 1.6; margin: 0 0 0.75rem; }
+.cgvuText:last-child { margin: 0; }
+
+.error {
+  color: #c52625;
+  font-size: 0.875rem;
+  background: #fff0f0;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.btnSign {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: #1972d2;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnSign:hover:not(:disabled) { background: #0050aa; }
+.btnSign:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.successBox {
+  background: #e6f7ee;
+  color: #007d44;
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+  font-weight: 600;
+  text-align: center;
+}

@@ -1,0 +1,83 @@
+.page {
+  min-height: 100vh;
+  background: #f5f9ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(37, 48, 59, 0.1);
+  padding: 3rem 2.5rem;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.loading { color: #64b5f6; font-size: 1rem; }
+
+.iconSuccess {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #007d44;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconError {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #c52625;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #25303b;
+  margin: 0;
+}
+
+.text {
+  color: #64b5f6;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.btnPrimary {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  background: #1972d2;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+.btnPrimary:hover { background: #0050aa; }
+
+.btnBack {
+  color: #1972d2;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.btnBack:hover { text-decoration: underline; }

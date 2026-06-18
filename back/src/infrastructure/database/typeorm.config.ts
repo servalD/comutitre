@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { CgvuAcceptanceOrmEntity } from '../../modules/contracts/infrastructure/cgvu-acceptance.orm-entity';
+import { ContractOrmEntity } from '../../modules/contracts/infrastructure/contract.orm-entity';
+import { JustificatifOrmEntity } from '../../modules/justificatifs/infrastructure/justificatif.orm-entity';
 import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entity';
 
 /** Read an env var, falling back to the file referenced by `<NAME>_FILE` (Docker secrets). */
@@ -31,7 +34,12 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DATABASE_NAME ?? 'comutitre',
   username: process.env.DATABASE_USER ?? 'comutitre',
   password: fromEnvOrFile('DATABASE_PASSWORD', 'comutitre'),
-  entities: [UserOrmEntity],
+  entities: [
+    UserOrmEntity,
+    ContractOrmEntity,
+    CgvuAcceptanceOrmEntity,
+    JustificatifOrmEntity,
+  ],
   migrations: [__dirname + '/migrations/*.{ts,js}'],
   synchronize: false,
 };

@@ -4,7 +4,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { validateEnv } from './infrastructure/config/env.validation';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ContractsModule } from './modules/contracts/contracts.module';
+import { JustificatifsModule } from './modules/justificatifs/justificatifs.module';
 import { UsersModule } from './modules/users/users.module';
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { RolesGuard } from './shared/guards/roles.guard';
 import { HealthController } from './health.controller';
@@ -18,6 +21,9 @@ import { HealthController } from './health.controller';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    ContractsModule,
+    JustificatifsModule,
+    WebhooksModule,
   ],
   controllers: [HealthController],
   providers: [

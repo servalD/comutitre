@@ -4,6 +4,10 @@ import Login from './routes/Login';
 import Register from './routes/Register';
 import AuthCallback from './routes/AuthCallback';
 import Dashboard from './routes/Dashboard';
+import Justificatifs from './routes/Justificatifs';
+import ContratSignature from './routes/ContratSignature';
+import SignatureCallback from './routes/SignatureCallback';
+import AdminDossiers from './routes/AdminDossiers';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { token, isLoading } = useAuth();
@@ -44,6 +48,38 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/justificatifs"
+            element={
+              <ProtectedRoute>
+                <Justificatifs />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contrat/:id"
+            element={
+              <ProtectedRoute>
+                <ContratSignature />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/signature/callback"
+            element={
+              <ProtectedRoute>
+                <SignatureCallback />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/dossiers"
+            element={
+              <ProtectedRoute>
+                <AdminDossiers />
               </ProtectedRoute>
             }
           />

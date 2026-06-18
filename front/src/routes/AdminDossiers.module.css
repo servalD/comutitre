@@ -1,0 +1,140 @@
+.page {
+  min-height: 100vh;
+  background: #f5f9ff;
+  padding: 2rem 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #25303b;
+  margin: 0;
+}
+
+.btnRefresh {
+  padding: 0.5rem 1.125rem;
+  background: #deeeff;
+  color: #1972d2;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btnRefresh:hover { background: #c0d9f5; }
+
+.error {
+  background: #fff0f0;
+  color: #c52625;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.hint { color: #64b5f6; }
+
+.empty { text-align: center; padding: 3rem; color: #64b5f6; }
+
+.list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1rem; }
+
+.item {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(37, 48, 59, 0.07);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.itemMeta { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.9rem;
+}
+
+.metaLabel { color: #64b5f6; min-width: 80px; flex-shrink: 0; font-size: 0.8125rem; }
+
+.mono { font-family: monospace; color: #25303b; }
+
+.badge {
+  padding: 0.25rem 0.625rem;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.ysStatus { color: #1972d2; font-size: 0.8125rem; font-weight: 600; }
+.ysCode { color: #25303b; font-size: 0.75rem; }
+
+.actions { display: flex; gap: 0.75rem; }
+
+.btnValidate {
+  padding: 0.5rem 1.125rem;
+  background: #007d44;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnValidate:hover:not(:disabled) { background: #005a30; }
+.btnValidate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btnRefuse {
+  padding: 0.5rem 1.125rem;
+  background: #c52625;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btnRefuse:hover:not(:disabled) { background: #9e1e1e; }
+.btnRefuse:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.motifBox { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.motifInput {
+  border: 1.5px solid #deeeff;
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9rem;
+  color: #25303b;
+  background: #f5f9ff;
+  outline: none;
+  resize: vertical;
+}
+.motifInput:focus { border-color: #1972d2; }
+
+.motifActions { display: flex; gap: 0.75rem; }
+
+.btnCancel {
+  padding: 0.5rem 1.125rem;
+  background: #deeeff;
+  color: #25303b;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btnCancel:hover { background: #c0d9f5; }

@@ -60,6 +60,15 @@ export const envSchema = z.object({
   FRANCECONNECT_REDIRECT_URI: z
     .string()
     .default('http://localhost:3000/auth/franceconnect/callback'),
+
+  // YouSign API v3
+  YOUSIGN_API_KEY: z.string().default(''),
+  YOUSIGN_BASE_URL: z
+    .string()
+    .url()
+    .default('https://api-sandbox.yousign.app/v3'),
+  YOUSIGN_WEBHOOK_SECRET: z.string().default(''),
+  YOUSIGN_DELIVERY_MODE: z.enum(['email', 'none']).default('none'),
 });
 
 export type Env = z.infer<typeof envSchema>;

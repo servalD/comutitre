@@ -34,6 +34,8 @@ services:
       - '5173:5173'
     environment:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      # Override .env.local to use real auth in Docker
+      VITE_MOCK_AUTH: 'false'
     env_file:
       - ../front/.env.example
     tty: true
@@ -53,6 +55,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: comutitre_ngrok_dev
+    command: http back:3000 --log=stdout
+    env_file:
+      - ../.env.dev
+    ports:
+      - '4040:4040'
+    depends_on:
+      - back
 
 volumes:
   postgres_dev_data:

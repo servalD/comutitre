@@ -2,6 +2,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Env } from '../config/env.validation';
+import { CgvuAcceptanceOrmEntity } from '../../modules/contracts/infrastructure/cgvu-acceptance.orm-entity';
+import { ContractOrmEntity } from '../../modules/contracts/infrastructure/contract.orm-entity';
+import { JustificatifOrmEntity } from '../../modules/justificatifs/infrastructure/justificatif.orm-entity';
 import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entity';
 
 @Module({
@@ -16,7 +19,12 @@ import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entit
         database: config.get('DATABASE_NAME', { infer: true }),
         username: config.get('DATABASE_USER', { infer: true }),
         password: config.get('DATABASE_PASSWORD', { infer: true }),
-        entities: [UserOrmEntity],
+        entities: [
+          UserOrmEntity,
+          ContractOrmEntity,
+          CgvuAcceptanceOrmEntity,
+          JustificatifOrmEntity,
+        ],
         migrations: [__dirname + '/migrations/*.{ts,js}'],
         // Never auto-sync schema: migrations are the single source of truth.
         synchronize: false,

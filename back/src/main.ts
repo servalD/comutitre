@@ -6,7 +6,7 @@ import { AppModule } from './app.module';
 import { Env } from './infrastructure/config/env.validation';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   const config = app.get(ConfigService<Env, true>);
 
   app.useGlobalPipes(

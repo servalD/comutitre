@@ -1,20 +1,9 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { contractsApi, type ContractResponse } from '../api/contracts';
 import { useAuth } from '../contexts/AuthContext';
+
 import styles from './Dashboard.module.css';
-
-const RENEWAL_DATE = new Date('2026-09-01').getTime();
-const NOW = new Date('2026-06-17').getTime();
-const DAYS_TO_RENEWAL = Math.ceil((RENEWAL_DATE - NOW) / 86_400_000);
-
-const MOCK_CONTRACT = {
-  id: 'CTR-2024-084521',
-  produit: 'Navigo Annuel',
-  zones: '1 – 5',
-  statut: 'Actif',
-  dateDebut: '01/09/2025',
-  dateRenouvellement: '01/09/2026',
-  prochainPrelevement: { date: '28/06/2026', montant: '86,40 €' },
-  support: { type: 'Passe Navigo physique', ref: '****  4521', statut: 'Valide' },
-};
 
 const MOCK_ACTIVITE = [
   { id: 1, icon: '✔', label: 'Renouvellement automatique programmé', date: '15 juin 2026', type: 'success' },
@@ -23,12 +12,81 @@ const MOCK_ACTIVITE = [
   { id: 4, icon: '✔', label: 'Abonnement activé', date: '01 sept. 2025', type: 'success' },
 ];
 
-const MOCK_ALERTES = [
-  { id: 1, label: 'Votre renouvellement approche dans 76 jours.', type: 'warning' },
-];
+const PRODUCT_LABELS: Record<string, string> = {
+  navigo_annuel: 'Navigo Annuel',
+  navigo_annuel_senior: 'Navigo Senior',
+  imagine_r_scolaire: 'Imagine R Scolaire',
+  imagine_r_junior: 'Imagine R Junior',
+  imagine_r_etudiant: 'Imagine R Étudiant',
+  navigo_liberte_plus: 'Navigo Liberté+',
+  tst: 'TST',
+  amethyste: 'Améthyste',
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  actif: '#007D44',
+  en_attente_de_justificatif: '#F39224',
+  en_attente_de_validation_documentaire: '#F39224',
+  en_attente_de_signature_payeur: '#1972D2',
+  signature_en_cours: '#1972D2',
+  brouillon: '#64B5F6',
+  suspendu: '#C52625',
+  resilie: '#C52625',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  actif: 'Actif',
+  en_attente_de_justificatif: 'En attente de justificatifs',
+  en_attente_de_validation_documentaire: 'En attente de validation',
+  en_attente_de_signature_payeur: 'À signer',
+  signature_en_cours: 'Signature en cours',
+  brouillon: 'Brouillon',
+  suspendu: 'Suspendu',
+  resilie: 'Résilié',
+};
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
+  const [contracts, setContracts] = useState<ContractResponse[]>([]);
+  const [showNewContract, setShowNewContract] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    productCode: 'navigo_annuel',
+    holderFirstName: '',
+    holderLastName: '',
+    holderEmail: '',
+  });
+
+  useEffect(() => {
+    if (user?.email) setForm((f) => ({ ...f, holderEmail: f.holderEmail || user.email! }));
+  }, [user?.email]);
+
+  useEffect(() => {
+    if (!token) return;
+    contractsApi.list(token).then(setContracts).catch(() => {});
+  }, [token]);
+
+  async function handleCreateContract(e: React.FormEvent) {
+    e.preventDefault();
+    if (!token) return;
+    setCreating(true);
+    setCreateError(null);
+    try {
+      const c = await contractsApi.create(token, {
+        productCode: form.productCode,
+        holderFirstName: form.holderFirstName,
+        holderLastName: form.holderLastName,
+        holderEmail: form.holderEmail || (user?.email ?? ''),
+      });
+      setContracts((prev) => [c, ...prev]);
+      setShowNewContract(false);
+    } catch (err) {
+      setCreateError(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setCreating(false);
+    }
+  }
 
   const initials = user?.displayName
     ? user.displayName
@@ -38,8 +96,6 @@ export default function Dashboard() {
         .toUpperCase()
         .slice(0, 2)
     : '?';
-
-  const days = DAYS_TO_RENEWAL;
 
   return (
     <div className={styles.layout}>
@@ -81,7 +137,10 @@ export default function Dashboard() {
             </svg>
             Assistance SAV
           </a>
-          <a className={styles.navItem} href="#">
+          <Link
+            className={styles.navItem}
+            to={contracts[0] ? `/justificatifs?contractId=${contracts[0].id}` : '/justificatifs'}
+          >
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M20 12V22H4V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M22 7H2v5h20V7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -90,13 +149,24 @@ export default function Dashboard() {
               <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Justificatifs
-          </a>
+          </Link>
           <a className={styles.navItem} href="#">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Mon compte
           </a>
+          {user?.roles?.includes('ADMIN') && (
+            <Link className={styles.navItem} to="/admin/dossiers">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+                <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+              </svg>
+              Back-office
+            </Link>
+          )}
         </nav>
 
         <div className={styles.sidebarUser}>
@@ -136,98 +206,181 @@ export default function Dashboard() {
           </div>
         </header>
 
-        {/* Alertes */}
-        {MOCK_ALERTES.map((a) => (
-          <div key={a.id} className={`${styles.alert} ${styles[`alert_${a.type}`]}`}>
+        {/* Alertes dynamiques */}
+        {contracts.some((c) => c.status === 'en_attente_de_justificatif') && (
+          <div className={`${styles.alert} ${styles.alert_warning}`}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
               <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <circle cx="12" cy="16" r="1" fill="currentColor"/>
             </svg>
-            {a.label}
+            Un ou plusieurs contrats nécessitent des justificatifs.
           </div>
-        ))}
+        )}
+        {contracts.some((c) => c.status === 'en_attente_de_signature_payeur') && (
+          <div className={`${styles.alert} ${styles.alert_warning}`}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+              <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="12" cy="16" r="1" fill="currentColor"/>
+            </svg>
+            Un ou plusieurs contrats sont en attente de signature.
+          </div>
+        )}
 
         {/* KPI row */}
         <div className={styles.kpiRow}>
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Statut abonnement</span>
+            <span className={styles.kpiLabel}>Contrats actifs</span>
             <span className={`${styles.kpiValue} ${styles.kpiGreen}`}>
-              <span className={styles.dot} /> {MOCK_CONTRACT.statut}
+              <span className={styles.dot} /> {contracts.filter((c) => c.status === 'actif').length}
             </span>
           </div>
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Prochain prélèvement</span>
-            <span className={styles.kpiValue}>{MOCK_CONTRACT.prochainPrelevement.montant}</span>
-            <span className={styles.kpiSub}>le {MOCK_CONTRACT.prochainPrelevement.date}</span>
-          </div>
-          <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Renouvellement dans</span>
-            <span className={styles.kpiValue}>{days} jours</span>
-            <span className={styles.kpiSub}>{MOCK_CONTRACT.dateRenouvellement}</span>
-          </div>
-          <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Support physique</span>
-            <span className={`${styles.kpiValue} ${styles.kpiGreen}`}>
-              <span className={styles.dot} /> {MOCK_CONTRACT.support.statut}
+            <span className={styles.kpiLabel}>En attente</span>
+            <span className={styles.kpiValue} style={{ color: '#F39224' }}>
+              {contracts.filter((c) => c.status.startsWith('en_attente')).length}
             </span>
-            <span className={styles.kpiSub}>{MOCK_CONTRACT.support.ref}</span>
+          </div>
+          <div className={styles.kpiCard}>
+            <span className={styles.kpiLabel}>À signer</span>
+            <span className={styles.kpiValue} style={{ color: '#1972D2' }}>
+              {contracts.filter((c) => c.status === 'en_attente_de_signature_payeur' || c.status === 'signature_en_cours').length}
+            </span>
+          </div>
+          <div className={styles.kpiCard}>
+            <span className={styles.kpiLabel}>Total contrats</span>
+            <span className={styles.kpiValue}>{contracts.length}</span>
           </div>
         </div>
 
         {/* Content row */}
         <div className={styles.contentRow}>
-          {/* Carte abonnement */}
+          {/* Contrats réels */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Mon abonnement</h2>
-            <div className={styles.navigoCard}>
-              <div className={styles.navigoCardHeader}>
-                <div>
-                  <div className={styles.navigoCardProduct}>{MOCK_CONTRACT.produit}</div>
-                  <div className={styles.navigoCardZones}>Zones {MOCK_CONTRACT.zones}</div>
-                </div>
-                <span className={styles.statusBadge}>Actif</span>
-              </div>
-              <div className={styles.navigoCardChip} aria-hidden="true" />
-              <div className={styles.navigoCardRef}>{MOCK_CONTRACT.support.ref}</div>
-              <div className={styles.navigoCardFooter}>
-                <div>
-                  <div className={styles.navigoCardFooterLabel}>Début</div>
-                  <div className={styles.navigoCardFooterValue}>{MOCK_CONTRACT.dateDebut}</div>
-                </div>
-                <div>
-                  <div className={styles.navigoCardFooterLabel}>Renouvellement</div>
-                  <div className={styles.navigoCardFooterValue}>{MOCK_CONTRACT.dateRenouvellement}</div>
-                </div>
-                <div>
-                  <div className={styles.navigoCardFooterLabel}>N° contrat</div>
-                  <div className={styles.navigoCardFooterValue}>{MOCK_CONTRACT.id}</div>
-                </div>
-              </div>
+            <div className={styles.newContractHeader}>
+              <h2 className={styles.sectionTitle}>Mes contrats</h2>
+              <button
+                type="button"
+                className={styles.newContractToggle}
+                onClick={() => setShowNewContract((v) => !v)}
+              >
+                + Nouveau contrat
+              </button>
             </div>
 
-            <div className={styles.quickActions}>
-              <button className={styles.quickActionBtn}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Renouveler
-              </button>
-              <button className={styles.quickActionBtn}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Contacter le SAV
-              </button>
-              <button className={styles.quickActionBtn}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
-                </svg>
-                Passe perdu/volé
-              </button>
-            </div>
+            {showNewContract && (
+              <form onSubmit={handleCreateContract} className={styles.newContractForm}>
+                <div className={styles.newContractField}>
+                  <label htmlFor="productCode" className={styles.newContractLabel}>
+                    Type de forfait
+                  </label>
+                  <select
+                    id="productCode"
+                    className={styles.newContractSelect}
+                    value={form.productCode}
+                    onChange={(e) => setForm((f) => ({ ...f, productCode: e.target.value }))}
+                  >
+                    {Object.entries(PRODUCT_LABELS).map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.newContractRow}>
+                  <div className={styles.newContractField}>
+                    <label htmlFor="holderFirstName" className={styles.newContractLabel}>
+                      Prénom du porteur
+                    </label>
+                    <input
+                      id="holderFirstName"
+                      required
+                      className={styles.newContractInput}
+                      placeholder="Prénom"
+                      value={form.holderFirstName}
+                      onChange={(e) => setForm((f) => ({ ...f, holderFirstName: e.target.value }))}
+                    />
+                  </div>
+                  <div className={styles.newContractField}>
+                    <label htmlFor="holderLastName" className={styles.newContractLabel}>
+                      Nom du porteur
+                    </label>
+                    <input
+                      id="holderLastName"
+                      required
+                      className={styles.newContractInput}
+                      placeholder="Nom"
+                      value={form.holderLastName}
+                      onChange={(e) => setForm((f) => ({ ...f, holderLastName: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.newContractField}>
+                  <label htmlFor="holderEmail" className={styles.newContractLabel}>
+                    E-mail du porteur
+                  </label>
+                  <input
+                    id="holderEmail"
+                    required
+                    type="email"
+                    className={styles.newContractInput}
+                    placeholder="email@exemple.fr"
+                    value={form.holderEmail}
+                    onChange={(e) => setForm((f) => ({ ...f, holderEmail: e.target.value }))}
+                  />
+                </div>
+
+                {createError && (
+                  <p className={styles.newContractError}>{createError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className={styles.newContractSubmit}
+                >
+                  {creating ? 'Création…' : 'Créer le contrat'}
+                </button>
+              </form>
+            )}
+
+            {contracts.length === 0 ? (
+              <p style={{ color: '#64b5f6', fontSize: '0.9rem' }}>Aucun contrat. Cliquez sur « + Nouveau contrat » pour commencer.</p>
+            ) : (
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {contracts.map((c) => (
+                  <li key={c.id} className={styles.navigoCard} style={{ padding: '1rem 1.25rem' }}>
+                    <div className={styles.navigoCardHeader}>
+                      <div>
+                        <div className={styles.navigoCardProduct}>{PRODUCT_LABELS[c.productCode] ?? c.productCode}</div>
+                        <div className={styles.navigoCardZones} style={{ fontSize: '0.8rem', marginTop: 2 }}>{c.id.slice(0, 8)}…</div>
+                      </div>
+                      <span
+                        className={styles.statusBadge}
+                        style={{ background: STATUS_COLORS[c.status] ?? '#1972D2' }}
+                      >
+                        {STATUS_LABELS[c.status] ?? c.status}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.875rem', flexWrap: 'wrap' }}>
+                      <Link
+                        to={`/contrat/${c.id}`}
+                        style={{ padding: '0.4rem 0.875rem', background: '#1972D2', color: '#fff', borderRadius: 6, textDecoration: 'none', fontSize: '0.8125rem', fontWeight: 600 }}
+                      >
+                        Voir le dossier
+                      </Link>
+                      <Link
+                        to={`/justificatifs?contractId=${c.id}`}
+                        style={{ padding: '0.4rem 0.875rem', background: '#deeeff', color: '#1972D2', borderRadius: 6, textDecoration: 'none', fontSize: '0.8125rem', fontWeight: 600 }}
+                      >
+                        Justificatifs
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Activité récente */}
