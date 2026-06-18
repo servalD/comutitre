@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
+import {
+  IsDateString,
+  IsEmail,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { normalizeLocalEmailValue } from '../local-email';
 
 export class RegisterRequest {
@@ -15,6 +21,10 @@ export class RegisterRequest {
   @MinLength(1)
   @MaxLength(50)
   lastName: string;
+
+  @ApiProperty({ example: '1990-03-15', format: 'date' })
+  @IsDateString()
+  birthDate: string;
 
   @ApiProperty({ example: 'marie.dupont@example.com' })
   @Transform(({ value }) => normalizeLocalEmailValue(value))

@@ -12,4 +12,8 @@ export interface ExternalIdentity {
   email: string | null;
   walletAddress: string | null;
   displayName: string | null;
+  givenName?: string | null;
+  familyName?: string | null;
+  /** ISO date (YYYY-MM-DD) when the provider exposes it (e.g. FranceConnect). */
+  birthDate?: string | null;
 }

@@ -22,6 +22,7 @@ import { ListDocumentsUseCase } from './application/use-cases/list-documents.use
 import { ListMyIdentitiesUseCase } from './application/use-cases/list-my-identities.use-case';
 import { ListSupportsUseCase } from './application/use-cases/list-supports.use-case';
 import { RevokeRelationshipUseCase } from './application/use-cases/revoke-relationship.use-case';
+import { ProvisionOwnerMobilityIdentityUseCase } from './application/use-cases/provision-owner-mobility-identity.use-case';
 import { UpdateMobilityIdentityUseCase } from './application/use-cases/update-mobility-identity.use-case';
 import { ContractOrmEntity } from './infrastructure/contract.orm-entity';
 import { DocumentOrmEntity } from './infrastructure/document.orm-entity';
@@ -82,6 +83,8 @@ import { MobilityController } from './presentation/mobility.controller';
     CreateSupportUseCase,
     ListSupportsUseCase,
     GetTimelineUseCase,
+    ProvisionOwnerMobilityIdentityUseCase,
   ],
+  exports: [ProvisionOwnerMobilityIdentityUseCase],
 })
 export class MobilityModule {}

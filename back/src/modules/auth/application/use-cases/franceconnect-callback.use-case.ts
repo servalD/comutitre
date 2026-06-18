@@ -1,5 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { ProvisionOwnerMobilityIdentityUseCase } from '../../../mobility/application/use-cases/provision-owner-mobility-identity.use-case';
 import { SyncUserUseCase } from '../../../users/application/use-cases/sync-user.use-case';
+import { ownerIdentityInputFromExternalIdentity } from '../owner-identity-from-auth';
 import { FranceConnectService } from '../../infrastructure/franceconnect.service';
 import { AppJwtService } from '../../infrastructure/app-jwt.service';
 
@@ -21,10 +23,13 @@ export interface FranceConnectCallbackInput {
  */
 @Injectable()
 export class FranceConnectCallbackUseCase {
+  private readonly logger = new Logger(FranceConnectCallbackUseCase.name);
+
   constructor(
     private readonly franceConnect: FranceConnectService,
     private readonly syncUser: SyncUserUseCase,
     private readonly appJwtService: AppJwtService,
+    private readonly provisionOwnerIdentity: ProvisionOwnerMobilityIdentityUseCase,
   ) {}
 
   async execute(
@@ -48,6 +53,16 @@ export class FranceConnectCallbackUseCase {
       walletAddress: identity.walletAddress,
       displayName: identity.displayName,
     });
+
+    const ownerInput = ownerIdentityInputFromExternalIdentity(identity);
+    if (ownerInput) {
+      await this.provisionOwnerIdentity.execute(user, ownerInput);
+    } else {
+      this.logger.warn(
+        `Skipping owner mobility identity for account ${user.id}: missing birth date from provider`,
+      );
+    }
+
     const accessToken = await this.appJwtService.sign(identity);
     return { accessToken, userId: user.id };
   }

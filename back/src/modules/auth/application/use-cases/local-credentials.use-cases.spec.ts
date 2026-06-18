@@ -1,4 +1,5 @@
 import { ConflictException } from '@nestjs/common';
+import { ProvisionOwnerMobilityIdentityUseCase } from '../../../mobility/application/use-cases/provision-owner-mobility-identity.use-case';
 import { AppJwtService } from '../../infrastructure/app-jwt.service';
 import { InMemoryUserRepository } from '../../../users/infrastructure/in-memory-user.repository';
 import { LoginWithCredentialsUseCase } from './login-with-credentials.use-case';
@@ -12,12 +13,20 @@ const createUseCases = () => {
   const appJwtService = {
     sign,
   } as unknown as AppJwtService;
+  const provisionOwnerIdentity = {
+    execute: jest.fn().mockResolvedValue({ id: 'identity-1' }),
+  } as unknown as ProvisionOwnerMobilityIdentityUseCase;
 
   return {
     userRepository,
     sign,
     appJwtService,
-    registerUseCase: new RegisterUseCase(userRepository, appJwtService),
+    provisionOwnerIdentity,
+    registerUseCase: new RegisterUseCase(
+      userRepository,
+      appJwtService,
+      provisionOwnerIdentity,
+    ),
     loginUseCase: new LoginWithCredentialsUseCase(
       userRepository,
       appJwtService,
@@ -32,6 +41,7 @@ describe('local credentials auth use cases', () => {
     const result = await registerUseCase.execute({
       firstName: 'Marie',
       lastName: 'Dupont',
+      birthDate: '1990-03-15',
       email: '  Marie.Dupont@Example.FR  ',
       password: 'MotDePasse123!',
     });
@@ -59,6 +69,7 @@ describe('local credentials auth use cases', () => {
     await registerUseCase.execute({
       firstName: 'Marie',
       lastName: 'Dupont',
+      birthDate: '1990-03-15',
       email: 'marie.dupont@example.fr',
       password: 'MotDePasse123!',
     });
@@ -67,6 +78,7 @@ describe('local credentials auth use cases', () => {
       registerUseCase.execute({
         firstName: 'Marie',
         lastName: 'Dupont',
+        birthDate: '1990-03-15',
         email: '  MARIE.DUPONT@EXAMPLE.FR  ',
         password: 'AutreMotDePasse123!',
       }),
@@ -79,6 +91,7 @@ describe('local credentials auth use cases', () => {
     await registerUseCase.execute({
       firstName: 'Marie',
       lastName: 'Dupont',
+      birthDate: '1990-03-15',
       email: 'marie.dupont@example.fr',
       password: 'MotDePasse123!',
     });

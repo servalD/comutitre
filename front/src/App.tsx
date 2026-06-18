@@ -4,6 +4,7 @@ import { AppShell } from './components/layout/AppShell'
 import Login from './routes/Login'
 import Register from './routes/Register'
 import AuthCallback from './routes/AuthCallback'
+import Dashboard from './routes/Dashboard'
 import { AddIdentityPage } from './pages/mobility/AddIdentityPage'
 import { IdentityDetailPage } from './pages/mobility/IdentityDetailPage'
 import { MobilityHubPage } from './pages/mobility/MobilityHubPage'
@@ -13,7 +14,9 @@ function ProtectedRoute() {
   const { token, isLoading } = useAuth()
   const location = useLocation()
 
-  if (isLoading) return null
+  if (isLoading) {
+    return <p style={{ padding: '2rem', textAlign: 'center' }}>Chargement…</p>
+  }
   if (!token) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />
   }
@@ -24,7 +27,9 @@ function ProtectedRoute() {
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { token, isLoading } = useAuth()
 
-  if (isLoading) return null
+  if (isLoading) {
+    return <p style={{ padding: '2rem', textAlign: 'center' }}>Chargement…</p>
+  }
   if (token) {
     return <Navigate to="/mobility" replace />
   }
@@ -62,6 +67,7 @@ export default function App() {
           />
 
           <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route element={<AppShell />}>
               <Route path="/" element={<Navigate to="/mobility" replace />} />
               <Route path="/mobility" element={<MobilityHubPage />} />

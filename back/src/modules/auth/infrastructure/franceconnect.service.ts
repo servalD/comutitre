@@ -142,6 +142,7 @@ export class FranceConnectService {
       email?: string;
       given_name?: string;
       family_name?: string;
+      birthdate?: string;
     };
 
     return {
@@ -151,6 +152,9 @@ export class FranceConnectService {
       walletAddress: null,
       displayName:
         [info.given_name, info.family_name].filter(Boolean).join(' ') || null,
+      givenName: info.given_name ?? null,
+      familyName: info.family_name ?? null,
+      birthDate: info.birthdate ?? null,
     };
   }
 
@@ -179,7 +183,10 @@ export class FranceConnectService {
       subject: `${subjectPrefix}-${code.slice(-12)}`,
       email: 'mock.user@franceconnect.test',
       walletAddress: null,
-      displayName: 'Mock FranceConnect User',
+      displayName: 'Marie Dupont',
+      givenName: 'Marie',
+      familyName: 'Dupont',
+      birthDate: '1990-03-15',
     };
   }
 }

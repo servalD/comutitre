@@ -1,4 +1,4 @@
-const TOKEN_KEY = 'comutitre_access_token'
+const TOKEN_KEY = 'comutitre_token'
 
 export const tokenStorage = {
   get(): string | null {

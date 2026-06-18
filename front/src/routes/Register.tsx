@@ -10,6 +10,7 @@ export default function Register() {
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -34,6 +35,7 @@ export default function Register() {
       const { accessToken } = await authApi.register({
         firstName,
         lastName,
+        birthDate,
         email,
         password,
       });
@@ -123,6 +125,21 @@ export default function Register() {
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="birthDate" className={styles.label}>
+              Date de naissance
+            </label>
+            <input
+              id="birthDate"
+              type="date"
+              autoComplete="bday"
+              required
+              className={styles.input}
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+            />
           </div>
 
           <div className={styles.field}>

@@ -77,6 +77,7 @@ describe('Auth & RBAC (e2e)', () => {
       .send({
         firstName: 'Marie',
         lastName: 'Dupont',
+        birthDate: '1990-03-15',
         email: '  Marie.Dupont@Example.FR  ',
         password: 'MotDePasse123!',
       })
@@ -85,6 +86,29 @@ describe('Auth & RBAC (e2e)', () => {
     expect(
       typeof (register.body as { accessToken?: unknown }).accessToken,
     ).toBe('string');
+
+    const token = (register.body as { accessToken: string }).accessToken;
+
+    const identities = await request(app.getHttpServer())
+      .get('/users/me/identities')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const list = identities.body as Array<{
+      firstName: string;
+      lastName: string;
+      relationships: Array<{ relationshipType: string }>;
+    }>;
+    expect(list).toHaveLength(1);
+    expect(list[0]).toMatchObject({
+      firstName: 'Marie',
+      lastName: 'Dupont',
+    });
+    expect(list[0].relationships).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ relationshipType: 'owner' }),
+      ]),
+    );
 
     const login = await request(app.getHttpServer())
       .post('/auth/login')

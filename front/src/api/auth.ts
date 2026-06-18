@@ -18,6 +18,7 @@ export interface UserResponse {
 export interface RegisterPayload {
   firstName: string;
   lastName: string;
+  birthDate: string;
   email: string;
   password: string;
 }

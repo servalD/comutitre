@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom'
-import { useAuth } from '../../auth/use-auth'
+import { Link, NavLink } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '../ui/Button'
 import styles from './Header.module.css'
 
 export function Header() {
-  const { isAuthenticated, clearToken } = useAuth()
+  const { token, logout } = useAuth()
 
   return (
     <header className={styles.header}>
@@ -15,14 +15,34 @@ export function Header() {
           </span>
           <span>
             <strong>Comutitres</strong>
-            <small>Mobilité</small>
+            <small>Espace client</small>
           </span>
         </Link>
 
-        {isAuthenticated ? (
-          <Button variant="ghost" onClick={clearToken}>
-            Déconnexion
-          </Button>
+        {token ? (
+          <div className={styles.actions}>
+            <nav className={styles.nav} aria-label="Navigation principale">
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  [styles.navLink, isActive ? styles.navLinkActive : ''].filter(Boolean).join(' ')
+                }
+              >
+                Tableau de bord
+              </NavLink>
+              <NavLink
+                to="/mobility"
+                className={({ isActive }) =>
+                  [styles.navLink, isActive ? styles.navLinkActive : ''].filter(Boolean).join(' ')
+                }
+              >
+                Mobilité
+              </NavLink>
+            </nav>
+            <Button variant="ghost" onClick={logout}>
+              Déconnexion
+            </Button>
+          </div>
         ) : null}
       </div>
     </header>

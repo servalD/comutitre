@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './Dashboard.module.css';
 
@@ -58,13 +59,32 @@ export default function Dashboard() {
         </div>
 
         <nav className={styles.sidebarNav}>
-          <a className={`${styles.navItem} ${styles.navItemActive}`} href="#">
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              [styles.navItem, isActive ? styles.navItemActive : ''].filter(Boolean).join(' ')
+            }
+          >
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Tableau de bord
-          </a>
+          </NavLink>
+          <NavLink
+            to="/mobility"
+            className={({ isActive }) =>
+              [styles.navItem, isActive ? styles.navItemActive : ''].filter(Boolean).join(' ')
+            }
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Mobilité
+          </NavLink>
           <a className={styles.navItem} href="#">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>

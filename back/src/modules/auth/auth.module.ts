@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { Env } from '../../infrastructure/config/env.validation';
+import { MobilityModule } from '../mobility/mobility.module';
 import { UsersModule } from '../users/users.module';
 import { TokenVerifier } from './application/ports/token-verifier.port';
 import { AuthenticateBearerUseCase } from './application/use-cases/authenticate-bearer.use-case';
@@ -19,6 +20,7 @@ import { FranceConnectPublicCallbackController } from './presentation/franceconn
 @Module({
   imports: [
     UsersModule,
+    MobilityModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
