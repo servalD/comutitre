@@ -6,14 +6,12 @@
  */
 export class Mistral {
   embeddings = {
-    create: async () => {
-      throw new Error('Mistral SDK is stubbed in tests');
-    },
+    create: () => Promise.reject(new Error('Mistral SDK is stubbed in tests')),
   };
   chat = {
-    stream: async () => {
-      throw new Error('Mistral SDK is stubbed in tests');
-    },
+    stream: () => Promise.reject(new Error('Mistral SDK is stubbed in tests')),
   };
-  constructor(_opts?: unknown) {}
+  constructor(_opts?: unknown) {
+    void _opts;
+  }
 }
