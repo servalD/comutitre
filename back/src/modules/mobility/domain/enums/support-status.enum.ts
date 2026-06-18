@@ -6,4 +6,5 @@ export enum SupportStatus {
   REPLACED = 'replaced',
   EXPIRED = 'expired',
   PENDING_ACTIVATION = 'pending_activation',
+  SUPPORT_NON_RECLAME = 'support_non_reclame',
 }

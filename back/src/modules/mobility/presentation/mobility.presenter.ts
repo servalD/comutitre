@@ -2,6 +2,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Address } from '../domain/address';
 import { Contract } from '../domain/contract';
 import { Document } from '../domain/document';
+import { FoundSupportCaseResult } from '../application/use-cases/declare-found-support.use-case';
+import { FoundSupportClosureResult } from '../application/use-cases/close-found-support-case.use-case';
+import { FoundSupportDecision } from '../domain/enums/found-support-decision.enum';
+import { FoundSupportFinalStatus } from '../domain/enums/found-support-final-status.enum';
+import { FoundSupportNotificationStrategy } from '../domain/enums/found-support-notification-strategy.enum';
 import { IdentityStatus } from '../domain/enums/identity-status.enum';
 import { Profile } from '../domain/enums/profile.enum';
 import { RelationshipType } from '../domain/enums/relationship-type.enum';
@@ -258,6 +263,88 @@ export class TimelineEventResponse {
   createdAt: string;
 }
 
+export class FoundSupportCaseResponse {
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  id: string | null;
+
+  @ApiProperty()
+  supportId: string;
+
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  mobilityIdentityId: string | null;
+
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  contractId: string | null;
+
+  @ApiProperty()
+  agencyId: string;
+
+  @ApiProperty({ format: 'date-time' })
+  receivedAt: string;
+
+  @ApiProperty({ format: 'uuid' })
+  agentId: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  supportStatus: string | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  holderMaskedName: string | null;
+
+  @ApiProperty({ enum: FoundSupportDecision })
+  decision: FoundSupportDecision;
+
+  @ApiProperty({ enum: FoundSupportNotificationStrategy })
+  notificationStrategy: FoundSupportNotificationStrategy;
+
+  @ApiPropertyOptional({ format: 'date-time', nullable: true })
+  pickupDeadline: string | null;
+
+  @ApiPropertyOptional({ enum: FoundSupportFinalStatus, nullable: true })
+  finalStatus: FoundSupportFinalStatus | null;
+
+  @ApiProperty({ type: String, isArray: true })
+  userMessage: string[];
+}
+
+export class FoundSupportClosureResponse {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  supportFoundEventId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  supportId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  mobilityIdentityId: string;
+
+  @ApiProperty({ enum: FoundSupportFinalStatus })
+  finalStatus: FoundSupportFinalStatus;
+
+  @ApiProperty({ format: 'date-time' })
+  closedAt: string;
+
+  @ApiProperty({ format: 'uuid' })
+  closedByAgentId: string;
+
+  @ApiPropertyOptional({ format: 'date-time', nullable: true })
+  withdrawnAt: string | null;
+
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  withdrawnByAgentId: string | null;
+
+  @ApiProperty()
+  identityCheckPerformed: boolean;
+
+  @ApiPropertyOptional({ nullable: true })
+  withdrawalProofReference: string | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  supportStatusAfterClosure: string | null;
+}
+
 export const toMobilityIdentityResponse = (
   identity: MobilityIdentity,
 ): MobilityIdentityResponse => ({
@@ -343,4 +430,40 @@ export const toTimelineEventResponse = (
   type: event.type,
   metadata: event.metadata,
   createdAt: event.createdAt.toISOString(),
+});
+
+export const toFoundSupportCaseResponse = (
+  item: FoundSupportCaseResult,
+): FoundSupportCaseResponse => ({
+  id: item.id,
+  supportId: item.supportId,
+  mobilityIdentityId: item.mobilityIdentityId,
+  contractId: item.contractId,
+  agencyId: item.agencyId,
+  receivedAt: item.receivedAt.toISOString(),
+  agentId: item.agentId,
+  supportStatus: item.supportStatus,
+  holderMaskedName: item.holderMaskedName,
+  decision: item.decision,
+  notificationStrategy: item.notificationStrategy,
+  pickupDeadline: item.pickupDeadline?.toISOString() ?? null,
+  finalStatus: item.finalStatus,
+  userMessage: item.userMessage,
+});
+
+export const toFoundSupportClosureResponse = (
+  item: FoundSupportClosureResult,
+): FoundSupportClosureResponse => ({
+  id: item.id,
+  supportFoundEventId: item.supportFoundEventId,
+  supportId: item.supportId,
+  mobilityIdentityId: item.mobilityIdentityId,
+  finalStatus: item.finalStatus,
+  closedAt: item.closedAt.toISOString(),
+  closedByAgentId: item.closedByAgentId,
+  withdrawnAt: item.withdrawnAt?.toISOString() ?? null,
+  withdrawnByAgentId: item.withdrawnByAgentId,
+  identityCheckPerformed: item.identityCheckPerformed,
+  withdrawalProofReference: item.withdrawalProofReference,
+  supportStatusAfterClosure: item.supportStatusAfterClosure,
 });

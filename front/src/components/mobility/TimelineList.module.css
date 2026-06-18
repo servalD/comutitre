@@ -30,3 +30,10 @@
   color: var(--color-text-muted);
   margin-top: 2px;
 }
+
+.meta {
+  margin: 2px 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}

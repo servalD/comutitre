@@ -15,18 +15,24 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
+import { Roles } from '../../../shared/decorators/roles.decorator';
+import { Role } from '../../../shared/enums/role.enum';
 import { User } from '../../users/domain/user';
+import { CloseFoundSupportCaseRequest } from '../application/dto/close-found-support-case.request';
 import { CreateContractRequest } from '../application/dto/create-contract.request';
 import { CreateDocumentRequest } from '../application/dto/create-document.request';
 import { CreateMobilityIdentityRequest } from '../application/dto/create-mobility-identity.request';
 import { CreateRelationshipRequest } from '../application/dto/create-relationship.request';
 import { CreateSupportRequest } from '../application/dto/create-support.request';
+import { DeclareFoundSupportRequest } from '../application/dto/declare-found-support.request';
 import { UpdateMobilityIdentityRequest } from '../application/dto/update-mobility-identity.request';
+import { CloseFoundSupportCaseUseCase } from '../application/use-cases/close-found-support-case.use-case';
 import { CreateContractUseCase } from '../application/use-cases/create-contract.use-case';
 import { CreateDocumentUseCase } from '../application/use-cases/create-document.use-case';
 import { CreateMobilityIdentityUseCase } from '../application/use-cases/create-mobility-identity.use-case';
 import { CreateRelationshipUseCase } from '../application/use-cases/create-relationship.use-case';
 import { CreateSupportUseCase } from '../application/use-cases/create-support.use-case';
+import { DeclareFoundSupportUseCase } from '../application/use-cases/declare-found-support.use-case';
 import { GetMobilityIdentityUseCase } from '../application/use-cases/get-mobility-identity.use-case';
 import { GetTimelineUseCase } from '../application/use-cases/get-timeline.use-case';
 import { ListContractsUseCase } from '../application/use-cases/list-contracts.use-case';
@@ -38,6 +44,8 @@ import { UpdateMobilityIdentityUseCase } from '../application/use-cases/update-m
 import {
   ContractResponse,
   DocumentResponse,
+  FoundSupportCaseResponse,
+  FoundSupportClosureResponse,
   MobilityIdentityResponse,
   MobilityIdentityWithRelationshipsResponse,
   RelationshipResponse,
@@ -45,6 +53,8 @@ import {
   TimelineEventResponse,
   toContractResponse,
   toDocumentResponse,
+  toFoundSupportCaseResponse,
+  toFoundSupportClosureResponse,
   toMobilityIdentityResponse,
   toRelationshipResponse,
   toSupportResponse,
@@ -68,6 +78,8 @@ export class MobilityController {
     private readonly listDocuments: ListDocumentsUseCase,
     private readonly createSupport: CreateSupportUseCase,
     private readonly listSupports: ListSupportsUseCase,
+    private readonly declareFoundSupport: DeclareFoundSupportUseCase,
+    private readonly closeFoundSupportCase: CloseFoundSupportCaseUseCase,
     private readonly getTimeline: GetTimelineUseCase,
   ) {}
 
@@ -228,6 +240,34 @@ export class MobilityController {
   ): Promise<SupportResponse> {
     const support = await this.createSupport.execute(user, id, body);
     return toSupportResponse(support);
+  }
+
+  @Post('support-found-cases')
+  @ApiTags('support-found-cases')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Declarer un pass retrouve en agence' })
+  @ApiOkResponse({ type: FoundSupportCaseResponse })
+  async declareFoundSupportCase(
+    @CurrentUser() user: User,
+    @Body() body: DeclareFoundSupportRequest,
+  ): Promise<FoundSupportCaseResponse> {
+    const item = await this.declareFoundSupport.execute(user, body);
+    return toFoundSupportCaseResponse(item);
+  }
+
+  @Patch('support-found-cases/:id/close')
+  @ApiTags('support-found-cases')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Cloturer un dossier de pass retrouve' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkResponse({ type: FoundSupportClosureResponse })
+  async closeFoundSupport(
+    @CurrentUser() user: User,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: CloseFoundSupportCaseRequest,
+  ): Promise<FoundSupportClosureResponse> {
+    const item = await this.closeFoundSupportCase.execute(user, id, body);
+    return toFoundSupportClosureResponse(item);
   }
 
   @Get('mobility-identities/:id/timeline')

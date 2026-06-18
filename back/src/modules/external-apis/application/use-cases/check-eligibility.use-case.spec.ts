@@ -74,7 +74,8 @@ describe('CheckEligibilityUseCase', () => {
         backOfficeAction: 'auto_validate_right',
       });
       expect(result.rawPayload).toBeDefined();
-      expect(result.rawPayload.quotientFamilial).toBe(1234);
+      const payload = result.rawPayload as { quotientFamilial: number };
+      expect(payload.quotientFamilial).toBe(1234);
     });
 
     it('matches FAMILY_QUOTIENT starts with 404', async () => {
@@ -92,8 +93,12 @@ describe('CheckEligibilityUseCase', () => {
         ine: '1234567890A',
       });
       expect(result.status).toBe(VerificationStatus.VERIFIED);
-      expect(result.rawPayload.boursier).toBe(true);
-      expect(result.rawPayload.echelonBourse).toBe('6');
+      const payload = result.rawPayload as {
+        boursier: boolean;
+        echelonBourse: string;
+      };
+      expect(payload.boursier).toBe(true);
+      expect(payload.echelonBourse).toBe('6');
     });
 
     it('matches SCHOOL_STUDENT (martin, justine)', async () => {
@@ -104,7 +109,8 @@ describe('CheckEligibilityUseCase', () => {
         dateNaissance: '2000-01-20',
       });
       expect(result.status).toBe(VerificationStatus.VERIFIED);
-      expect(result.rawPayload.eleve.prenom).toBe('Justine');
+      const payload = result.rawPayload as { eleve: { prenom: string } };
+      expect(payload.eleve.prenom).toBe('Justine');
     });
 
     it('matches TAX (1234567890123)', async () => {
@@ -113,8 +119,8 @@ describe('CheckEligibilityUseCase', () => {
         numeroFiscal: '1234567890123',
       });
       expect(result.status).toBe(VerificationStatus.VERIFIED);
-      expect(result.rawPayload.revenuFiscalReference).toBe(24500);
+      const payload = result.rawPayload as { revenuFiscalReference: number };
+      expect(payload.revenuFiscalReference).toBe(24500);
     });
   });
 });
-

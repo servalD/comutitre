@@ -7,7 +7,9 @@ import styles from './ResourceList.module.css'
 function supportTone(status: SupportStatus): 'success' | 'warning' | 'danger' | 'neutral' {
   if (status === 'active') return 'success'
   if (status === 'lost' || status === 'stolen') return 'danger'
-  if (status === 'pending_activation') return 'warning'
+  if (status === 'pending_activation' || status === 'support_non_reclame') {
+    return 'warning'
+  }
   return 'neutral'
 }
 

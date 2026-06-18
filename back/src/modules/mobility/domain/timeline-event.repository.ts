@@ -12,6 +12,7 @@ export interface AppendTimelineEventParams {
 }
 
 export abstract class TimelineEventRepository {
+  abstract findById(id: string): Promise<TimelineEvent | null>;
   abstract findByMobilityIdentityId(
     mobilityIdentityId: string,
   ): Promise<TimelineEvent[]>;

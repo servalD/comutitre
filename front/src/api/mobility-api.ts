@@ -1,13 +1,17 @@
 import { HttpClient } from './http-client'
 import { tokenStorage } from '../auth/token-storage'
 import type {
+  CloseFoundSupportPayload,
   Contract,
   CreateContractPayload,
+  DeclareFoundSupportPayload,
   CreateDocumentPayload,
   CreateMobilityIdentityPayload,
   CreateRelationshipPayload,
   CreateSupportPayload,
   Document,
+  FoundSupportCase,
+  FoundSupportClosure,
   MobilityIdentity,
   MobilityIdentityWithRelationships,
   Support,
@@ -90,6 +94,19 @@ export const mobilityApi = {
 
   getTimeline(identityId: string): Promise<TimelineEvent[]> {
     return http.get(`/mobility-identities/${identityId}/timeline`)
+  },
+
+  declareFoundSupport(
+    payload: DeclareFoundSupportPayload,
+  ): Promise<FoundSupportCase> {
+    return http.post('/support-found-cases', payload)
+  },
+
+  closeFoundSupportCase(
+    id: string,
+    payload: CloseFoundSupportPayload,
+  ): Promise<FoundSupportClosure> {
+    return http.patch(`/support-found-cases/${id}/close`, payload)
   },
 }
 

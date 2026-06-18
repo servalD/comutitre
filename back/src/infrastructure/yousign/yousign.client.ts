@@ -135,7 +135,12 @@ export class YousignClient {
         `YouSign getIdentityDocumentVerification failed: ${res.status}`,
       );
     }
-    return this.parseVerificationResponse(await res.json());
+    const data = (await res.json()) as {
+      id: string;
+      status: string;
+      status_codes?: string[];
+    };
+    return this.parseVerificationResponse(data);
   }
 
   async getProofOfAddressVerification(
@@ -150,7 +155,12 @@ export class YousignClient {
         `YouSign getProofOfAddressVerification failed: ${res.status}`,
       );
     }
-    return this.parseVerificationResponse(await res.json());
+    const data = (await res.json()) as {
+      id: string;
+      status: string;
+      status_codes?: string[];
+    };
+    return this.parseVerificationResponse(data);
   }
 
   /** @deprecated Use getIdentityDocumentVerification or getProofOfAddressVerification */

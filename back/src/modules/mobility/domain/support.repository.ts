@@ -18,4 +18,8 @@ export abstract class SupportRepository {
     mobilityIdentityId: string,
   ): Promise<Support[]>;
   abstract create(params: CreateSupportParams): Promise<Support>;
+  abstract updateStatus(
+    id: string,
+    status: SupportStatus,
+  ): Promise<Support | null>;
 }

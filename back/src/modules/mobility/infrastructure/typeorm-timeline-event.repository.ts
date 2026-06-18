@@ -17,6 +17,11 @@ export class TypeOrmTimelineEventRepository extends TimelineEventRepository {
     super();
   }
 
+  async findById(id: string): Promise<TimelineEvent | null> {
+    const entity = await this.repository.findOne({ where: { id } });
+    return entity ? this.toDomain(entity) : null;
+  }
+
   async findByMobilityIdentityId(
     mobilityIdentityId: string,
   ): Promise<TimelineEvent[]> {

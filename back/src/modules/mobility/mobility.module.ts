@@ -15,6 +15,8 @@ import { CreateDocumentUseCase } from './application/use-cases/create-document.u
 import { CreateMobilityIdentityUseCase } from './application/use-cases/create-mobility-identity.use-case';
 import { CreateRelationshipUseCase } from './application/use-cases/create-relationship.use-case';
 import { CreateSupportUseCase } from './application/use-cases/create-support.use-case';
+import { CloseFoundSupportCaseUseCase } from './application/use-cases/close-found-support-case.use-case';
+import { DeclareFoundSupportUseCase } from './application/use-cases/declare-found-support.use-case';
 import { GetMobilityIdentityUseCase } from './application/use-cases/get-mobility-identity.use-case';
 import { GetTimelineUseCase } from './application/use-cases/get-timeline.use-case';
 import { ListContractsUseCase } from './application/use-cases/list-contracts.use-case';
@@ -82,6 +84,8 @@ import { MobilityController } from './presentation/mobility.controller';
     ListDocumentsUseCase,
     CreateSupportUseCase,
     ListSupportsUseCase,
+    DeclareFoundSupportUseCase,
+    CloseFoundSupportCaseUseCase,
     GetTimelineUseCase,
     ProvisionOwnerMobilityIdentityUseCase,
   ],

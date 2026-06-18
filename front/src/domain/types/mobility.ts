@@ -73,6 +73,33 @@ export type SupportStatus =
   | 'replaced'
   | 'expired'
   | 'pending_activation'
+  | 'support_non_reclame'
+
+export type FoundSupportDecision =
+  | 'FOUND_PICKUP_ALLOWED'
+  | 'CONTROLLED_REUSE_ELIGIBLE'
+  | 'BACKOFFICE_REVIEW_REQUIRED'
+  | 'SUPPORT_ALREADY_REPLACED'
+  | 'SUPPORT_UNUSABLE'
+  | 'UNKNOWN_SUPPORT'
+
+export type FoundSupportNotificationStrategy =
+  | 'SECURITY_NOTICE'
+  | 'PICKUP_AVAILABLE'
+  | 'LEGAL_GUARDIAN_OR_PAYER'
+  | 'REVIEW_BEFORE_NOTIFICATION'
+  | 'SUPPORT_UNUSABLE_NOTICE'
+  | 'UNKNOWN_SUPPORT_NO_NOTIFICATION'
+
+export type FoundSupportFinalStatus =
+  | 'withdrawn'
+  | 'not_claimed'
+  | 'archived'
+  | 'destroyed'
+  | 'sent_to_backoffice'
+  | 'unusable_confirmed'
+
+export type FoundSupportRiskFlag = 'unpaid' | 'fraud' | 'litigation'
 
 export type RenewalMode = 'automatic' | 'manual'
 
@@ -179,6 +206,38 @@ export interface TimelineEvent {
   createdAt: string
 }
 
+export interface FoundSupportCase {
+  id: string | null
+  supportId: string
+  mobilityIdentityId: string | null
+  contractId: string | null
+  agencyId: string
+  receivedAt: string
+  agentId: string
+  supportStatus: SupportStatus | null
+  holderMaskedName: string | null
+  decision: FoundSupportDecision
+  notificationStrategy: FoundSupportNotificationStrategy
+  pickupDeadline: string | null
+  finalStatus: FoundSupportFinalStatus | null
+  userMessage: string[]
+}
+
+export interface FoundSupportClosure {
+  id: string
+  supportFoundEventId: string
+  supportId: string
+  mobilityIdentityId: string
+  finalStatus: FoundSupportFinalStatus
+  closedAt: string
+  closedByAgentId: string
+  withdrawnAt: string | null
+  withdrawnByAgentId: string | null
+  identityCheckPerformed: boolean
+  withdrawalProofReference: string | null
+  supportStatusAfterClosure: SupportStatus | null
+}
+
 export interface CreateMobilityIdentityPayload {
   firstName: string
   lastName: string
@@ -220,4 +279,17 @@ export interface CreateSupportPayload {
   type?: SupportType
   status?: SupportStatus
   contractId?: string
+}
+
+export interface DeclareFoundSupportPayload {
+  supportId: string
+  agencyId: string
+  receivedAt?: string
+  riskFlags?: FoundSupportRiskFlag[]
+}
+
+export interface CloseFoundSupportPayload {
+  finalStatus: FoundSupportFinalStatus
+  identityCheckPerformed?: boolean
+  withdrawalProofReference?: string
 }

@@ -66,6 +66,39 @@
   gap: 8px;
 }
 
+.checkPillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.checkPill,
+.checkLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.checkPill {
+  padding: 6px 9px;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 8px;
+  background: var(--color-background-primary);
+}
+
+.checkPill input,
+.checkLine input {
+  width: 13px;
+  height: 13px;
+  accent-color: var(--blue-int);
+}
+
+.checkLine {
+  margin: 10px 0 8px;
+}
+
 .btnPrimary {
   width: 100%;
   padding: 11px;

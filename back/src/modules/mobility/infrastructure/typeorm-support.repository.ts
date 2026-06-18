@@ -50,6 +50,20 @@ export class TypeOrmSupportRepository extends SupportRepository {
     return this.toDomain(saved);
   }
 
+  async updateStatus(
+    id: string,
+    status: SupportStatus,
+  ): Promise<Support | null> {
+    const entity = await this.repository.findOne({ where: { id } });
+    if (!entity) {
+      return null;
+    }
+
+    entity.status = status;
+    const saved = await this.repository.save(entity);
+    return this.toDomain(saved);
+  }
+
   private toDomain(entity: SupportOrmEntity): Support {
     return new Support(
       entity.id,
