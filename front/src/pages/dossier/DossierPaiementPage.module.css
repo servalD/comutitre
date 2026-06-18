@@ -1,0 +1,318 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.stepperWrap {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 900px) {
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-xl);
+  }
+
+  .main {
+    flex: 1;
+  }
+
+  .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-anthracite);
+  margin: 0;
+}
+
+.payModes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.payMode {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-white);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.payMode:hover {
+  border-color: var(--color-interaction);
+}
+
+.payMode:focus-within {
+  border-color: var(--color-interaction);
+  outline: 3px solid var(--color-idfm-blue);
+  outline-offset: 2px;
+}
+
+.payMode.payModeActive {
+  border-color: var(--color-interaction);
+  background: #EDF5FF;
+}
+
+.radioInput {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-interaction);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.payModeBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.payModeTop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.payModeLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.payModeBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-interaction);
+  background: var(--color-bg-medium);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+.payModeDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.cardForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.formRow {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.fieldLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.inputIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--color-anthracite);
+  background: var(--color-white);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.inputWrap .input {
+  padding-left: 42px;
+}
+
+.input:focus {
+  border-color: var(--color-interaction);
+  box-shadow: 0 0 0 3px rgba(25, 114, 210, 0.12);
+}
+
+.secureBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-green);
+}
+
+.secureBadge svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.recap {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.recapProduct {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.recapVisual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1E3A5F, #1972D2);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.recapBrand {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.recapType {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: white;
+}
+
+.recapName {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-anthracite);
+  margin: 0;
+}
+
+.recapBenef {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.recapTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.recapTotalLabel {
+  font-size: 0.9375rem;
+  color: var(--color-anthracite);
+}
+
+.recapTotalAmount {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--color-anthracite);
+}
+
+.recapNote {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.footer {
+  max-width: 420px;
+  width: 100%;
+}
+
+.footer button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.footer button svg {
+  width: 18px;
+  height: 18px;
+}

@@ -1,0 +1,98 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+}
+
+.card:hover {
+  border-color: var(--color-interaction);
+  background: var(--color-bg-light);
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--color-idfm-blue);
+  outline-offset: 2px;
+}
+
+.card.selected {
+  border-color: var(--color-interaction);
+  background: #EDF5FF;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-medium);
+  color: var(--color-interaction);
+  flex-shrink: 0;
+}
+
+.card.selected .icon {
+  background: #DEEEFF;
+  color: var(--color-interaction);
+}
+
+.icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.label {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--color-anthracite);
+}
+
+.description {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: border-color 0.15s;
+}
+
+.card.selected .radio {
+  border-color: var(--color-interaction);
+}
+
+.radioDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-interaction);
+}

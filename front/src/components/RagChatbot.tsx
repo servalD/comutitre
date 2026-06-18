@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ChatBot, { Button, type Settings, type Styles } from 'react-chatbotify'
-import MarkdownRenderer, {
-  type MarkdownRendererBlock,
-} from '@rcb-plugins/markdown-renderer'
+import MarkdownRenderer from '@rcb-plugins/markdown-renderer'
 import { streamRagChat } from '../rag/chat-client'
 import './RagChatbot.css'
 
@@ -92,7 +90,7 @@ export function RagChatbot() {
 
   // Typed with MarkdownRendererBlock so each block can opt into markdown
   // rendering via `renderMarkdown` (the plugin parses BOT messages as markdown).
-  const flow: Record<string, MarkdownRendererBlock> = useMemo(
+  const flow = useMemo(
     () => ({
       start: {
         message:
@@ -102,7 +100,8 @@ export function RagChatbot() {
       },
       loop: {
         renderMarkdown: ['BOT'],
-        message: async (params) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        message: async (params: any) => {
           const question = (params.userInput ?? '').trim()
           if (!question) return
 

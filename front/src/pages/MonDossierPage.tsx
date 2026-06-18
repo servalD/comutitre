@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { PageHeader } from '../components/layout/PageHeader'
 import { Avatar } from '../components/ui/Avatar'
@@ -111,6 +112,7 @@ const DOC_ICONS: Record<string, ReactNode> = {
 }
 
 export function MonDossierPage() {
+  const navigate = useNavigate()
   const {
     product,
     beneficiaryFullName,
@@ -126,7 +128,7 @@ export function MonDossierPage() {
   return (
     <AppLayout activeTab="accueil">
       <div className={styles.page}>
-        <PageHeader title="Mon dossier" backTo="/" />
+        <PageHeader title="Mon dossier" backTo="/espace" />
 
         <section className={styles.summary} aria-label="Résumé du dossier">
           <div className={styles.cardVisual} aria-hidden="true">
@@ -194,7 +196,7 @@ export function MonDossierPage() {
           <aside className={styles.actionsPanel} aria-label="Dépôt de documents">
             <UploadZone />
             <InfoBanner>{processingDelay}</InfoBanner>
-            <Button fullWidth className={styles.submitBtn}>
+            <Button fullWidth className={styles.submitBtn} onClick={() => navigate('/dossier/signature')}>
               <UploadCloudIcon />
               Déposer mes justificatifs
             </Button>

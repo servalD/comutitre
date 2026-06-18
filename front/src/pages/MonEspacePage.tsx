@@ -170,29 +170,31 @@ export function MonEspacePage() {
               <ul className={styles.memberList}>
                 {MOCK_HOUSEHOLD.map((member) => (
                   <li key={member.id} className={styles.memberRow}>
-                    <Avatar
-                      name={`${member.firstName} ${member.lastName}`}
-                      size="sm"
-                      character={member.character}
-                    />
-                    <div className={styles.memberInfo}>
-                      <div className={styles.memberTop}>
-                        <span className={styles.memberName}>
-                          {member.firstName} {member.lastName}
-                        </span>
-                        {member.isSelf && (
-                          <span className={styles.youBadge}>Vous</span>
-                        )}
+                    <Link to={`/foyer/${member.id}`} className={styles.memberLink}>
+                      <Avatar
+                        name={`${member.firstName} ${member.lastName}`}
+                        size="sm"
+                        character={member.character}
+                      />
+                      <div className={styles.memberInfo}>
+                        <div className={styles.memberTop}>
+                          <span className={styles.memberName}>
+                            {member.firstName} {member.lastName}
+                          </span>
+                          {member.isSelf && (
+                            <span className={styles.youBadge}>Vous</span>
+                          )}
+                        </div>
+                        <div className={styles.memberTags}>
+                          <span className={styles.tag}>{member.role}</span>
+                          <span className={styles.tag}>{member.age} ans</span>
+                        </div>
                       </div>
-                      <div className={styles.memberTags}>
-                        <span className={styles.tag}>{member.role}</span>
-                        <span className={styles.tag}>{member.age} ans</span>
-                      </div>
-                    </div>
-                    <span className={[styles.status, statusClass(member.status)].join(' ')}>
-                      <span className={styles.statusDot} aria-hidden="true" />
-                      {member.status}
-                    </span>
+                      <span className={[styles.status, statusClass(member.status)].join(' ')}>
+                        <span className={styles.statusDot} aria-hidden="true" />
+                        {member.status}
+                      </span>
+                    </Link>
                   </li>
                 ))}
               </ul>

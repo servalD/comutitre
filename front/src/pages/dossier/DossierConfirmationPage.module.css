@@ -1,0 +1,234 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: 600px;
+  }
+}
+
+.confetti {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  height: 200px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confettiDot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  left: calc(var(--i) * 6.5%);
+  top: 0;
+  animation: fall 2s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.1s);
+  opacity: 0;
+}
+
+.confettiDot:nth-child(odd) {
+  background: var(--color-idfm-blue);
+  border-radius: 2px;
+}
+
+.confettiDot:nth-child(even) {
+  background: var(--color-interaction);
+}
+
+.confettiDot:nth-child(3n) {
+  background: var(--color-orange);
+  width: 6px;
+  height: 10px;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(180px) rotate(360deg); opacity: 0; }
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+  padding-top: var(--space-lg);
+}
+
+.headerBranding {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+}
+
+.logoWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--color-bg-medium);
+  padding: 8px 20px;
+  border-radius: var(--radius-md);
+}
+
+.logoText {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-interaction);
+  text-transform: lowercase;
+  letter-spacing: 0.03em;
+}
+
+.logoSub {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-interaction);
+  text-transform: lowercase;
+}
+
+.checkIcon {
+  display: flex;
+}
+
+.checkIcon svg {
+  width: 72px;
+  height: 72px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 18px;
+  background: var(--color-green-bg);
+  color: var(--color-green);
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-anthracite);
+  margin: 0;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 1.875rem;
+  }
+}
+
+.subtitle {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cardWrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+  align-items: center;
+}
+
+.actions a {
+  width: 100%;
+  text-decoration: none;
+}
+
+@media (min-width: 600px) {
+  .actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .actions a {
+    width: auto;
+  }
+
+  .actions a button {
+    min-width: 200px;
+  }
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 var(--space-lg);
+  min-height: 44px;
+  background: none;
+  border: 1.5px solid var(--color-interaction);
+  border-radius: var(--radius-full);
+  color: var(--color-interaction);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.downloadBtn:hover {
+  background: var(--color-bg-light);
+  border-color: var(--color-focus);
+  color: var(--color-focus);
+}
+
+.downloadBtn:focus-visible {
+  outline: 3px solid var(--color-idfm-blue);
+  outline-offset: 2px;
+}
+
+.downloadBtn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.renewalBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--color-bg-medium);
+  border-radius: var(--radius-md);
+  width: 100%;
+}
+
+.renewalIcon {
+  display: flex;
+  color: var(--color-interaction);
+  flex-shrink: 0;
+}
+
+.renewalIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.renewalText {
+  font-size: 0.875rem;
+  color: var(--color-anthracite);
+  margin: 0;
+}

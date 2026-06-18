@@ -1,0 +1,88 @@
+.card {
+  background: linear-gradient(135deg, #1E3A5F 0%, #1972D2 60%, #64B5F6 100%);
+  border-radius: 16px;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(25, 114, 210, 0.25);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandText {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: white;
+}
+
+.nfc {
+  color: rgba(255,255,255,0.7);
+}
+
+.nfc svg {
+  width: 22px;
+  height: 22px;
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatarInitials {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: white;
+}
+
+.product {
+  font-size: 0.8125rem;
+  margin: 0;
+  color: rgba(255,255,255,0.85);
+}
+
+.validity {
+  font-size: 0.75rem;
+  margin: 0;
+  color: rgba(255,255,255,0.7);
+}

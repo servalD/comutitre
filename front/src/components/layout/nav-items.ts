@@ -10,5 +10,5 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { id: 'accueil', label: 'Accueil', to: '/espace' },
   { id: 'foyer', label: 'Mon foyer', to: '/foyer' },
-  { id: 'aide', label: 'Aide', to: '#', disabled: true },
+  { id: 'aide', label: 'Aide', to: '/aide' },
 ]

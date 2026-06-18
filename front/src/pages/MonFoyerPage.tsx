@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { AppLayout } from '../components/layout/AppLayout'
 import { PageHeader } from '../components/layout/PageHeader'
 import { Avatar } from '../components/ui/Avatar'
@@ -53,17 +54,19 @@ export function MonFoyerPage() {
           <p className={styles.count}>
             <strong>{MOCK_HOUSEHOLD.length}</strong> personnes rattachées
           </p>
-          <Button className={styles.toolbarBtn}>
-            <PlusIcon />
-            Ajouter une personne
-          </Button>
+          <Link to="/foyer/ajouter">
+            <Button className={styles.toolbarBtn}>
+              <PlusIcon />
+              Ajouter une personne
+            </Button>
+          </Link>
         </div>
 
         <ul className={styles.memberGrid} aria-label="Membres du foyer">
           {MOCK_HOUSEHOLD.map((member) => (
             <li key={member.id}>
               <Card className={styles.memberCard}>
-                <button type="button" className={styles.memberBtn}>
+                <Link to={`/foyer/${member.id}`} className={styles.memberBtn}>
                   <Avatar
                     name={`${member.firstName} ${member.lastName}`}
                     size="md"
@@ -94,14 +97,14 @@ export function MonFoyerPage() {
                   </div>
 
                   <ChevronRight />
-                </button>
+                </Link>
               </Card>
             </li>
           ))}
         </ul>
 
         <div className={styles.addSection}>
-          <button type="button" className={styles.addDashed}>
+          <Link to="/foyer/ajouter" className={styles.addDashed}>
             <span className={styles.addIcon} aria-hidden="true">
               <PlusIcon />
             </span>
@@ -109,12 +112,14 @@ export function MonFoyerPage() {
             <span className={styles.addHint}>
               Enfant, conjoint ou personne à charge
             </span>
-          </button>
+          </Link>
 
-          <Button fullWidth className={styles.mobileAddBtn}>
-            <PlusIcon />
-            Ajouter une personne
-          </Button>
+          <Link to="/foyer/ajouter">
+            <Button fullWidth className={styles.mobileAddBtn}>
+              <PlusIcon />
+              Ajouter une personne
+            </Button>
+          </Link>
         </div>
       </div>
     </AppLayout>

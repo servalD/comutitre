@@ -1,0 +1,97 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.select:hover {
+  border-color: var(--color-interaction);
+}
+
+.select:focus-visible {
+  outline: 3px solid var(--color-idfm-blue);
+  outline-offset: 2px;
+}
+
+.selectValue {
+  font-size: 0.9375rem;
+  color: var(--color-anthracite);
+}
+
+.chevron {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
+  color: var(--color-anthracite);
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-interaction);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-interaction);
+}
+
+.consentIcon {
+  display: flex;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.consentIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.link {
+  color: var(--color-interaction);
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.link:hover {
+  color: var(--color-focus);
+}
