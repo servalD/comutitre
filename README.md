@@ -31,6 +31,14 @@ Roles (RBAC: `USER` / `ADMIN`) are **app-managed** in our own database.
 ```
 front/                  Vite + React SPA
 back/                   NestJS API (clean architecture)
+  src/ARCHITECTURE.md       architecture rules — read before adding code
+  src/modules/auth/README.md       auth & providers rules
+  src/shared/guards/README.md      guards & RBAC rules
+  src/infrastructure/database/README.md  TypeORM & migrations rules
+docker/                 Dockerfiles live next to each app; compose & swarm here
+  README.md                 how to run dev / test / prod / swarm
+docs/                   functional specifications and technical guides
+.github/workflows/      CI (tests), Trivy (security), Release (build+push to GHCR)
 docker/                 Compose files (dev/test/build) + stack Swarm
 terraform/              Infra Azure (3 VMs, VNet, NSG)
 ansible/                Config Swarm + déploiement stack

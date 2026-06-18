@@ -1,0 +1,36 @@
+:root {
+  /* Charte IDFM — AGENTS.md */
+  --color-idfm-blue: #64b5f6;
+  --color-interaction: #1972d2;
+  --color-focus: #0050aa;
+  --color-anthracite: #25303b;
+  --color-bg-light: #f5f9ff;
+  --color-bg-medium: #deeeff;
+  --color-red: #c52625;
+  --color-danger: #c52625;
+  --color-orange: #f39224;
+  --color-yellow: #ffe500;
+  --color-green: #007d44;
+  --color-white: #ffffff;
+
+  --color-text: var(--color-anthracite);
+  --color-text-muted: #5a6570;
+  --color-border: #c8ddf5;
+  --color-surface: var(--color-white);
+  --color-page-bg: var(--color-bg-light);
+
+  --font-sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(37, 48, 59, 0.08);
+  --shadow-md: 0 4px 16px rgba(37, 48, 59, 0.1);
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --header-height: 64px;
+  --max-width: 960px;
+}

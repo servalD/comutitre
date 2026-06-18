@@ -1,6 +1,15 @@
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { CgvuAcceptanceOrmEntity } from '../../modules/contracts/infrastructure/cgvu-acceptance.orm-entity';
+import { ContractOrmEntity as SubscriptionContractOrmEntity } from '../../modules/contracts/infrastructure/contract.orm-entity';
+import { JustificatifOrmEntity } from '../../modules/justificatifs/infrastructure/justificatif.orm-entity';
+import { ContractOrmEntity as MobilityContractOrmEntity } from '../../modules/mobility/infrastructure/contract.orm-entity';
+import { DocumentOrmEntity } from '../../modules/mobility/infrastructure/document.orm-entity';
+import { MobilityIdentityOrmEntity } from '../../modules/mobility/infrastructure/mobility-identity.orm-entity';
+import { RelationshipOrmEntity } from '../../modules/mobility/infrastructure/relationship.orm-entity';
+import { SupportOrmEntity } from '../../modules/mobility/infrastructure/support.orm-entity';
+import { TimelineEventOrmEntity } from '../../modules/mobility/infrastructure/timeline-event.orm-entity';
 import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entity';
 
 /** Read an env var, falling back to the file referenced by `<NAME>_FILE` (Docker secrets). */
@@ -31,7 +40,18 @@ export const dataSourceOptions: DataSourceOptions = {
   database: process.env.DATABASE_NAME ?? 'comutitre',
   username: process.env.DATABASE_USER ?? 'comutitre',
   password: fromEnvOrFile('DATABASE_PASSWORD', 'comutitre'),
-  entities: [UserOrmEntity],
+  entities: [
+    UserOrmEntity,
+    MobilityIdentityOrmEntity,
+    RelationshipOrmEntity,
+    MobilityContractOrmEntity,
+    DocumentOrmEntity,
+    SupportOrmEntity,
+    TimelineEventOrmEntity,
+    SubscriptionContractOrmEntity,
+    CgvuAcceptanceOrmEntity,
+    JustificatifOrmEntity,
+  ],
   migrations: [__dirname + '/migrations/*.{ts,js}'],
   synchronize: false,
 };

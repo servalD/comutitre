@@ -1,0 +1,21 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-md);
+}
+
+.clickable {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.clickable:hover {
+  border-color: var(--color-idfm-blue);
+  box-shadow: var(--shadow-md);
+}

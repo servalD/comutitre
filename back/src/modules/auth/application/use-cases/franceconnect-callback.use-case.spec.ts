@@ -1,4 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
+import { UnauthorizedException } from '@nestjs/common';
 import { FranceConnectCallbackUseCase } from './franceconnect-callback.use-case';
 import { SyncUserUseCase } from '../../../users/application/use-cases/sync-user.use-case';
 import { InMemoryUserRepository } from '../../../users/infrastructure/in-memory-user.repository';
@@ -42,5 +43,14 @@ describe('FranceConnectCallbackUseCase', () => {
     const identity = await appJwt.verify(result.accessToken);
     expect(identity.provider).toBe(AuthProvider.FRANCECONNECT);
     expect(identity.subject).toBe('fc-sub');
+  });
+
+  it('rejects provider error callbacks without issuing an app session token', async () => {
+    await expect(
+      useCase.execute({
+        error: 'temporarily_unavailable',
+        errorDescription: 'Sandbox unavailable',
+      }),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
   });
 });

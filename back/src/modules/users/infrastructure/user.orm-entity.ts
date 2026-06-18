@@ -34,6 +34,9 @@ export class UserOrmEntity {
   @Column({ type: 'varchar', nullable: true })
   displayName: string | null;
 
+  @Column({ type: 'varchar', nullable: true, select: false })
+  passwordHash: string | null;
+
   @Column({ type: 'simple-array' })
   roles: Role[];
 

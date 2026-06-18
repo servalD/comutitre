@@ -1,0 +1,301 @@
+/* ─── Design tokens IDFM ─── */
+:root {
+  --idfm-blue: #64b5f6;
+  --idfm-interaction: #1972d2;
+  --idfm-focus: #0050aa;
+  --idfm-anthracite: #25303b;
+  --idfm-bg-light: #f5f9ff;
+  --idfm-bg-mid: #deeeff;
+  --idfm-error: #c52625;
+  --idfm-radius: 12px;
+  --idfm-shadow: 0 8px 32px rgba(25, 114, 210, 0.12),
+    0 2px 8px rgba(25, 114, 210, 0.08);
+}
+
+/* ─── Full-page layout ─── */
+.page {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--idfm-bg-light) 0%, var(--idfm-bg-mid) 100%);
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+/* ─── Card ─── */
+.card {
+  width: 100%;
+  max-width: 460px;
+  background: #fff;
+  border-radius: var(--idfm-radius);
+  box-shadow: var(--idfm-shadow);
+  padding: 40px 40px 32px;
+  box-sizing: border-box;
+
+  @media (max-width: 480px) {
+    padding: 28px 20px 24px;
+  }
+}
+
+/* ─── Brand header ─── */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+
+.brandIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--idfm-interaction) 0%, var(--idfm-blue) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: 4px;
+
+  svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.brandName {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--idfm-anthracite);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.brandTagline {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ─── Section title ─── */
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--idfm-anthracite);
+  margin: 0 0 20px;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+/* ─── Alert ─── */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff5f5;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 13.5px;
+  color: var(--idfm-error);
+  line-height: 1.4;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+/* ─── Form ─── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 380px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.label {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--idfm-anthracite);
+}
+
+.hint {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--idfm-anthracite);
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    border-color: var(--idfm-interaction);
+    box-shadow: 0 0 0 3px rgba(25, 114, 210, 0.15);
+  }
+
+  &:invalid:not(:placeholder-shown) {
+    border-color: var(--idfm-error);
+  }
+}
+
+/* ─── Primary button ─── */
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  margin-top: 4px;
+  background: linear-gradient(135deg, var(--idfm-focus) 0%, var(--idfm-interaction) 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: 0.1px;
+
+  &:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+/* ─── Loading spinner ─── */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Divider ─── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: #9ca3af;
+  font-size: 13px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+  }
+}
+
+/* ─── FranceConnect button ─── */
+.btnFranceConnect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 20px;
+  background: #fff;
+  border: 1.5px solid #003189;
+  border-radius: 8px;
+  color: #003189;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.1s;
+
+  &:hover {
+    background: #f0f4ff;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.fcLogo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* ─── Footer link ─── */
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13.5px;
+  color: #6b7280;
+}
+
+.link {
+  color: var(--idfm-interaction);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--idfm-focus);
+  }
+}

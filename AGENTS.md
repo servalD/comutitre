@@ -1,5 +1,5 @@
 # AGENTS.md — Guide de référence pour assistants et agents automatisés
-*Last updated: 2026-06-16*
+*Last updated: 2026-06-17*
 
 Ce fichier sert de point d'entrée pour le contexte du projet, les commandes, la charte graphique et les consignes de développement pour le **Hackathon Comutitres & Île-de-France Mobilités (IDFM)** (15 au 19 Juin 2026).
 
@@ -16,6 +16,13 @@ Comutitres est une filiale d'IDFM gérant l'intégralité du back-office de la b
 - **Jeudi 18/06** : Flash Pédagogique *« CTPO is the new CTO » (Jérémy Serval)*, **Sprint 4**, Nocturne & Soirée Pizza.
 - **Vendredi 19/06** : Sprint Final, **Soutenances** (10 min démo + 5 min Q&A) et délibérations du jury.
 
+### Cadrage d'intégration pour le hackathon
+- Privilégier les parcours démontrables, les mocks API et les adaptateurs propres plutôt que de rendre la démo dépendante d'intégrations externes.
+- Un mode live sandbox peut être ajouté en bonus, sur demande explicite, si l'intégration est simple, isolée par feature flag et accompagnée d'un fallback mock immédiat.
+- Ne pas faire dépendre le parcours principal de FranceConnect, API Particulier, CAF/MSA, DGFiP ou autres services sous habilitation.
+- Pour les APIs réellement ouvertes (adresse, géographie, Sirene si utile), garder aussi un fallback mock afin que la démo reste stable.
+- Les intégrations externes doivent servir les scénarios métier du hackathon : orientation forfait, justificatifs, droits TST/bourse, paiement simulé et back-office.
+
 ---
 
 Cartographie de la Documentation (Sources de Vérité)
@@ -29,6 +36,7 @@ Pour éviter toute redondance et pollution de contexte, les règles métier dét
 5. **Attendus & Barème académique (ESGI)** : Consulter [attendus_et_bareme_hackathon_esgi.md](docs/attendus_et_bareme_hackathon_esgi.md) (Critères d'évaluation, répartition des notes de soutenance sur 20 points, exigences UI/UX, Agile, Front/Back, DevOps).
 6. **Périmètre fonctionnel & Backlog MVP** : Consulter [perimetre_fonctionnel_hackathon_comutitres.md](docs/perimetre_fonctionnel_hackathon_comutitres.md) (Découpage en priorités MVP 1, 2 et 3, scénarios de démonstration cibles, attendus de la refonte).
 7. **Schéma métier global & Modèle conceptuel** : Consulter [schema_enrichi_comutitres.md](docs/schema_enrichi_comutitres.md) (Diagramme ER de relation Porteur/Payeur/Contrat/Droit, architecture macro et états back-office consolidés).
+8. **Développement Web Offline-First** : Consulter [offline-first-web.md](docs/offline-first-web.md) (Principes du Manifeste Offline-First, Service Workers, stratégies de cache Cache-First/Network-First/Stale-While-Revalidate, IndexedDB et gestion des conflits).
 
 ---
 

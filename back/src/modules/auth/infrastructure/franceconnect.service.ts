@@ -11,12 +11,9 @@ import { ExternalIdentity } from '../domain/external-identity';
  * The back drives the authorization-code flow: it builds the authorize URL,
  * then exchanges the returned code for tokens + userinfo on the callback.
  *
- * Currently runs in MOCK mode (FRANCECONNECT_MODE=mock): no real credentials
- * are provisioned yet, so we short-circuit with a deterministic fake identity
- * to let the full flow be exercised end-to-end.
- *
- * // TODO: replace the mock branch with the real FranceConnect endpoints once
- * //       client_id / client_secret are provisioned (set FRANCECONNECT_MODE=live).
+ * `mock` keeps local tests deterministic. `sandbox` uses FranceConnect's public
+ * integration credentials and falls back to the mock identity for demos.
+ * `live` is reserved for provisioned credentials.
  */
 @Injectable()
 export class FranceConnectService {
@@ -24,8 +21,12 @@ export class FranceConnectService {
 
   constructor(private readonly config: ConfigService<Env, true>) {}
 
-  private get mode(): 'mock' | 'live' {
+  private get mode(): 'mock' | 'sandbox' | 'live' {
     return this.config.get('FRANCECONNECT_MODE', { infer: true });
+  }
+
+  private get fallbackToMock(): boolean {
+    return this.config.get('FRANCECONNECT_FALLBACK_TO_MOCK', { infer: true });
   }
 
   /** Build the URL the user is redirected to in order to authenticate. */
@@ -44,10 +45,7 @@ export class FranceConnectService {
     const issuer = this.config.get('FRANCECONNECT_ISSUER_URL', { infer: true });
     const url = new URL(`${issuer}/authorize`);
     url.searchParams.set('response_type', 'code');
-    url.searchParams.set(
-      'client_id',
-      this.config.get('FRANCECONNECT_CLIENT_ID', { infer: true }),
-    );
+    url.searchParams.set('client_id', this.getClientId());
     url.searchParams.set(
       'redirect_uri',
       this.config.get('FRANCECONNECT_REDIRECT_URI', { infer: true }),
@@ -65,18 +63,42 @@ export class FranceConnectService {
     }
 
     if (this.mode === 'mock') {
-      // Deterministic per-code subject so repeated logins map to one user.
-      const subject = `fc-mock-${code.slice(-12)}`;
-      return {
-        provider: AuthProvider.FRANCECONNECT,
-        subject,
-        email: 'mock.user@franceconnect.test',
-        walletAddress: null,
-        displayName: 'Mock FranceConnect User',
-      };
+      return this.buildMockIdentity(code, 'fc-mock');
     }
 
-    return this.exchangeCodeLive(code);
+    try {
+      return await this.exchangeCodeLive(code);
+    } catch (error) {
+      if (this.shouldFallbackToMock()) {
+        this.logger.warn(
+          `FranceConnect ${this.mode} failed, falling back to mock identity: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+        return this.buildMockIdentity(code, `fc-${this.mode}-fallback`);
+      }
+
+      this.logger.error(
+        `FranceConnect ${this.mode} failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      throw error;
+    }
+  }
+
+  handleCallbackError(
+    error: string,
+    errorDescription?: string,
+  ): Promise<ExternalIdentity> {
+    this.logger.warn(
+      `FranceConnect callback returned ${error}${
+        errorDescription ? `: ${errorDescription}` : ''
+      }`,
+    );
+    throw new UnauthorizedException(
+      errorDescription || `FranceConnect callback failed: ${error}`,
+    );
   }
 
   /**
@@ -94,17 +116,12 @@ export class FranceConnectService {
         redirect_uri: this.config.get('FRANCECONNECT_REDIRECT_URI', {
           infer: true,
         }),
-        client_id: this.config.get('FRANCECONNECT_CLIENT_ID', { infer: true }),
-        client_secret: this.config.get('FRANCECONNECT_CLIENT_SECRET', {
-          infer: true,
-        }),
+        client_id: this.getClientId(),
+        client_secret: this.getClientSecret(),
       }),
     });
 
     if (!tokenResponse.ok) {
-      this.logger.error(
-        `FranceConnect token exchange failed: ${tokenResponse.status}`,
-      );
       throw new UnauthorizedException('FranceConnect token exchange failed');
     }
 
@@ -125,6 +142,7 @@ export class FranceConnectService {
       email?: string;
       given_name?: string;
       family_name?: string;
+      birthdate?: string;
     };
 
     return {
@@ -134,6 +152,41 @@ export class FranceConnectService {
       walletAddress: null,
       displayName:
         [info.given_name, info.family_name].filter(Boolean).join(' ') || null,
+      givenName: info.given_name ?? null,
+      familyName: info.family_name ?? null,
+      birthDate: info.birthdate ?? null,
+    };
+  }
+
+  private shouldFallbackToMock(): boolean {
+    return this.mode === 'sandbox' || this.fallbackToMock;
+  }
+
+  private getClientId(): string {
+    return this.config.get('FRANCECONNECT_CLIENT_ID', {
+      infer: true,
+    });
+  }
+
+  private getClientSecret(): string {
+    return this.config.get('FRANCECONNECT_CLIENT_SECRET', {
+      infer: true,
+    });
+  }
+
+  private buildMockIdentity(
+    code: string,
+    subjectPrefix: string,
+  ): ExternalIdentity {
+    return {
+      provider: AuthProvider.FRANCECONNECT,
+      subject: `${subjectPrefix}-${code.slice(-12)}`,
+      email: 'mock.user@franceconnect.test',
+      walletAddress: null,
+      displayName: 'Marie Dupont',
+      givenName: 'Marie',
+      familyName: 'Dupont',
+      birthDate: '1990-03-15',
     };
   }
 }

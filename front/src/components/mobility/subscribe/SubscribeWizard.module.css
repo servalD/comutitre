@@ -1,0 +1,133 @@
+.subscribe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.intro {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.questionCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.questionLabel {
+  font-weight: 600;
+  font-size: 1.0625rem;
+}
+
+.hint {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.option:hover {
+  border-color: var(--color-idfm-blue);
+  background: var(--color-bg-light);
+}
+
+.optionSelected {
+  border-color: var(--color-interaction);
+  background: var(--color-bg-medium);
+}
+
+.optionLabel {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.optionDesc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.recommendation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.productHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.whyList {
+  margin: 0;
+  padding-left: var(--space-lg);
+  color: var(--color-text-muted);
+}
+
+.whyList li {
+  margin-bottom: var(--space-xs);
+}
+
+.docs {
+  background: var(--color-bg-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.docs ul {
+  margin: var(--space-sm) 0 0;
+  padding-left: var(--space-lg);
+}
+
+.alternatives {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.usageNote {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.success {
+  color: var(--color-green);
+  font-weight: 500;
+}

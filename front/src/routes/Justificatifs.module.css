@@ -1,0 +1,400 @@
+.screenBody {
+  padding: 16px;
+
+  @media (min-width: 900px) {
+    padding: 24px 28px;
+  }
+}
+
+.layoutGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (min-width: 900px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+.uploadPanel,
+.listPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.countPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--blue-med);
+  color: var(--blue-focus);
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.field { margin-bottom: 2px; }
+
+.select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-secondary);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-size: 12px;
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M6 9l6 6 6-6' stroke='%231972D2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  color-scheme: light;
+}
+
+.select:focus {
+  border-color: var(--blue-int);
+  box-shadow: 0 0 0 3px rgba(25, 114, 210, 0.12);
+}
+
+.select option {
+  color: var(--color-text-primary);
+  background: var(--white);
+}
+
+.iaCard {
+  background: var(--blue-light);
+  border: 0.5px solid #b8d5f3;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.iaCardOk {
+  background: var(--green-bg);
+  border: 0.5px solid #a8dcc0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.iaIcon {
+  font-size: 14px;
+  color: var(--blue-int);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.iaCardOk .iaIcon { color: var(--green); }
+
+.iaCard p,
+.iaCardOk p {
+  font-size: 11px;
+  color: var(--blue-focus);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.iaCardOk p { color: var(--green); }
+
+.iaCard small,
+.iaCardOk small {
+  display: block;
+  font-size: 10px;
+  color: var(--gray-dark);
+  margin-top: 3px;
+}
+
+.iaCard code {
+  font-size: 9px;
+  background: var(--blue-med);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.docUpload {
+  position: relative;
+  border: 1.5px dashed var(--color-border-secondary);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-background-primary);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.docUpload:hover { border-color: var(--blue-int); }
+
+.docUploadDrag {
+  border-color: var(--blue-int);
+  background: var(--blue-light);
+}
+
+.docUploadFilled {
+  border-style: solid;
+  border-color: var(--blue-idf);
+  cursor: default;
+}
+
+.fileInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.docUploadFilled .fileInput { pointer-events: none; }
+
+.uploadIcon {
+  font-size: 24px;
+  color: var(--blue-int);
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.docUpload p {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.docUpload small {
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  display: block;
+  margin-top: 2px;
+}
+
+.fileSelected { pointer-events: none; }
+
+.fileName {
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+  word-break: break-all;
+}
+
+.fileRemove {
+  pointer-events: auto;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  background: var(--blue-med);
+  color: var(--blue-int);
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.fileRemove:hover { background: var(--blue-int); color: #fff; }
+
+.uploadingState { pointer-events: none; }
+
+.uploadingState p {
+  font-weight: 600;
+  color: var(--blue-int) !important;
+}
+
+.spinner {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto 8px;
+  border: 3px solid var(--blue-med);
+  border-top-color: var(--blue-int);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.warningCard {
+  background: var(--orange-bg);
+  border: 0.5px solid #f3d49a;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.warningCard span { font-size: 15px; flex-shrink: 0; }
+
+.warningCard p {
+  font-size: 11px;
+  color: #7a4c00;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.btnPrimary {
+  width: 100%;
+  padding: 11px;
+  background: var(--blue-int);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover:not(:disabled) { background: var(--blue-focus); }
+
+.btnPrimary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btnSecondary {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  color: var(--blue-int);
+  border: 1.5px solid var(--blue-int);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.15s;
+  box-sizing: border-box;
+}
+
+.btnSecondary:hover {
+  background: #eef5fd;
+}
+
+.humanLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+  text-decoration: none;
+}
+
+.humanLink:hover { color: var(--blue-int); }
+
+.hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.docList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profileCard {
+  background: var(--color-background-secondary);
+  border-radius: 12px;
+  border: 0.5px solid var(--color-border-tertiary);
+  padding: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.profileCardHighlight {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0, 125, 68, 0.12);
+}
+
+.docCardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.docCardName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.statusPill {
+  font-size: 9px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badgeOk { background: var(--green-bg); color: var(--green); }
+.badgePending { background: var(--orange-bg); color: #7a4c00; }
+.badgeFail { background: var(--red-bg); color: var(--red); }
+.badgeNeutral { background: var(--blue-med); color: var(--blue-focus); }
+
+.docCardFile {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  word-break: break-all;
+}
+
+.docCardHint {
+  font-size: 10px;
+  color: var(--gray-dark);
+  margin: 6px 0 0;
+  line-height: 1.45;
+}
+
+.docCardMotif {
+  font-size: 10px;
+  color: var(--red);
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--color-text-secondary);
+}
+
+.empty p { margin-bottom: 1rem; font-size: 13px; }

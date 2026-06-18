@@ -1,6 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { AuthProvider, User } from '../domain/user';
-import { UpsertUserParams, UserRepository } from '../domain/user.repository';
+import {
+  CreateLocalUserParams,
+  LocalUserCredentials,
+  UpsertUserParams,
+  UserRepository,
+} from '../domain/user.repository';
 import { Role } from '../../../shared/enums/role.enum';
 
 /**
@@ -9,6 +14,7 @@ import { Role } from '../../../shared/enums/role.enum';
  */
 export class InMemoryUserRepository extends UserRepository {
   private readonly users = new Map<string, User>();
+  private readonly localPasswords = new Map<string, string>();
 
   findById(id: string): Promise<User | null> {
     return Promise.resolve(this.users.get(id) ?? null);
@@ -47,6 +53,35 @@ export class InMemoryUserRepository extends UserRepository {
       now,
     );
     this.users.set(user.id, user);
+    return Promise.resolve(user);
+  }
+
+  findLocalByEmail(email: string): Promise<LocalUserCredentials | null> {
+    const user = [...this.users.values()].find(
+      (u) => u.provider === AuthProvider.LOCAL && u.email === email,
+    );
+    if (!user) return Promise.resolve(null);
+    const passwordHash = this.localPasswords.get(user.id);
+    if (!passwordHash) return Promise.resolve(null);
+    return Promise.resolve({ user, passwordHash });
+  }
+
+  createLocal(params: CreateLocalUserParams): Promise<User> {
+    const now = new Date();
+    const id = randomUUID();
+    const user = new User(
+      id,
+      AuthProvider.LOCAL,
+      params.email,
+      params.email,
+      null,
+      `${params.firstName} ${params.lastName}`.trim(),
+      [Role.USER],
+      now,
+      now,
+    );
+    this.users.set(id, user);
+    this.localPasswords.set(id, params.passwordHash);
     return Promise.resolve(user);
   }
 

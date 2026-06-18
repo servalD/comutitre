@@ -24,13 +24,22 @@ this — never raw provider tokens.
   issues an **app session JWT** (our own token, `AppJwtService`), handed to the SPA via URL fragment.
 - Subsequent API calls send that app token as a Bearer; it is verified by `AppJwtService`.
 
-### ⚠️ Mock mode (current state)
+### FranceConnect modes
 
 `FRANCECONNECT_MODE=mock` short-circuits the OIDC calls with a deterministic fake identity so the
-full flow can be exercised without real credentials. The real `openid`-style exchange is scaffolded
-in `franceconnect.service.ts` behind `FRANCECONNECT_MODE=live`.
+full flow can be exercised without real credentials.
+
+`FRANCECONNECT_MODE=sandbox` uses FranceConnect's public integration credentials configured in the
+untracked local `.env.dev` file and the allowlisted callback `http://localhost:3000/callback`. If
+FranceConnect is unavailable or returns an error during the demo,
+`FRANCECONNECT_FALLBACK_TO_MOCK=true` issues the same app JWT from a mock identity so the user
+journey can continue.
+
+`FRANCECONNECT_MODE=live` is reserved for provisioned credentials and should disable mock fallback in
+production.
 
 **TODO before going live:**
+
 - Provision `FRANCECONNECT_CLIENT_ID` / `FRANCECONNECT_CLIENT_SECRET` / issuer URL, set
   `FRANCECONNECT_MODE=live`.
 - Persist and validate `state` + `nonce` (CSRF/replay) — see `FranceConnectLoginUseCase`.
@@ -39,6 +48,7 @@ in `franceconnect.service.ts` behind `FRANCECONNECT_MODE=live`.
 ## Token routing
 
 `CompositeTokenVerifier` inspects the (unverified) `iss` claim and routes:
+
 - `iss === "comutitre"` → app session token → `AppJwtService`.
 - otherwise → Dynamic token → `DynamicTokenVerifier`.
 
