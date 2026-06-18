@@ -121,6 +121,17 @@
         - "'already exists' not in secret_jwt.stderr"
       when: is_leader
 
+    - name: Créer le secret comutitre_mistral_api_key (leader)
+      ansible.builtin.command: docker secret create comutitre_mistral_api_key -
+      args:
+        stdin: "{{ vault_mistral_api_key }}"
+      register: secret_mistral
+      changed_when: secret_mistral.rc == 0
+      failed_when:
+        - secret_mistral.rc != 0
+        - "'already exists' not in secret_mistral.stderr"
+      when: is_leader
+
     # --- Config Traefik / certbot + stack (leader uniquement) ---
     - name: Créer les répertoires de config (leader)
       ansible.builtin.file:
@@ -175,3 +186,4 @@
         FRANCECONNECT_CLIENT_SECRET: "{{ vault_franceconnect_client_secret }}"
         FRANCECONNECT_ISSUER_URL: "{{ franceconnect_issuer_url }}"
         FRANCECONNECT_REDIRECT_URI: "https://{{ ingress_ip }}/api/auth/franceconnect/callback"
+        FRANCECONNECT_FALLBACK_TO_MOCK: "false"

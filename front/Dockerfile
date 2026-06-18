@@ -14,6 +14,11 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+
+# Vite inlines env vars at build time. In prod the SPA and API share an origin
+# behind Traefik, so default to the relative `/api` (overridable via --build-arg).
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm build
 
 

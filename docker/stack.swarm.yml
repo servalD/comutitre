@@ -16,6 +16,7 @@
 # Secrets (à créer une fois sur un manager) :
 #   printf '%s' "$(openssl rand -base64 32)" | docker secret create comutitre_app_jwt_secret -
 #   printf '%s' 'strong-db-password'         | docker secret create comutitre_db_password -
+#   printf '%s' 'your-mistral-api-key'       | docker secret create comutitre_mistral_api_key -
 version: '3.9'
 
 services:
@@ -116,9 +117,12 @@ services:
       FRANCECONNECT_CLIENT_SECRET: ${FRANCECONNECT_CLIENT_SECRET}
       FRANCECONNECT_ISSUER_URL: ${FRANCECONNECT_ISSUER_URL}
       FRANCECONNECT_REDIRECT_URI: ${FRANCECONNECT_REDIRECT_URI}
+      FRANCECONNECT_FALLBACK_TO_MOCK: ${FRANCECONNECT_FALLBACK_TO_MOCK:-false}
+      MISTRAL_API_KEY_FILE: /run/secrets/comutitre_mistral_api_key
     secrets:
       - comutitre_db_password
       - comutitre_app_jwt_secret
+      - comutitre_mistral_api_key
     networks:
       - backend
       - frontend
@@ -221,6 +225,8 @@ secrets:
   comutitre_db_password:
     external: true
   comutitre_app_jwt_secret:
+    external: true
+  comutitre_mistral_api_key:
     external: true
 
 networks:

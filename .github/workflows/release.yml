@@ -17,8 +17,11 @@ jobs:
         include:
           - name: back
             context: ./back
+            build_args: ''
           - name: front
             context: ./front
+            # SPA and API share an origin behind Traefik in prod.
+            build_args: VITE_API_URL=/api
     steps:
       - uses: actions/checkout@v4
 
@@ -45,6 +48,7 @@ jobs:
           context: ${{ matrix.context }}
           target: runner
           load: true
+          build-args: ${{ matrix.build_args }}
           tags: |
             ${{ steps.img.outputs.image }}:${{ github.sha }}
             ${{ steps.img.outputs.image }}:latest
