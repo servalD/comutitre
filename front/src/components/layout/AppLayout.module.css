@@ -20,20 +20,10 @@
   justify-content: space-between;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-md);
+  min-height: var(--header-height);
   max-width: var(--shell-max-desktop);
   margin: 0 auto;
   width: 100%;
-}
-
-.logoLink {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.logo {
-  height: 32px;
-  width: auto;
 }
 
 .profileBtn {
@@ -73,10 +63,12 @@
 @media (min-width: 768px) {
   .headerInner {
     padding: var(--space-md) var(--space-xl);
+    min-height: 72px;
   }
 
-  .logo {
-    height: 36px;
+  .profileBtn {
+    width: 44px;
+    height: 44px;
   }
 
   .main {

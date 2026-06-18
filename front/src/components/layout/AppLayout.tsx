@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import logo from '../../assets/comutitres_v_couleur.svg'
 import { BottomNav } from './BottomNav'
 import { DesktopNav } from './DesktopNav'
+import { Logo } from './Logo'
 import type { TabId } from './nav-items'
 import styles from './AppLayout.module.css'
 
@@ -35,9 +34,7 @@ export function AppLayout({
     <div className={styles.shell}>
       <header className={styles.header}>
         <div className={styles.headerInner}>
-          <Link to="/" className={styles.logoLink} aria-label="Comutitres — Accueil">
-            <img src={logo} alt="Comutitres" className={styles.logo} />
-          </Link>
+          <Logo />
 
           <DesktopNav activeTab={activeTab} />
 
