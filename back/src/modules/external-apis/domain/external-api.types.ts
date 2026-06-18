@@ -32,6 +32,7 @@ export interface VerificationResult {
   reasonCode?: string;
   userMessage: string;
   backOfficeAction?: string;
+  rawPayload?: any;
 }
 
 export interface AddressCandidate {
@@ -79,6 +80,17 @@ export interface EducationInstitution {
 export interface EligibilityCheckInput {
   type: EligibilityCheckType;
   scenario?: string;
+  numeroAllocataire?: string;
+  codePostal?: string;
+  ine?: string;
+  numeroFiscal?: string;
+  referenceAvis?: string;
+  nom?: string;
+  prenom?: string;
+  sexe?: string;
+  dateNaissance?: string;
+  codeEtablissement?: string;
+  anneeScolaire?: string;
 }
 
 export interface InternalMobilityCheckInput {

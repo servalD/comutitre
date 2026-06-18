@@ -59,4 +59,62 @@ describe('CheckEligibilityUseCase', () => {
       backOfficeAction: 'manual_review',
     });
   });
+
+  describe('Parameter matching cases', () => {
+    it('matches FAMILY_QUOTIENT (2345678, 75001)', async () => {
+      const result = await useCase.execute({
+        type: EligibilityCheckType.FAMILY_QUOTIENT,
+        numeroAllocataire: '2345678',
+        codePostal: '75001',
+      });
+      expect(result).toMatchObject({
+        status: VerificationStatus.VERIFIED,
+        reasonCode: 'family_quotient_confirmed',
+        userMessage: 'Quotient familial confirme (1234 €).',
+        backOfficeAction: 'auto_validate_right',
+      });
+      expect(result.rawPayload).toBeDefined();
+      expect(result.rawPayload.quotientFamilial).toBe(1234);
+    });
+
+    it('matches FAMILY_QUOTIENT starts with 404', async () => {
+      const result = await useCase.execute({
+        type: EligibilityCheckType.FAMILY_QUOTIENT,
+        numeroAllocataire: '4041234',
+      });
+      expect(result.status).toBe(VerificationStatus.REJECTED);
+      expect(result.reasonCode).toBe('family_quotient_rejected');
+    });
+
+    it('matches STUDENT_SCHOLARSHIP (1234567890A)', async () => {
+      const result = await useCase.execute({
+        type: EligibilityCheckType.STUDENT_SCHOLARSHIP,
+        ine: '1234567890A',
+      });
+      expect(result.status).toBe(VerificationStatus.VERIFIED);
+      expect(result.rawPayload.boursier).toBe(true);
+      expect(result.rawPayload.echelonBourse).toBe('6');
+    });
+
+    it('matches SCHOOL_STUDENT (martin, justine)', async () => {
+      const result = await useCase.execute({
+        type: EligibilityCheckType.SCHOOL_STUDENT,
+        nom: 'Martin',
+        prenom: 'Justine',
+        dateNaissance: '2000-01-20',
+      });
+      expect(result.status).toBe(VerificationStatus.VERIFIED);
+      expect(result.rawPayload.eleve.prenom).toBe('Justine');
+    });
+
+    it('matches TAX (1234567890123)', async () => {
+      const result = await useCase.execute({
+        type: EligibilityCheckType.TAX,
+        numeroFiscal: '1234567890123',
+      });
+      expect(result.status).toBe(VerificationStatus.VERIFIED);
+      expect(result.rawPayload.revenuFiscalReference).toBe(24500);
+    });
+  });
 });
+

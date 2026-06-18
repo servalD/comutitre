@@ -122,4 +122,7 @@ export class VerificationResultResponse {
 
   @ApiPropertyOptional({ example: 'auto_validate_right' })
   backOfficeAction?: string;
+
+  @ApiPropertyOptional({ description: 'Raw payload from external API response' })
+  rawPayload?: any;
 }
