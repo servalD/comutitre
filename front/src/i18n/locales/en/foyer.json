@@ -121,7 +121,7 @@
     "usage": {
       "daily": { "label": "Daily", "description": "Regular round trips to work or school" },
       "occasional": { "label": "Occasional", "description": "A few trips per week" },
-      "payPerUse": { "label": "Pay as you go", "description": "Pay for each Liberté+ trip" }
+      "payPerUse": { "label": "Liberté+ (usage-based)", "description": "Trips billed monthly by IDFM, no annual subscription" }
     },
     "person": {
       "ageBascule": "Switch to School plan expected at age 11",

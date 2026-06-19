@@ -142,7 +142,16 @@
         "label": "Do you want to renew or change your right?",
         "renew": "Renew my TST",
         "annual": "Switch to annual plan (full fare)",
-        "liberte": "Switch to Liberté+ (pay as you go)"
+        "liberte": "Switch to Liberté+"
+      },
+      "liberteSupport": {
+        "label": "Which support do you want for Liberté+?",
+        "passe": "Personalised Navigo card",
+        "passeDesc": "Load Liberté+ onto your physical Navigo card — managed by Comutitres.",
+        "telephone": "Mobile app (phone)",
+        "telephoneDesc": "Available exclusively via the IDFM app.",
+        "telephoneUnavailable": "Not available on Comutitres",
+        "telephoneBlock": "Liberté+ on phone is managed exclusively by the Île-de-France Mobilités app. Comutitres does not handle this option. Download the IDFM app to subscribe."
       },
       "socialLevelTst": {
         "label": "Which TST level?"
@@ -190,7 +199,7 @@
       "reduction_50": "Reduction −50%"
     },
     "tariff": {
-      "liberte": "Pay-as-you-go billing (no fixed plan)",
+      "liberte": "Monthly billing for validated trips (SEPA direct debit)",
       "tst": "Based on verified social right",
       "amethyste": "Based on department assignment",
       "perYear": "{{amount}} € / year"
@@ -222,7 +231,7 @@
       "duration": "12 months"
     },
     "liberte_plus": {
-      "desc": "Pay only for your validated trips — no annual commitment.",
+      "desc": "No annual commitment: your validated trips are billed monthly by IDFM (SEPA direct debit).",
       "duration": "No fixed duration (monthly trip billing)"
     },
     "tst": {

@@ -17,6 +17,10 @@ export function applyAdvisorAnswer(
     case 'travel_habit':
       next.travelHabit = value as SubscriptionAnswers['travelHabit']
       if (value !== 'social_rights') next.socialRightLevel = undefined
+      if (value !== 'occasional') next.liberteSupport = undefined
+      break
+    case 'liberte_support':
+      next.liberteSupport = value as SubscriptionAnswers['liberteSupport']
       break
     case 'social_right_level':
       next.socialRightLevel = value as SubscriptionAnswers['socialRightLevel']
@@ -41,6 +45,8 @@ export function getAdvisorSelectedValue(
       return answers.hasScholarship ? 'yes' : 'no'
     case 'travel_habit':
       return answers.travelHabit
+    case 'liberte_support':
+      return answers.liberteSupport
     case 'social_right_level':
       return answers.socialRightLevel
     case 'has_navigo_card':
@@ -67,6 +73,10 @@ export function clearAdvisorAnswer(
     case 'travel_habit':
       delete next.travelHabit
       delete next.socialRightLevel
+      delete next.liberteSupport
+      break
+    case 'liberte_support':
+      delete next.liberteSupport
       break
     case 'social_right_level':
       delete next.socialRightLevel

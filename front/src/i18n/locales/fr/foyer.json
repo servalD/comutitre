@@ -121,7 +121,7 @@
     "usage": {
       "daily": { "label": "Quotidien", "description": "Allers-retours réguliers travail ou école" },
       "occasional": { "label": "Occasionnel", "description": "Quelques trajets par semaine" },
-      "payPerUse": { "label": "À l'usage", "description": "Payer à chaque trajet Liberté+" }
+      "payPerUse": { "label": "À l'usage", "description": "Trajets facturés mensuellement, sans engagement annuel" }
     },
     "person": {
       "ageBascule": "Bascule Scolaire prévue à 11 ans",

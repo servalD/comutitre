@@ -67,15 +67,22 @@ export function SubscriptionAdvisorStep({
               <button
                 key={option.value}
                 type="button"
+                disabled={option.disabled}
                 className={[
                   styles.option,
                   selected ? styles.optionSelected : '',
+                  option.disabled ? styles.optionDisabled : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={() => onAnswer(currentQuestion.id, option.value)}
+                onClick={() => !option.disabled && onAnswer(currentQuestion.id, option.value)}
               >
-                <span className={styles.optionLabel}>{option.label}</span>
+                <span className={styles.optionLabelRow}>
+                  <span className={styles.optionLabel}>{option.label}</span>
+                  {option.disabled && option.disabledReason && (
+                    <span className={styles.optionBadge}>{option.disabledReason}</span>
+                  )}
+                </span>
                 {option.description ? (
                   <span className={styles.optionDesc}>{option.description}</span>
                 ) : null}
@@ -86,6 +93,10 @@ export function SubscriptionAdvisorStep({
         {blockingError ? <p className={styles.error}>{blockingError}</p> : null}
       </div>
     )
+  }
+
+  if (step.isBlocked && step.blockMessage) {
+    return <p className={styles.error}>{step.blockMessage}</p>
   }
 
   if (step.canRecommend) {

@@ -142,7 +142,16 @@
         "label": "Souhaitez-vous renouveler ou modifier votre droit ?",
         "renew": "Renouveler ma TST",
         "annual": "Passer au forfait annuel (plein tarif)",
-        "liberte": "Passer à Liberté+ (à l’usage)"
+        "liberte": "Passer à Liberté+"
+      },
+      "liberteSupport": {
+        "label": "Sur quel support souhaitez-vous Liberté+ ?",
+        "passe": "Passe Navigo personnalisé",
+        "passeDesc": "Chargez Liberté+ sur votre carte Navigo physique — géré par Comutitres.",
+        "telephone": "Application mobile (téléphone)",
+        "telephoneDesc": "Disponible exclusivement via l’application IDFM.",
+        "telephoneUnavailable": "Non disponible sur Comutitres",
+        "telephoneBlock": "Liberté+ sur téléphone est géré exclusivement par l’application Île-de-France Mobilités. Comutitres ne prend pas en charge cette formule. Téléchargez l’appli IDFM pour souscrire."
       },
       "socialLevelTst": {
         "label": "Quel niveau de TST ?"
@@ -190,7 +199,7 @@
       "reduction_50": "Réduction −50 %"
     },
     "tariff": {
-      "liberte": "Facturation à l’usage (pas de forfait fixe)",
+      "liberte": "Facturation mensuelle des trajets validés (prélèvement SEPA)",
       "tst": "Selon droit social vérifié",
       "amethyste": "Selon attribution départementale",
       "perYear": "{{amount}} € / an"
@@ -222,7 +231,7 @@
       "duration": "12 mois"
     },
     "liberte_plus": {
-      "desc": "Payez uniquement vos trajets validés — sans engagement annuel.",
+      "desc": "Sans engagement annuel : vos trajets validés sont facturés mensuellement par IDFM (prélèvement SEPA).",
       "duration": "Sans durée fixe (facturation mensuelle des trajets)"
     },
     "tst": {

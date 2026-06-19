@@ -157,9 +157,39 @@ export function getAdvisorStep(
     }
   }
 
+  if (questions.length === 0 && answers.travelHabit === 'occasional') {
+    if (answers.liberteSupport === undefined) {
+      questions.push({
+        id: 'liberte_support',
+        label: at('q.liberteSupport.label'),
+        options: [
+          {
+            value: 'passe',
+            label: at('q.liberteSupport.passe'),
+            description: at('q.liberteSupport.passeDesc'),
+          },
+          {
+            value: 'telephone',
+            label: at('q.liberteSupport.telephone'),
+            description: at('q.liberteSupport.telephoneDesc'),
+            disabled: true,
+            disabledReason: at('q.liberteSupport.telephoneUnavailable'),
+          },
+        ],
+      })
+    } else if (answers.liberteSupport === 'telephone') {
+      return {
+        questions: [],
+        canRecommend: false,
+        isBlocked: true,
+        blockMessage: at('q.liberteSupport.telephoneBlock'),
+      }
+    }
+  }
+
   if (questions.length === 0 && answers.hasNavigoCard === undefined) {
     const product = peekProduct(context, answers)
-    if (product && product !== 'liberte_plus') {
+    if (product && (product !== 'liberte_plus' || answers.liberteSupport === 'passe')) {
       questions.push({
         id: 'has_navigo_card',
         label: at('q.navigoCard.label'),
