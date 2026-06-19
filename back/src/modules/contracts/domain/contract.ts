@@ -4,6 +4,7 @@ export enum ContractStatus {
   EN_ATTENTE_DE_VALIDATION_DOCUMENTAIRE = 'en_attente_de_validation_documentaire',
   EN_ATTENTE_DE_SIGNATURE_PAYEUR = 'en_attente_de_signature_payeur',
   SIGNATURE_EN_COURS = 'signature_en_cours',
+  EN_ATTENTE_PAIEMENT = 'en_attente_paiement',
   ACTIF = 'actif',
   SUSPENDU = 'suspendu',
   RESILIÉ = 'resilie',
@@ -42,6 +43,11 @@ export class Contract {
     this.yousignSignatureRequestId = signatureRequestId;
     this.yousignSignatureLink = signatureLink;
     this.status = ContractStatus.SIGNATURE_EN_COURS;
+    this.updatedAt = new Date();
+  }
+
+  markAwaitingPayment(): void {
+    this.status = ContractStatus.EN_ATTENTE_PAIEMENT;
     this.updatedAt = new Date();
   }
 

@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { contractsApi } from '../api/contracts'
 import { SubscriptionWizardShell } from '../components/layout/SubscriptionWizardShell'
-import { RoleAssignmentForm } from '../components/subscription/RoleAssignmentForm'
-import { UsageSelectionCards } from '../components/subscription/UsageSelectionCards'
 import { RecommendationView } from '../components/subscription/RecommendationView'
+import { SubscriptionAdvisorStep } from '../components/subscription/SubscriptionAdvisorStep'
+import { UsageSelectionCards } from '../components/subscription/UsageSelectionCards'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { InfoBanner } from '../components/ui/InfoBanner'
@@ -11,16 +12,26 @@ import { SelectionCard } from '../components/ui/SelectionCard'
 import { WizardStepper } from '../components/ui/WizardStepper'
 import { useAuth } from '../contexts/AuthContext'
 import type { SubscriptionBeneficiaryView } from '../data/household-from-api'
+import { MOCK_SUBSCRIPTION, type UsageOption } from '../data/mock'
 import {
-  MOCK_SUBSCRIPTION,
-  type BeneficiaryChoice,
-  type SubscriptionProductId,
-  type UsageOption,
-} from '../data/mock'
+  applyAdvisorAnswer,
+  clearAdvisorAnswer,
+  getAdvisorSelectedValue,
+  seedAnswersFromUsage,
+} from '../domain/subscription-advisor/advisor-answers'
+import {
+  buildCreateContractPayload,
+  usageToTravelHabit,
+} from '../domain/subscription-advisor/contract-mapping'
+import type {
+  QuestionId,
+  SubscriptionAnswers,
+} from '../domain/subscription-advisor/types'
 import { useSubscriptionBeneficiaries } from '../hooks/useSubscriptionBeneficiaries'
+import { useAdvisorRecommendation } from '../hooks/useAdvisorRecommendation'
 import styles from './NouvelleSouscriptionPage.module.css'
 
-const ADD_PERSON_PATH = '/mobility/new'
+const ADD_PERSON_PATH = '/foyer/ajouter'
 const RETURN_PATH = '/souscription/nouvelle'
 const TOTAL_STEPS = 5
 
@@ -60,18 +71,9 @@ function beneficiaryLabel(person: SubscriptionBeneficiaryView) {
   return person.isSelf ? `${fullName} (Vous)` : fullName
 }
 
-function getDefaultProductForCategory(
-  category: BeneficiaryChoice,
-  products: typeof MOCK_SUBSCRIPTION.products,
-): SubscriptionProductId {
-  const suggested = products.find((p) => p.forBeneficiary.includes(category))
-  return suggested?.id ?? products[0].id
-}
-
 export function NouvelleSouscriptionPage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
-  const { products } = MOCK_SUBSCRIPTION
+  const { token, user } = useAuth()
   const { beneficiaries, loading, error } = useSubscriptionBeneficiaries()
 
   const defaultBeneficiary = beneficiaries.find((b) => b.isSelf) ?? beneficiaries[0]
@@ -79,13 +81,11 @@ export function NouvelleSouscriptionPage() {
 
   const [step, setStep] = useState(1)
   const [selectedBeneficiaryId, setSelectedBeneficiaryId] = useState<string | null>(null)
-  const [productId, setProductId] = useState<SubscriptionProductId>(() =>
-    getDefaultProductForCategory(
-      defaultBeneficiary?.productCategory ?? 'self',
-      products,
-    ),
-  )
   const [usage, setUsage] = useState<UsageOption>('daily')
+  const [answers, setAnswers] = useState<SubscriptionAnswers>({})
+  const [advisorHistory, setAdvisorHistory] = useState<QuestionId[]>([])
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const effectiveBeneficiaryId =
     selectedBeneficiaryId &&
@@ -98,38 +98,128 @@ export function NouvelleSouscriptionPage() {
     defaultBeneficiary
 
   const contactEmail = user?.email ?? MOCK_SUBSCRIPTION.beneficiaryForm.email
-  const isMinor = (selectedBeneficiary?.age ?? 18) < 18
-  const payerName = ownerBeneficiary
-    ? `${ownerBeneficiary.firstName} ${ownerBeneficiary.lastName}`
-    : 'Marie Dupont'
+
+  const { step: advisorStep, recommendation } = useAdvisorRecommendation(
+    selectedBeneficiary,
+    answers,
+  )
 
   const handleBeneficiaryChange = (person: SubscriptionBeneficiaryView) => {
     setSelectedBeneficiaryId(person.id)
-    setProductId(getDefaultProductForCategory(person.productCategory, products))
+    setAnswers({})
+    setAdvisorHistory([])
+    setSubmitError(null)
   }
 
-  const goNext = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1))
-  const goBack = () => setStep((s) => Math.max(1, s - 1))
+  const goNext = () => {
+    if (step === 3 && selectedBeneficiary) {
+      setAnswers((prev) =>
+        seedAnswersFromUsage(
+          prev,
+          selectedBeneficiary.currentProfile,
+          usageToTravelHabit(usage),
+        ),
+      )
+      setAdvisorHistory([])
+    }
+    setStep((s) => Math.min(TOTAL_STEPS, s + 1))
+  }
+
+  const goBack = () => {
+    setSubmitError(null)
+    if (step === 4) {
+      if (advisorHistory.length > 0) {
+        const lastQuestion = advisorHistory[advisorHistory.length - 1]
+        setAdvisorHistory((history) => history.slice(0, -1))
+        setAnswers((prev) => clearAdvisorAnswer(prev, lastQuestion))
+        return
+      }
+      setAnswers({})
+      setAdvisorHistory([])
+    }
+    setStep((s) => Math.max(1, s - 1))
+  }
+
+  const handleAdvisorAnswer = (questionId: QuestionId, value: string) => {
+    const hadAnswer = getAdvisorSelectedValue(answers, questionId) !== undefined
+    setAnswers((prev) => applyAdvisorAnswer(prev, questionId, value))
+    if (!hadAnswer) {
+      setAdvisorHistory((history) => [...history, questionId])
+    }
+  }
+
+  async function handleCreateContract() {
+    if (!token || !recommendation || !selectedBeneficiary || !ownerBeneficiary) {
+      return
+    }
+    const ownerEmail = user?.email
+    if (!ownerEmail) {
+      setSubmitError('Votre compte doit avoir une adresse e-mail pour souscrire.')
+      return
+    }
+
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const payload = buildCreateContractPayload({
+        recommendation,
+        beneficiary: selectedBeneficiary,
+        ownerEmail,
+        ownerFirstName: ownerBeneficiary.firstName,
+        ownerLastName: ownerBeneficiary.lastName,
+      })
+      const contract = await contractsApi.create(token, payload)
+      navigate(`/dossier?contractId=${contract.id}`, {
+        state: { recommendation },
+      })
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : 'Impossible de créer le dossier.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const getStepTitle = () => {
     switch (step) {
-      case 1: return 'Pour qui souhaitez-vous souscrire ?'
-      case 2: return 'Informations du bénéficiaire'
-      case 3: return 'Rôles et responsabilités'
-      case 4: return 'Quel est votre usage principal ?'
-      case 5: return 'Notre recommandation ✦'
-      default: return ''
+      case 1:
+        return 'Pour qui souhaitez-vous souscrire ?'
+      case 2:
+        return 'Informations du bénéficiaire'
+      case 3:
+        return 'Quel est votre usage principal ?'
+      case 4: {
+        const currentQuestion = advisorStep?.questions[0]
+        if (currentQuestion) return currentQuestion.label
+        if (advisorStep?.canRecommend) return 'Situation complète'
+        return 'Votre situation'
+      }
+      case 5:
+        return 'Notre recommandation ✦'
+      default:
+        return ''
     }
   }
 
   const getStepSubtitle = () => {
     switch (step) {
-      case 4:
+      case 3:
         return 'Votre réponse nous aide à vous proposer les titres les plus adaptés à vos besoins.'
+      case 4: {
+        const currentQuestion = advisorStep?.questions[0]
+        if (currentQuestion?.hint) return currentQuestion.hint
+        if (advisorStep?.canRecommend) {
+          return 'Vous pouvez passer à l’étape suivante pour voir notre recommandation.'
+        }
+        return 'Répondez à chaque question pour affiner le forfait proposé.'
+      }
       default:
         return undefined
     }
   }
+
+  const canContinueStep4 = advisorStep?.canRecommend ?? false
 
   const renderStep = () => {
     switch (step) {
@@ -165,7 +255,8 @@ export function NouvelleSouscriptionPage() {
               </div>
             )}
             <InfoBanner>
-              Si la personne est mineure, vous devrez renseigner le payeur.
+              Le titulaire du compte connecté sera automatiquement payeur et
+              responsable légal si le bénéficiaire est mineur.
             </InfoBanner>
           </>
         )
@@ -207,25 +298,30 @@ export function NouvelleSouscriptionPage() {
         )
 
       case 3:
-        return (
-          <RoleAssignmentForm
-            beneficiaryName={selectedBeneficiary?.firstName ?? '—'}
-            payerName={payerName}
-            isMinor={isMinor}
-          />
-        )
-
-      case 4:
         return <UsageSelectionCards selected={usage} onChange={setUsage} />
 
-      case 5:
-        return (
-          <RecommendationView
-            beneficiaryName={selectedBeneficiary?.firstName ?? '—'}
-            selectedId={productId}
-            onSelect={setProductId}
-            onContinue={() => navigate('/dossier')}
+      case 4:
+        return selectedBeneficiary ? (
+          <SubscriptionAdvisorStep
+            beneficiary={selectedBeneficiary}
+            answers={answers}
+            onAnswer={handleAdvisorAnswer}
           />
+        ) : null
+
+      case 5:
+        return recommendation && selectedBeneficiary ? (
+          <RecommendationView
+            beneficiaryName={selectedBeneficiary.firstName}
+            recommendation={recommendation}
+            submitting={submitting}
+            error={submitError}
+            onContinue={() => void handleCreateContract()}
+          />
+        ) : (
+          <p className={styles.loadingHint}>
+            Impossible de calculer une recommandation. Revenez à l’étape précédente.
+          </p>
         )
 
       default:
@@ -233,7 +329,7 @@ export function NouvelleSouscriptionPage() {
     }
   }
 
-  const showDefaultFooter = step < TOTAL_STEPS
+  const showDefaultFooter = step < 5
 
   return (
     <SubscriptionWizardShell
@@ -249,7 +345,12 @@ export function NouvelleSouscriptionPage() {
                 Étape {step} sur {TOTAL_STEPS}
               </p>
             )}
-            <h2 className={styles.question}>{getStepTitle()}</h2>
+            <h2
+              id={step === 4 ? 'advisor-question' : undefined}
+              className={styles.question}
+            >
+              {getStepTitle()}
+            </h2>
             {getStepSubtitle() && (
               <p className={styles.stepSubtitle}>{getStepSubtitle()}</p>
             )}
@@ -263,13 +364,19 @@ export function NouvelleSouscriptionPage() {
             <Button
               fullWidth
               onClick={goNext}
-              disabled={loading || !selectedBeneficiary}
+              disabled={
+                loading ||
+                !selectedBeneficiary ||
+                (step === 4 && !canContinueStep4)
+              }
             >
               Continuer
             </Button>
             {step > 1 && (
               <button type="button" className={styles.backLink} onClick={goBack}>
-                Retour
+                {step === 4 && advisorHistory.length > 0
+                  ? 'Question précédente'
+                  : 'Retour'}
               </button>
             )}
           </footer>

@@ -1,5 +1,12 @@
 import styles from './ValidationTimeline.module.css'
-import { MOCK_VALIDATION_TIMELINE } from '../../data/mock'
+
+export interface ValidationTimelineItem {
+  id: string
+  label: string
+  date: string
+  done?: boolean
+  active?: boolean
+}
 
 function CheckIcon() {
   return (
@@ -17,10 +24,14 @@ function SpinnerIcon() {
   )
 }
 
-export function ValidationTimeline() {
+interface ValidationTimelineProps {
+  items: ValidationTimelineItem[]
+}
+
+export function ValidationTimeline({ items }: ValidationTimelineProps) {
   return (
     <ol className={styles.timeline}>
-      {MOCK_VALIDATION_TIMELINE.map((item) => (
+      {items.map((item) => (
         <li key={item.id} className={[styles.item, item.done ? styles.done : '', item.active ? styles.active : ''].filter(Boolean).join(' ')}>
           <span className={styles.icon} aria-hidden="true">
             {item.done ? <CheckIcon /> : item.active ? <SpinnerIcon /> : null}
@@ -33,4 +44,22 @@ export function ValidationTimeline() {
       ))}
     </ol>
   )
+}
+
+export function buildValidationTimelineItems(
+  validated: boolean,
+): ValidationTimelineItem[] {
+  if (validated) {
+    return [
+      { id: '1', label: 'Dossier envoyé', date: 'Aujourd\'hui', done: true },
+      { id: '2', label: 'Vérification documents', date: 'Validé', done: true },
+      { id: '3', label: 'Activation titre', date: 'Aujourd\'hui', done: true },
+    ]
+  }
+
+  return [
+    { id: '1', label: 'Dossier envoyé', date: 'Aujourd\'hui', done: true },
+    { id: '2', label: 'Vérification documents', date: 'En cours', active: true },
+    { id: '3', label: 'Activation titre', date: 'En attente' },
+  ]
 }

@@ -6,6 +6,10 @@ import {
   createSubscriptionContext,
   getAdvisorStep,
 } from '../../../domain/subscription-advisor/advisor'
+import {
+  applyAdvisorAnswer,
+  getAdvisorSelectedValue,
+} from '../../../domain/subscription-advisor/advisor-answers'
 import type {
   QuestionId,
   SubscriptionAnswers,
@@ -67,49 +71,11 @@ export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
 
   function applyAnswer(questionId: QuestionId, value: string) {
     setError(null)
-    setAnswers((prev) => {
-      const next = { ...prev }
-      switch (questionId) {
-        case 'is_enrolled':
-          next.isEnrolled = value === 'yes'
-          if (!next.isEnrolled) next.hasScholarship = undefined
-          break
-        case 'has_scholarship':
-          next.hasScholarship = value === 'yes'
-          break
-        case 'travel_habit':
-          next.travelHabit = value as SubscriptionAnswers['travelHabit']
-          if (value !== 'social_rights') next.socialRightLevel = undefined
-          break
-        case 'social_right_level':
-          next.socialRightLevel = value as SubscriptionAnswers['socialRightLevel']
-          break
-        case 'has_navigo_card':
-          next.hasNavigoCard = value === 'yes'
-          break
-      }
-      return next
-    })
+    setAnswers((prev) => applyAdvisorAnswer(prev, questionId, value))
   }
 
   function getSelectedValue(questionId: QuestionId): string | undefined {
-    switch (questionId) {
-      case 'is_enrolled':
-        if (answers.isEnrolled === undefined) return undefined
-        return answers.isEnrolled ? 'yes' : 'no'
-      case 'has_scholarship':
-        if (answers.hasScholarship === undefined) return undefined
-        return answers.hasScholarship ? 'yes' : 'no'
-      case 'travel_habit':
-        return answers.travelHabit
-      case 'social_right_level':
-        return answers.socialRightLevel
-      case 'has_navigo_card':
-        if (answers.hasNavigoCard === undefined) return undefined
-        return answers.hasNavigoCard ? 'yes' : 'no'
-      default:
-        return undefined
-    }
+    return getAdvisorSelectedValue(answers, questionId)
   }
 
   async function handleSubscribe() {

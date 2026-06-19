@@ -109,18 +109,20 @@ export default function App() {
             }
           />
 
-          {/* ── Écrans maquette (features/design/views) ── */}
-          <Route path="/espace" element={<MonEspacePage />} />
-          <Route path="/dossier" element={<MonDossierPage />} />
-          <Route path="/dossier/signature" element={<DossierSignaturePage />} />
-          <Route path="/dossier/paiement" element={<DossierPaiementPage />} />
-          <Route path="/dossier/validation" element={<DossierValidationPage />} />
-          <Route path="/dossier/confirmation" element={<DossierConfirmationPage />} />
-          <Route path="/foyer" element={<MonFoyerPage />} />
-          <Route path="/foyer/ajouter" element={<AjouterPersonnePage />} />
-          <Route path="/foyer/:id" element={<FichePersonnePage />} />
-          <Route path="/aide" element={<AidePage />} />
-          <Route path="/souscription/nouvelle" element={<NouvelleSouscriptionPage />} />
+          {/* ── Écrans maquette (features/design/views) — protégés ── */}
+          <Route element={<ProtectedRoute zone="mobility" />}>
+            <Route path="/espace" element={<MonEspacePage />} />
+            <Route path="/dossier" element={<MonDossierPage />} />
+            <Route path="/dossier/signature" element={<DossierSignaturePage />} />
+            <Route path="/dossier/paiement" element={<DossierPaiementPage />} />
+            <Route path="/dossier/validation" element={<DossierValidationPage />} />
+            <Route path="/dossier/confirmation" element={<DossierConfirmationPage />} />
+            <Route path="/foyer" element={<MonFoyerPage />} />
+            <Route path="/foyer/ajouter" element={<AjouterPersonnePage />} />
+            <Route path="/foyer/:id" element={<FichePersonnePage />} />
+            <Route path="/aide" element={<AidePage />} />
+            <Route path="/souscription/nouvelle" element={<NouvelleSouscriptionPage />} />
+          </Route>
 
           {/* ── Mobilité : auth ── */}
           <Route path="/auth/callback" element={<AuthCallback zone="mobility" />} />

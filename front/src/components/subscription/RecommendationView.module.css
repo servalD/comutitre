@@ -313,3 +313,10 @@
 .otherLink:hover {
   color: var(--color-focus);
 }
+
+.error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-red, #c52625);
+  text-align: center;
+}

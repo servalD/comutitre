@@ -1,10 +1,13 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { contractsApi, type ContractResponse } from '../../api/contracts'
 import { AppLayout } from '../../components/layout/AppLayout'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { Button } from '../../components/ui/Button'
 import { DossierSubStepper } from '../../components/dossier/DossierSubStepper'
+import { useAuth } from '../../contexts/AuthContext'
 import { DOSSIER_SUB_STEPS } from '../../data/mock'
+import { productLabelFromContractCode } from '../../domain/subscription-dossier'
 import styles from './DossierPaiementPage.module.css'
 
 type PayMode = 'quarterly' | 'monthly'
@@ -29,12 +32,95 @@ function LockIcon() {
 
 export function DossierPaiementPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const contractId = searchParams.get('contractId') ?? ''
+  const { token } = useAuth()
   const [payMode, setPayMode] = useState<PayMode>('quarterly')
+  const [contract, setContract] = useState<ContractResponse | null>(null)
+  const [loading, setLoading] = useState(!!contractId && !!token)
+  const [paying, setPaying] = useState(false)
+  const [payError, setPayError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!token || !contractId) return
+
+    let cancelled = false
+    contractsApi
+      .get(token, contractId)
+      .then((c) => {
+        if (cancelled) return
+        if (
+          c.status === 'en_attente_de_validation_documentaire' ||
+          c.status === 'actif'
+        ) {
+          navigate(`/dossier/validation?contractId=${contractId}`, {
+            replace: true,
+          })
+          return
+        }
+        if (c.status !== 'en_attente_paiement') {
+          navigate(`/dossier?contractId=${contractId}`, { replace: true })
+          return
+        }
+        setContract(c)
+      })
+      .catch(() => {
+        if (!cancelled) navigate('/dossier', { replace: true })
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [token, contractId, navigate])
+
+  async function handlePay() {
+    if (!token || !contractId) return
+    setPaying(true)
+    setPayError(null)
+    try {
+      const result = await contractsApi.confirmPayment(token, contractId)
+      if (result.mobilityIdentityId) {
+        navigate(`/foyer/${result.mobilityIdentityId}`)
+      } else {
+        navigate(`/dossier/validation?contractId=${contractId}`)
+      }
+    } catch (err) {
+      setPayError(
+        err instanceof Error ? err.message : 'Le paiement n’a pas pu être confirmé.',
+      )
+      setPaying(false)
+    }
+  }
+
+  const productLabel = contract
+    ? productLabelFromContractCode(contract.productCode)
+    : 'Imagine R Junior'
+  const beneficiaryName = contract
+    ? `${contract.holderFirstName ?? ''} ${contract.holderLastName ?? ''}`.trim()
+    : '…'
+
+  if (loading) {
+    return (
+      <AppLayout activeTab="accueil">
+        <div className={styles.page}>
+          <PageHeader title="Paiement" backTo="/dossier" />
+          <p>Chargement…</p>
+        </div>
+      </AppLayout>
+    )
+  }
 
   return (
     <AppLayout activeTab="accueil">
       <div className={styles.page}>
-        <PageHeader title="Paiement" subtitle="Étape 4 sur 4" backTo="/dossier/signature" />
+        <PageHeader
+          title="Paiement"
+          subtitle="Étape 4 sur 4"
+          backTo={`/dossier/signature?contractId=${contractId}`}
+        />
 
         <div className={styles.stepperWrap}>
           <DossierSubStepper steps={DOSSIER_SUB_STEPS} currentStep={3} />
@@ -123,8 +209,8 @@ export function DossierPaiementPage() {
                   <span className={styles.recapType}>Junior</span>
                 </div>
                 <div>
-                  <p className={styles.recapName}>Imagine R Junior</p>
-                  <p className={styles.recapBenef}>Léa Dupont</p>
+                  <p className={styles.recapName}>{productLabel}</p>
+                  <p className={styles.recapBenef}>{beneficiaryName}</p>
                 </div>
               </div>
               <div className={styles.recapTotal}>
@@ -137,9 +223,14 @@ export function DossierPaiementPage() {
         </div>
 
         <div className={styles.footer}>
-          <Button fullWidth onClick={() => navigate('/dossier/validation')}>
+          {payError ? (
+            <p className={styles.payError} role="alert">
+              {payError}
+            </p>
+          ) : null}
+          <Button fullWidth disabled={paying || !token || !contractId} onClick={() => void handlePay()}>
             <LockIcon />
-            Payer 384 €
+            {paying ? 'Confirmation…' : 'Payer 384 €'}
           </Button>
         </div>
       </div>

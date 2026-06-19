@@ -11,13 +11,15 @@ import type {
   ProductType,
   RelationshipType,
 } from '../domain/types/mobility'
-import { MOCK_DOSSIER, MOCK_HOUSEHOLD, MOCK_PERSON_JULES, MOCK_PERSON_LEA, MOCK_PERSON_MARIE, MOCK_SUBSCRIPTION, MOCK_USER } from './mock'
+import { MOCK_DOSSIER, MOCK_DOSSIER_MARIE, MOCK_HOUSEHOLD, MOCK_PERSON_JULES, MOCK_PERSON_LEA, MOCK_PERSON_MARIE, MOCK_SUBSCRIPTION, MOCK_USER } from './mock'
+import type { SubscriptionDossierView } from '../domain/subscription-dossier'
+import { sortSubscriptionDossiersByPriority } from '../domain/subscription-dossier'
 import type { BeneficiaryChoice } from './mock'
 import type { Profile } from '../domain/types/mobility'
 
 import type { IdentityStatus } from '../domain/types/mobility'
 
-export type DataSource = 'api' | 'mock'
+export type DataSource = 'api' | 'mock' | 'none'
 
 export interface HouseholdMemberView {
   id: string
@@ -32,29 +34,12 @@ export interface HouseholdMemberView {
   avatarVariant?: 'default' | 'child'
 }
 
-export interface DossierView {
-  product: string
-  beneficiaryFirstName: string
-  currentStep: number
-  totalSteps: number
-  steps: { id: number; label: string }[]
-  stepHint: string
-}
-
 const PENDING_CONTRACT_STATUSES: ContractStatus[] = [
   'draft',
   'pending_document',
   'pending_payer_signature',
   'pending_payment',
 ]
-
-const DOSSIER_STEP_HINTS: Record<number, string> = {
-  1: 'Complétez les informations pour avancer dans la demande.',
-  2: 'Complétez vos justificatifs pour avancer dans la demande.',
-  3: 'Vérifiez votre dossier pour passer à l’étape suivante.',
-  4: 'Finalisez le paiement pour valider la souscription.',
-  5: 'Votre demande est en cours de validation.',
-}
 
 function hasActiveRelationship(
   identity: MobilityIdentityWithRelationships,
@@ -97,21 +82,6 @@ export function mapContractsToStatusLabel(contracts: Contract[]): string {
   return 'Aucun abonnement'
 }
 
-function contractStatusToStep(status: ContractStatus): number {
-  switch (status) {
-    case 'draft':
-      return 1
-    case 'pending_document':
-      return 2
-    case 'pending_payer_signature':
-      return 3
-    case 'pending_payment':
-      return 4
-    default:
-      return 2
-  }
-}
-
 export function mapIdentityToMember(
   identity: MobilityIdentityWithRelationships,
   contracts: Contract[],
@@ -146,43 +116,71 @@ export function findOwnerFirstName(
   return owner?.firstName ?? null
 }
 
-export function buildDossierFromContracts(
-  identities: MobilityIdentityWithRelationships[],
-  contractsByIdentity: Map<string, Contract[]>,
-): DossierView | null {
-  for (const identity of identities) {
-    const contracts = contractsByIdentity.get(identity.id) ?? []
-    const pending = contracts.find((c) =>
-      PENDING_CONTRACT_STATUSES.includes(c.status),
-    )
-    if (!pending) continue
-
-    const step = contractStatusToStep(pending.status)
-    return {
-      product: productLabels[pending.productType],
-      beneficiaryFirstName: identity.firstName,
-      currentStep: step,
-      totalSteps: MOCK_DOSSIER.totalSteps,
-      steps: MOCK_DOSSIER.steps,
-      stepHint: DOSSIER_STEP_HINTS[step] ?? DOSSIER_STEP_HINTS[2],
-    }
-  }
-  return null
-}
-
 export function mockHouseholdMembers(): HouseholdMemberView[] {
   return MOCK_HOUSEHOLD.map((m) => ({ ...m }))
 }
 
-export function mockDossierView(): DossierView {
-  return {
+export function mockSubscriptionDossierViews(): SubscriptionDossierView[] {
+  const jules: SubscriptionDossierView = {
+    contractId: 'mock-contract-jules',
     product: MOCK_DOSSIER.product,
+    productCode: 'imagine_r_scolaire',
     beneficiaryFirstName: MOCK_DOSSIER.beneficiaryFirstName,
+    beneficiaryFullName: MOCK_DOSSIER.beneficiaryFullName,
+    payerFullName: `${MOCK_USER.firstName} ${MOCK_USER.lastName}`,
+    payerEmail: 'marie.dupont@email.fr',
+    holderEmail: 'jules.dupont@email.fr',
+    status: 'en_attente_de_justificatif',
+    statusLabel: 'Justificatifs à déposer',
     currentStep: MOCK_DOSSIER.currentStep,
     totalSteps: MOCK_DOSSIER.totalSteps,
     steps: MOCK_DOSSIER.steps,
-    stepHint: 'Complétez vos justificatifs pour avancer dans la demande.',
+    stepHint: '1/3 documents déposés — complétez vos justificatifs.',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    documentsDeposed: 1,
+    documentsRequired: 3,
+    requiredDocumentLabels: [
+      "Pièce d'identité",
+      'Photo',
+      'Certificat scolaire',
+    ],
   }
+
+  const marie: SubscriptionDossierView = {
+    contractId: 'mock-contract-marie',
+    product: MOCK_DOSSIER_MARIE.product,
+    productCode: 'navigo_annuel',
+    beneficiaryFirstName: MOCK_DOSSIER_MARIE.beneficiaryFirstName,
+    beneficiaryFullName: MOCK_DOSSIER_MARIE.beneficiaryFullName,
+    payerFullName: `${MOCK_USER.firstName} ${MOCK_USER.lastName}`,
+    payerEmail: 'marie.dupont@email.fr',
+    holderEmail: 'marie.dupont@email.fr',
+    status: MOCK_DOSSIER_MARIE.status,
+    statusLabel: MOCK_DOSSIER_MARIE.statusLabel,
+    currentStep: MOCK_DOSSIER_MARIE.currentStep,
+    totalSteps: MOCK_DOSSIER.totalSteps,
+    steps: MOCK_DOSSIER.steps,
+    stepHint: 'Signez les CGVU et finalisez le paiement.',
+    createdAt: new Date().toISOString(),
+    documentsDeposed: MOCK_DOSSIER_MARIE.documentsDeposed,
+    documentsRequired: MOCK_DOSSIER_MARIE.documentsRequired,
+    requiredDocumentLabels: [
+      "Pièce d'identité",
+      'Justificatif de domicile',
+      'RIB',
+    ],
+  }
+
+  return sortSubscriptionDossiersByPriority([jules, marie])
+}
+
+export function mockSubscriptionDossierView(): SubscriptionDossierView {
+  return mockSubscriptionDossierViews()[0]!
+}
+
+/** @deprecated use mockSubscriptionDossierView */
+export function mockDossierView(): SubscriptionDossierView {
+  return mockSubscriptionDossierView()
 }
 
 export function mockGreetingFirstName(): string {
@@ -290,6 +288,10 @@ function contractToTitreStatusType(status: ContractStatus): PersonTitreStatusTyp
 export function mapContractToPersonTitre(contract: Contract): PersonTitreView {
   const statusType = contractToTitreStatusType(contract.status)
   const label = productLabels[contract.productType]
+  const pendingLabel =
+    contract.status === 'pending_document'
+      ? 'Validation par nos équipes'
+      : 'Dossier en cours'
 
   return {
     label,
@@ -298,7 +300,7 @@ export function mapContractToPersonTitre(contract: Contract): PersonTitreView {
       statusType === 'active'
         ? `${label} actif`
         : statusType === 'pending'
-          ? 'Dossier en cours'
+          ? pendingLabel
           : mapContractsToStatusLabel([contract]),
     statusType,
     productType: contract.productType,

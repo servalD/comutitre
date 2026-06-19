@@ -8,7 +8,13 @@
   background: var(--color-white);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+}
+
+@media (max-width: 767px) {
+  .stepperWrap {
+    padding: var(--space-md);
+  }
 }
 
 .layout {
@@ -64,9 +70,14 @@
   width: 100%;
 }
 
-.pdfCard:hover {
+.pdfCard:hover:not(:disabled) {
   border-color: var(--color-interaction);
   background: var(--color-bg-light);
+}
+
+.pdfCard:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .pdfCard:focus-visible {
@@ -202,13 +213,48 @@
 }
 
 .footer {
-  max-width: 420px;
+  display: flex;
+  justify-content: center;
+}
+
+.signBtn {
   width: 100%;
+  max-width: 320px;
+  min-height: 44px;
+  padding: 10px 20px;
+  font-size: 0.9375rem;
+}
+
+.signBtn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.signError {
+  color: var(--color-error, #c52625);
+  font-size: 0.875rem;
+  margin-top: var(--space-sm);
+}
+
+.pendingSignHint {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--color-anthracite);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
 }
 
 @media (min-width: 768px) {
-  .footer button {
+  .footer {
+    justify-content: flex-start;
+  }
+
+  .signBtn {
     width: auto;
-    min-width: 280px;
+    max-width: none;
   }
 }

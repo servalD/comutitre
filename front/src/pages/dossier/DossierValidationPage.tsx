@@ -1,9 +1,15 @@
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { contractsApi, type ContractResponse } from '../../api/contracts'
 import { AppLayout } from '../../components/layout/AppLayout'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { Button } from '../../components/ui/Button'
 import { Stepper } from '../../components/ui/Stepper'
-import { ValidationTimeline } from '../../components/dossier/ValidationTimeline'
+import {
+  ValidationTimeline,
+  buildValidationTimelineItems,
+} from '../../components/dossier/ValidationTimeline'
+import { useAuth } from '../../contexts/AuthContext'
 import styles from './DossierValidationPage.module.css'
 
 const DOSSIER_STEPS = [
@@ -30,34 +36,181 @@ function SandglassIllustration() {
   )
 }
 
+function CheckIllustration() {
+  return (
+    <svg viewBox="0 0 120 140" fill="none" aria-hidden="true" className={styles.illustration}>
+      <ellipse cx="60" cy="70" rx="48" ry="48" fill="#E8F5E9" />
+      <circle cx="60" cy="70" r="28" stroke="#007D44" strokeWidth="3" />
+      <path d="M48 70l8 8 16-16" stroke="#007D44" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 export function DossierValidationPage() {
+  const [searchParams] = useSearchParams()
+  const contractId = searchParams.get('contractId') ?? ''
+  const dossierLink = contractId ? `/dossier?contractId=${contractId}` : '/dossier'
+  const { token } = useAuth()
+  const navigate = useNavigate()
+  const [contract, setContract] = useState<ContractResponse | null>(null)
+  const [confirmingPayment, setConfirmingPayment] = useState(false)
+  const [confirmingValidation, setConfirmingValidation] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [validationComplete, setValidationComplete] = useState(false)
+
+  useEffect(() => {
+    if (!token || !contractId) return
+
+    let cancelled = false
+    contractsApi
+      .get(token, contractId)
+      .then((c) => {
+        if (cancelled) return
+        setContract(c)
+        if (c.status === 'actif') {
+          setValidationComplete(true)
+        }
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [token, contractId])
+
+  const needsDemoPaymentConfirm =
+    contract &&
+    (contract.status === 'actif' || contract.status === 'en_attente_paiement')
+
+  const needsDemoValidationConfirm =
+    contract &&
+    !validationComplete &&
+    contract.status === 'en_attente_de_validation_documentaire'
+
+  const timelineItems = useMemo(
+    () => buildValidationTimelineItems(validationComplete),
+    [validationComplete],
+  )
+
+  async function handleDemoConfirmPayment() {
+    if (!token || !contractId) return
+    setConfirmingPayment(true)
+    setActionError(null)
+    try {
+      const result = await contractsApi.confirmPayment(token, contractId)
+      setContract((prev) =>
+        prev ? { ...prev, status: result.status } : prev,
+      )
+      if (result.mobilityIdentityId) {
+        navigate(`/foyer/${result.mobilityIdentityId}`, { replace: true })
+      } else {
+        window.location.reload()
+      }
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Impossible de confirmer le paiement.',
+      )
+    } finally {
+      setConfirmingPayment(false)
+    }
+  }
+
+  async function handleDemoConfirmValidation() {
+    if (!token || !contractId) return
+    setConfirmingValidation(true)
+    setActionError(null)
+    try {
+      const result = await contractsApi.confirmValidation(token, contractId)
+      setValidationComplete(true)
+      setContract((prev) =>
+        prev ? { ...prev, status: result.status } : prev,
+      )
+      if (result.mobilityIdentityId) {
+        navigate(`/foyer/${result.mobilityIdentityId}`, { replace: true })
+      }
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : 'Impossible de valider le dossier.',
+      )
+    } finally {
+      setConfirmingValidation(false)
+    }
+  }
+
   return (
     <AppLayout activeTab="accueil">
       <div className={styles.page}>
-        <PageHeader title="Mon dossier" backTo="/dossier" />
+        <PageHeader title="Mon dossier" backTo={dossierLink} />
 
         <div className={styles.stepperWrap}>
-          <Stepper steps={DOSSIER_STEPS} currentStep={4} />
+          <Stepper steps={DOSSIER_STEPS} currentStep={validationComplete ? 5 : 4} />
         </div>
 
         <div className={styles.layout}>
           <div className={styles.hero}>
-            <SandglassIllustration />
+            {validationComplete ? <CheckIllustration /> : <SandglassIllustration />}
             <div className={styles.heroText}>
-              <h1 className={styles.heroTitle}>Votre dossier est en cours de validation</h1>
+              <h1 className={styles.heroTitle}>
+                {validationComplete
+                  ? 'Votre titre est activé'
+                  : 'Votre dossier est en cours de validation'}
+              </h1>
               <p className={styles.heroSubtitle}>
-                Nos équipes vérifient vos documents. Vous recevrez une notification dès que votre titre sera prêt.
+                {validationComplete
+                  ? 'Votre Imagine R est maintenant visible sur la fiche du bénéficiaire.'
+                  : 'Nos équipes vérifient vos documents. Vous recevrez une notification dès que votre titre sera prêt.'}
               </p>
             </div>
           </div>
 
           <div className={styles.timeline}>
-            <ValidationTimeline />
+            <ValidationTimeline items={timelineItems} />
           </div>
         </div>
 
         <div className={styles.footer}>
-          <Link to="/dossier">
+          {needsDemoPaymentConfirm && (
+            <div className={styles.demoConfirm}>
+              <p className={styles.demoHint}>
+                Paiement non enregistré — bouton réservé à la démo.
+              </p>
+              <Button
+                variant="secondary"
+                disabled={confirmingPayment || !token}
+                onClick={() => void handleDemoConfirmPayment()}
+              >
+                {confirmingPayment ? 'Confirmation…' : 'Confirmer le paiement (démo)'}
+              </Button>
+            </div>
+          )}
+
+          {needsDemoValidationConfirm && (
+            <div className={styles.demoConfirm}>
+              <p className={styles.demoHint}>
+                Simulez la validation par nos équipes et activez le titre sur le profil (démo).
+              </p>
+              {actionError ? (
+                <p className={styles.demoError} role="alert">
+                  {actionError}
+                </p>
+              ) : null}
+              <Button
+                variant="secondary"
+                disabled={confirmingValidation || !token}
+                onClick={() => void handleDemoConfirmValidation()}
+              >
+                {confirmingValidation ? 'Validation…' : 'Valider le dossier (démo)'}
+              </Button>
+            </div>
+          )}
+
+          {validationComplete && (
+            <p className={styles.demoSuccess} role="status">
+              Dossier validé — titre actif sur le profil.
+            </p>
+          )}
+
+          <Link to="/espace">
             <Button>
               Suivre mon dossier
             </Button>

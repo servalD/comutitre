@@ -8,7 +8,13 @@
   background: var(--color-white);
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+}
+
+@media (max-width: 767px) {
+  .stepperWrap {
+    padding: var(--space-md);
+  }
 }
 
 .layout {
@@ -315,4 +321,10 @@
 .footer button svg {
   width: 18px;
   height: 18px;
+}
+
+.payError {
+  color: var(--color-error, #c52625);
+  font-size: 0.875rem;
+  margin: 0 0 12px;
 }

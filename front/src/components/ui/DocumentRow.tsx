@@ -10,6 +10,7 @@ interface DocumentRowProps {
   status: DocumentStatus
   statusLabel: string
   onClick?: () => void
+  selected?: boolean
 }
 
 function ClockIcon() {
@@ -47,14 +48,22 @@ export function DocumentRow({
   status,
   statusLabel,
   onClick,
+  selected = false,
 }: DocumentRowProps) {
   const Tag = onClick ? 'button' : 'div'
 
   return (
     <Tag
       type={onClick ? 'button' : undefined}
-      className={[styles.row, onClick ? styles.clickable : ''].filter(Boolean).join(' ')}
+      className={[
+        styles.row,
+        onClick ? styles.clickable : '',
+        selected ? styles.selected : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       onClick={onClick}
+      aria-pressed={onClick ? selected : undefined}
     >
       <span className={styles.icon} aria-hidden="true">
         {icon}

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import MobileShell from '../components/MobileShell';
 import { contractsApi, type ContractResponse } from '../api/contracts';
 import { justificatifsApi, type JustificatifResponse, STATUS_LABELS } from '../api/justificatifs';
 import { useAuth } from '../contexts/AuthContext';
+import { allRequiredDocumentsReady, buildRequiredDocumentSlots } from '../domain/justificatif-slots';
 import ui from '../styles/comutitres-ui.module.css';
 
 const STATUS_LABELS_CONTRACT: Record<string, string> = {
@@ -33,6 +34,7 @@ function docPillClass(status: string): string {
 
 export default function ContratSignature() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { token } = useAuth();
 
   const [contract, setContract] = useState<ContractResponse | null>(null);
@@ -60,9 +62,19 @@ export default function ContratSignature() {
     setSigning(true);
     setSignError(null);
     try {
-      const { signatureLink } = await contractsApi.startSignature(token, id);
-      if (signatureLink) {
-        window.location.href = signatureLink;
+      const result = await contractsApi.startSignature(token, id);
+      if (result.alreadySigned || result.contractStatus === 'actif') {
+        navigate(`/dossier/paiement?contractId=${id}`);
+        return;
+      }
+      if (result.signatureLink) {
+        const popup = window.open(result.signatureLink, '_blank', 'noopener,noreferrer');
+        if (!popup) {
+          setSignError(
+            'Impossible d’ouvrir un nouvel onglet. Autorisez les pop-ups pour ce site, puis réessayez.',
+          );
+        }
+        setSigning(false);
       } else {
         setSignError('Lien de signature non disponible. Réessayez dans quelques instants.');
         setSigning(false);
@@ -95,9 +107,10 @@ export default function ContratSignature() {
   }
 
   const isActive = contract.status === 'actif';
+  const documentSlots = buildRequiredDocumentSlots(contract.productCode, justificatifs);
+  const documentsReady = allRequiredDocumentsReady(documentSlots);
   const canSign =
-    contract.status === 'en_attente_de_signature_payeur' ||
-    contract.status === 'en_attente_de_justificatif';
+    contract.status === 'en_attente_de_signature_payeur' && documentsReady;
 
   return (
     <MobileShell

@@ -155,6 +155,76 @@
   display: none;
 }
 
+.stepHintVisible {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.dossierLoading,
+.emptyDossierText {
+  margin: 0 0 var(--space-md);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.sectionHeading {
+  margin: 0 0 var(--space-sm);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-anthracite);
+}
+
+.dossierList {
+  list-style: none;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.statusBadge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-orange);
+  background: var(--color-orange-bg);
+}
+
+.registeredSummary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.registeredSummary dt {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.registeredSummary dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--color-anthracite);
+}
+
+.syncNote {
+  margin: var(--space-sm) 0 0;
+  font-size: 12px;
+  color: var(--color-success, #007d44);
+}
+
 .continueLink {
   text-decoration: none;
   flex-shrink: 0;

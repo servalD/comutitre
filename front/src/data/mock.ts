@@ -45,6 +45,19 @@ export const MOCK_DOSSIER = {
   ],
 }
 
+export const MOCK_DOSSIER_MARIE = {
+  product: 'Navigo Annuel',
+  beneficiaryFirstName: 'Marie',
+  beneficiaryFullName: 'Marie Dupont',
+  beneficiaryCharacter: 'marie' as const,
+  currentStep: 4,
+  totalSteps: 5,
+  status: 'en_attente_de_signature_payeur' as const,
+  statusLabel: 'Signature payeur',
+  documentsDeposed: 3,
+  documentsRequired: 3,
+}
+
 export const MOCK_DOSSIER_DETAIL = {
   product: 'Imagine R Scolaire',
   beneficiaryFullName: 'Jules Dupont',

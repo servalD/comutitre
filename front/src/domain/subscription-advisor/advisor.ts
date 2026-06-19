@@ -70,7 +70,7 @@ export function getAdvisorStep(
           context.profile === 'scolaire'
             ? 'Cette personne est-elle scolarisée cette année ?'
             : 'Cette personne est-elle inscrite dans un établissement cette année ?',
-        hint: 'Un justificatif scolaire ou étudiant sera demandé.',
+        hint: 'Répondez pour l’année scolaire en cours.',
         options: [
           { value: 'yes', label: 'Oui' },
           { value: 'no', label: 'Non' },
@@ -80,7 +80,7 @@ export function getAdvisorStep(
       questions.push({
         id: 'has_scholarship',
         label: 'Bénéficie-t-elle d’une bourse (tarif réduit) ?',
-        hint: 'Attestation de bourse à fournir si oui.',
+        hint: 'Avec une bourse, vous pourrez bénéficier d’un tarif réduit sur présentation d’une attestation.',
         options: [
           { value: 'yes', label: 'Oui, boursier(ère)' },
           { value: 'no', label: 'Non, tarif plein' },
@@ -163,10 +163,10 @@ export function getAdvisorStep(
       questions.push({
         id: 'has_navigo_card',
         label: 'Avez-vous déjà une carte Navigo personnalisée ?',
-        hint: 'Nécessaire pour charger la plupart des forfaits sur support physique.',
+        hint: 'C’est le support sur lequel votre forfait sera enregistré. Si vous n’en avez pas, nous vous guiderons pour en commander une.',
         options: [
-          { value: 'yes', label: 'Oui' },
-          { value: 'no', label: 'Non, à commander' },
+          { value: 'yes', label: 'Oui, j’en ai déjà une' },
+          { value: 'no', label: 'Non, je dois en commander une' },
         ],
       })
     }

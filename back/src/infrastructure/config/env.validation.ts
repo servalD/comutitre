@@ -138,6 +138,7 @@ export const envSchema = z
     MISTRAL_BASE_URL: z.string().url().optional(),
     MISTRAL_CHAT_MODEL: z.string().default('ministral-3b-2512'),
     MISTRAL_EMBED_MODEL: z.string().default('mistral-embed'),
+    MISTRAL_VISION_MODEL: z.string().default('pixtral-12b-2409'),
   })
   .superRefine((config, ctx) => {
     if (config.FRANCECONNECT_MODE === 'sandbox') {

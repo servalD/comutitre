@@ -3,33 +3,13 @@ import { AppLayout } from '../components/layout/AppLayout'
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
-import { ProgressBar } from '../components/ui/ProgressBar'
-import { Stepper } from '../components/ui/Stepper'
+import {
+  SubscriptionDossierActionAlert,
+  SubscriptionDossierEmptyCard,
+  SubscriptionDossierFeaturedCard,
+} from '../components/subscription/SubscriptionDossierCards'
 import { useHouseholdData } from '../hooks/useHouseholdData'
 import styles from './MonEspacePage.module.css'
-
-function DossierIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <polyline
-        points="14 2 14 8 20 8"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <line x1="9" y1="13" x2="15" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <line x1="9" y1="17" x2="13" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  )
-}
 
 function FoyerIcon() {
   return (
@@ -90,7 +70,9 @@ export function MonEspacePage() {
   const {
     greetingFirstName,
     members,
-    dossier,
+    dossiers,
+    latestDossier,
+    dossierSource,
     loading,
     error,
   } = useHouseholdData()
@@ -99,14 +81,16 @@ export function MonEspacePage() {
     (m) => !m.isSelf && m.identityStatus === 'pending_recovery',
   )
 
-  const {
-    product,
-    beneficiaryFirstName,
-    currentStep,
-    totalSteps,
-    steps,
-    stepHint,
-  } = dossier
+  const needsJustificatifs = dossiers.some(
+    (d) =>
+      d.status === 'en_attente_de_justificatif' &&
+      d.documentsDeposed < d.documentsRequired,
+  )
+  const needsSignature = dossiers.some(
+    (d) =>
+      d.status === 'en_attente_de_signature_payeur' ||
+      d.status === 'signature_en_cours',
+  )
 
   return (
     <AppLayout activeTab="accueil">
@@ -157,42 +141,26 @@ export function MonEspacePage() {
 
         <div className={styles.grid}>
           <section className={styles.primary} aria-label="Dossier en cours">
-            <Card className={styles.dossierCard}>
-              <div className={styles.cardHeader}>
-                <div className={styles.cardTitleRow}>
-                  <span className={styles.iconOrange} aria-hidden="true">
-                    <DossierIcon />
-                  </span>
-                  <div>
-                    <h2 className={styles.cardTitle}>Dossier en cours</h2>
-                    <p className={styles.cardSubtitle}>
-                      {product} pour {beneficiaryFirstName}
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {dossiers.length > 0 && (
+              <SubscriptionDossierActionAlert
+                needsJustificatifs={needsJustificatifs}
+                needsSignature={needsSignature}
+              />
+            )}
 
-              <div className={styles.stepperWrap}>
-                <Stepper steps={steps} currentStep={currentStep} />
-              </div>
-
-              <ProgressBar value={currentStep} max={totalSteps} />
-
-              <div className={styles.dossierFooter}>
-                <div className={styles.dossierMeta}>
-                  <span className={styles.stepLabel}>
-                    Étape {currentStep} sur {totalSteps}
-                  </span>
-                  <span className={styles.stepHint}>{stepHint}</span>
-                </div>
-                <Link to="/dossier" className={styles.continueLink}>
-                  <Button>
-                    Continuer
-                    <ChevronRight />
-                  </Button>
-                </Link>
-              </div>
-            </Card>
+            {loading ? (
+              <Card className={styles.dossierCard}>
+                <p className={styles.dossierLoading}>Chargement du dossier…</p>
+              </Card>
+            ) : latestDossier ? (
+              <SubscriptionDossierFeaturedCard
+                dossier={latestDossier}
+                totalPending={dossiers.length}
+                showSyncNote={dossierSource === 'api'}
+              />
+            ) : (
+              <SubscriptionDossierEmptyCard title="Dossier en cours" />
+            )}
           </section>
 
           <aside className={styles.sidebar} aria-label="Mon foyer">

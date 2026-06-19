@@ -28,6 +28,11 @@
   background: var(--color-bg-light);
 }
 
+.selected {
+  background: var(--color-bg-medium);
+  box-shadow: inset 3px 0 0 var(--color-interaction);
+}
+
 .icon {
   display: flex;
   align-items: center;

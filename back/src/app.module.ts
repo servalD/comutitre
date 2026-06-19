@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { validateEnv } from './infrastructure/config/env.validation';
+import { MistralModule } from './infrastructure/mistral/mistral.module';
 import { DatabaseModule } from './infrastructure/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ContractsModule } from './modules/contracts/contracts.module';
@@ -21,6 +22,7 @@ import { HealthController } from './health.controller';
       isGlobal: true,
       validate: validateEnv,
     }),
+    MistralModule,
     DatabaseModule,
     UsersModule,
     AuthModule,

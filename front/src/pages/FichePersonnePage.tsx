@@ -5,7 +5,7 @@ import { PageHeader } from '../components/layout/PageHeader'
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
-import type { PersonTitreView } from '../data/household-from-api'
+import type { DataSource, PersonTitreView } from '../data/household-from-api'
 import {
   getPersonDetailMocks,
   resolvePersonMockScenario,
@@ -113,7 +113,7 @@ function DemoBanner({
   error,
   activeTab,
 }: {
-  source: 'api' | 'mock'
+  source: DataSource
   mockSections: string[]
   error: string | null
   activeTab: TabId

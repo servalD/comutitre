@@ -3,12 +3,16 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Contract } from '../../domain/contract';
+import { Contract, ContractStatus } from '../../domain/contract';
 import { ContractRepository } from '../../domain/contract.repository';
+import { ContractSignatureSyncService } from '../services/contract-signature-sync.service';
 
 @Injectable()
 export class GetContractUseCase {
-  constructor(private readonly repo: ContractRepository) {}
+  constructor(
+    private readonly repo: ContractRepository,
+    private readonly signatureSync: ContractSignatureSyncService,
+  ) {}
 
   async execute(contractId: string, userId: string): Promise<Contract> {
     const contract = await this.repo.findById(contractId);
@@ -16,6 +20,11 @@ export class GetContractUseCase {
 
     if (contract.userId !== userId) {
       throw new ForbiddenException('Accès refusé');
+    }
+
+    if (contract.status === ContractStatus.SIGNATURE_EN_COURS) {
+      const synced = await this.signatureSync.syncIfPending(contractId);
+      return synced ?? contract;
     }
 
     return contract;

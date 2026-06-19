@@ -1,5 +1,5 @@
 .stepper {
-  padding: 0 var(--space-sm);
+  padding: 0 var(--space-md);
 }
 
 .list {
@@ -10,6 +10,7 @@
   padding: 0;
   margin: 0;
   gap: 0;
+  width: 100%;
 }
 
 .item {
@@ -17,6 +18,7 @@
   align-items: center;
   gap: 6px;
   position: relative;
+  min-width: 0;
 }
 
 .bubble {
@@ -68,11 +70,12 @@
 
 .line {
   display: block;
-  width: 40px;
+  width: 24px;
   height: 2px;
   background: var(--color-border);
-  margin: 0 4px;
-  flex-shrink: 0;
+  margin: 0 2px;
+  flex-shrink: 1;
+  min-width: 6px;
 }
 
 .line.lineDone {
@@ -80,6 +83,18 @@
 }
 
 @media (min-width: 600px) {
+  .stepper {
+    padding: 0 var(--space-lg);
+  }
+
+  .line {
+    width: 40px;
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 900px) {
   .line {
     width: 64px;
   }

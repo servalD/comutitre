@@ -5,6 +5,7 @@ import {
   JustificatifStatus,
   JustificatifType,
 } from '../../domain/justificatif';
+import { ContractDocumentGateService } from '../services/contract-document-gate.service';
 import { JustificatifRepository } from '../../domain/justificatif.repository';
 
 const TERMINAL_YOUSIGN_STATUSES = new Set([
@@ -21,6 +22,7 @@ export class ListJustificatifsUseCase {
   constructor(
     private readonly repo: JustificatifRepository,
     private readonly yousign: YousignClient,
+    private readonly documentGate: ContractDocumentGateService,
   ) {}
 
   async execute(contractId: string): Promise<Justificatif[]> {
@@ -43,6 +45,7 @@ export class ListJustificatifsUseCase {
       return;
     }
     if (!justificatif.yousignVerificationId) return;
+    if (justificatif.yousignVerificationId.startsWith('sandbox-local-')) return;
 
     try {
       const result =
@@ -58,6 +61,7 @@ export class ListJustificatifsUseCase {
 
       justificatif.applyYousignResult(result.status, result.statusCodes);
       await this.repo.save(justificatif);
+      await this.documentGate.tryAdvanceContract(justificatif.contractId);
       this.logger.log(
         `Justificatif ${justificatif.id} synced via polling → ${justificatif.status}`,
       );

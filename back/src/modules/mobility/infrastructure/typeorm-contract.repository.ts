@@ -50,6 +50,10 @@ export class TypeOrmContractRepository extends ContractRepository {
     return this.toDomain(saved);
   }
 
+  async updateStatus(id: string, status: ContractStatus): Promise<void> {
+    await this.repository.update(id, { status });
+  }
+
   private toDomain(entity: ContractOrmEntity): Contract {
     return new Contract(
       entity.id,

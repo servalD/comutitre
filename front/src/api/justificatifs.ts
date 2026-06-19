@@ -26,6 +26,16 @@ export const JUSTIFICATIF_TYPES = [
   { value: 'autre', label: 'Autre document' },
 ] as const;
 
+/** Types vérifiés automatiquement via YouSign Document Verification. */
+export const YOUSIGN_VERIFIED_TYPES = new Set<string>([
+  'piece_identite',
+  'justificatif_domicile',
+]);
+
+export function isYousignVerifiedType(type: string): boolean {
+  return YOUSIGN_VERIFIED_TYPES.has(type);
+}
+
 export const STATUS_LABELS: Record<string, string> = {
   recu: 'Reçu',
   en_cours_de_verification: 'Vérification en cours…',
@@ -37,10 +47,13 @@ export const STATUS_LABELS: Record<string, string> = {
   expire: 'Expiré',
 };
 
-/** Message client selon le résultat YouSign. */
+/** Message client selon le résultat YouSign ou la file agent. */
 export function clientStatusHint(j: JustificatifResponse): string | null {
   if (j.status === 'en_cours_de_verification') {
-    return 'Analyse automatique en cours par YouSign…';
+    if (isYousignVerifiedType(j.type)) {
+      return 'Analyse automatique en cours par YouSign…';
+    }
+    return 'Analyse automatique en cours par IA…';
   }
   if (j.status === 'pre_qualifie') {
     return 'Votre document a passé la vérification automatique. Un agent confirmera sous peu.';

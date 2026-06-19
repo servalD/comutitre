@@ -1,39 +1,51 @@
 import { useEffect, useState } from 'react'
+import { contractsApi } from '../api/contracts'
+import { justificatifsApi } from '../api/justificatifs'
 import { mobilityApi } from '../api/mobility-api'
 import { ApiError } from '../api/http-client'
 import { useAuth } from '../contexts/AuthContext'
 import type {
   DataSource,
-  DossierView,
   HouseholdMemberView,
 } from '../data/household-from-api'
 import {
-  buildDossierFromContracts,
   findOwnerFirstName,
   greetingFromDisplayName,
   mapIdentityToMember,
-  mockDossierView,
   mockGreetingFirstName,
   mockHouseholdMembers,
+  mockSubscriptionDossierViews,
   sortHouseholdMembers,
 } from '../data/household-from-api'
+import type { SubscriptionDossierView } from '../domain/subscription-dossier'
+import {
+  buildSubscriptionDossierView,
+  findPendingSubscriptionContracts,
+  sortSubscriptionDossiersByRecency,
+  sortSubscriptionDossiersForSelection,
+} from '../domain/subscription-dossier'
 import type { Contract } from '../domain/types/mobility'
 
 export interface HouseholdData {
   greetingFirstName: string
   members: HouseholdMemberView[]
   membersSource: DataSource
-  dossier: DossierView
+  dossiers: SubscriptionDossierView[]
+  latestDossier: SubscriptionDossierView | null
   dossierSource: DataSource
   loading: boolean
   error: string | null
 }
 
+const MOCK_DOSSIERS = sortSubscriptionDossiersForSelection(mockSubscriptionDossierViews())
+const MOCK_LATEST = sortSubscriptionDossiersByRecency(MOCK_DOSSIERS)[0] ?? null
+
 const MOCK_RESULT: Omit<HouseholdData, 'loading' | 'error'> = {
   greetingFirstName: mockGreetingFirstName(),
   members: mockHouseholdMembers(),
   membersSource: 'mock',
-  dossier: mockDossierView(),
+  dossiers: MOCK_DOSSIERS,
+  latestDossier: MOCK_LATEST,
   dossierSource: 'mock',
 }
 
@@ -41,7 +53,8 @@ interface LoadedHousehold {
   greetingFirstName: string
   members: HouseholdMemberView[]
   membersSource: DataSource
-  dossier: DossierView
+  dossiers: SubscriptionDossierView[]
+  latestDossier: SubscriptionDossierView | null
   dossierSource: DataSource
 }
 
@@ -62,9 +75,8 @@ export function useHouseholdData(): HouseholdData {
 
     let cancelled = false
 
-    mobilityApi
-      .listMyIdentities()
-      .then(async (identities) => {
+    Promise.all([mobilityApi.listMyIdentities(), contractsApi.list(token)])
+      .then(async ([identities, subscriptionContracts]) => {
         if (cancelled) return
 
         const contractsByIdentity = new Map<string, Contract[]>()
@@ -93,10 +105,24 @@ export function useHouseholdData(): HouseholdData {
               )
             : []
 
-        const dossierFromApi = buildDossierFromContracts(
-          identities,
-          contractsByIdentity,
+        const pendingContracts = findPendingSubscriptionContracts(
+          subscriptionContracts,
         )
+
+        const builtDossiers = await Promise.all(
+          pendingContracts.map(async (contract) => {
+            const uploads = await justificatifsApi
+              .list(token, contract.id)
+              .catch(() => [])
+            return buildSubscriptionDossierView(contract, uploads)
+          }),
+        )
+
+        if (cancelled) return
+
+        const dossiers = sortSubscriptionDossiersForSelection(builtDossiers)
+        const latestDossier =
+          sortSubscriptionDossiersByRecency(builtDossiers)[0] ?? null
 
         const greetingFirstName =
           findOwnerFirstName(identities) ??
@@ -112,8 +138,9 @@ export function useHouseholdData(): HouseholdData {
                 ? membersFromApi
                 : mockHouseholdMembers(),
             membersSource: membersFromApi.length > 0 ? 'api' : 'mock',
-            dossier: dossierFromApi ?? mockDossierView(),
-            dossierSource: dossierFromApi ? 'api' : 'mock',
+            dossiers,
+            latestDossier,
+            dossierSource: dossiers.length > 0 ? 'api' : 'none',
           },
           error: null,
         })
@@ -140,7 +167,18 @@ export function useHouseholdData(): HouseholdData {
   }
 
   if (!cache || cache.token !== token) {
-    return { ...MOCK_RESULT, loading: true, error: null }
+    return {
+      greetingFirstName:
+        greetingFromDisplayName(user?.displayName ?? null) ??
+        mockGreetingFirstName(),
+      members: mockHouseholdMembers(),
+      membersSource: 'mock',
+      dossiers: [],
+      latestDossier: null,
+      dossierSource: 'none',
+      loading: true,
+      error: null,
+    }
   }
 
   if (cache.error) {
@@ -149,6 +187,9 @@ export function useHouseholdData(): HouseholdData {
       greetingFirstName:
         greetingFromDisplayName(user?.displayName ?? null) ??
         mockGreetingFirstName(),
+      dossiers: [],
+      latestDossier: null,
+      dossierSource: 'none',
       loading: false,
       error: cache.error,
     }
@@ -158,5 +199,14 @@ export function useHouseholdData(): HouseholdData {
     return { ...cache.data, loading: false, error: null }
   }
 
-  return { ...MOCK_RESULT, loading: false, error: null }
+  return {
+    greetingFirstName: mockGreetingFirstName(),
+    members: mockHouseholdMembers(),
+    membersSource: 'mock',
+    dossiers: [],
+    latestDossier: null,
+    dossierSource: 'none',
+    loading: false,
+    error: null,
+  }
 }

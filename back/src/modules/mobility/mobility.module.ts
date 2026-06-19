@@ -25,6 +25,8 @@ import { ListMyIdentitiesUseCase } from './application/use-cases/list-my-identit
 import { ListSupportsUseCase } from './application/use-cases/list-supports.use-case';
 import { RevokeRelationshipUseCase } from './application/use-cases/revoke-relationship.use-case';
 import { ProvisionOwnerMobilityIdentityUseCase } from './application/use-cases/provision-owner-mobility-identity.use-case';
+import { ActivateSubscriptionOnProfileUseCase } from './application/use-cases/activate-subscription-on-profile.use-case';
+import { SyncSubscriptionPaymentToProfileUseCase } from './application/use-cases/sync-subscription-payment-to-profile.use-case';
 import { UpdateMobilityIdentityUseCase } from './application/use-cases/update-mobility-identity.use-case';
 import { ContractOrmEntity } from './infrastructure/contract.orm-entity';
 import { DocumentOrmEntity } from './infrastructure/document.orm-entity';
@@ -88,9 +90,13 @@ import { MobilityController } from './presentation/mobility.controller';
     CloseFoundSupportCaseUseCase,
     GetTimelineUseCase,
     ProvisionOwnerMobilityIdentityUseCase,
+    SyncSubscriptionPaymentToProfileUseCase,
+    ActivateSubscriptionOnProfileUseCase,
   ],
   exports: [
     ProvisionOwnerMobilityIdentityUseCase,
+    SyncSubscriptionPaymentToProfileUseCase,
+    ActivateSubscriptionOnProfileUseCase,
     MobilityIdentityRepository,
     RelationshipRepository,
     DefaultPermissionsService,

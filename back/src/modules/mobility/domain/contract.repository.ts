@@ -21,4 +21,5 @@ export abstract class ContractRepository {
     mobilityIdentityId: string,
   ): Promise<Contract[]>;
   abstract create(params: CreateContractParams): Promise<Contract>;
+  abstract updateStatus(id: string, status: ContractStatus): Promise<void>;
 }
