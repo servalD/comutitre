@@ -51,6 +51,13 @@
   padding-left: 1.2em;
 }
 
+/* Slightly smaller chat button (default is 75px). */
+.rcb-toggle-button {
+  width: 58px !important;
+  height: 58px !important;
+}
+
+
 /* ── Responsive: full-screen chat window on phones/tablets ──────────────────
  * On small screens the fixed-size popup is awkward; make it fill the viewport.
  * !important beats the inline chatWindowStyle set on the window element. */

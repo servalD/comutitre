@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -22,7 +23,7 @@ import type { Response } from 'express';
 import { Env } from '../../../infrastructure/config/env.validation';
 import { CurrentUser } from '../../../shared/decorators/current-user.decorator';
 import { Public } from '../../../shared/decorators/public.decorator';
-import { User } from '../../users/domain/user';
+import { AuthProvider, User } from '../../users/domain/user';
 import {
   toUserResponse,
   UserResponse,
@@ -31,8 +32,24 @@ import { FranceConnectLoginUseCase } from '../application/use-cases/franceconnec
 import { FranceConnectCallbackUseCase } from '../application/use-cases/franceconnect-callback.use-case';
 import { RegisterRequest } from '../application/dto/register.request';
 import { LoginRequest } from '../application/dto/login.request';
+import {
+  CheckIdentityMatchRequest,
+  CheckIdentityMatchResponse,
+} from '../application/dto/check-identity-match.request';
+import {
+  RequestRecoveryRequest,
+  RequestRecoveryResponse,
+} from '../application/dto/request-recovery.request';
+import { CompleteRecoveryRequest } from '../application/dto/complete-recovery.request';
 import { RegisterUseCase } from '../application/use-cases/register.use-case';
 import { LoginWithCredentialsUseCase } from '../application/use-cases/login-with-credentials.use-case';
+import { CheckIdentityMatchUseCase } from '../application/use-cases/check-identity-match.use-case';
+import { RequestRecoveryUseCase } from '../application/use-cases/request-recovery.use-case';
+import { CompleteRecoveryUseCase } from '../application/use-cases/complete-recovery.use-case';
+import {
+  DynamicExternalJwtResult,
+  DynamicExternalJwtService,
+} from '../infrastructure/dynamic-external-jwt.service';
 import { buildFranceConnectErrorRedirectUrl } from './franceconnect-error-redirect';
 
 class TokenResponse {
@@ -48,6 +65,10 @@ export class AuthController {
     private readonly franceConnectCallback: FranceConnectCallbackUseCase,
     private readonly registerUseCase: RegisterUseCase,
     private readonly loginWithCredentials: LoginWithCredentialsUseCase,
+    private readonly dynamicExternalJwt: DynamicExternalJwtService,
+    private readonly checkIdentityMatchUseCase: CheckIdentityMatchUseCase,
+    private readonly requestRecoveryUseCase: RequestRecoveryUseCase,
+    private readonly completeRecoveryUseCase: CompleteRecoveryUseCase,
   ) {}
 
   /** Returns the current authenticated user (works for both providers). */
@@ -57,6 +78,44 @@ export class AuthController {
   @ApiOkResponse({ type: UserResponse })
   me(@CurrentUser() user: User): UserResponse {
     return toUserResponse(user);
+  }
+
+  @Get('dynamic/.well-known/jwks.json')
+  @Public()
+  @ApiOperation({ summary: 'JWKS public pour JWT externe Dynamic' })
+  dynamicJwks(): Promise<{ keys: Array<Record<string, unknown>> }> {
+    return this.dynamicExternalJwt.getJwks();
+  }
+
+  @Post('dynamic/external-jwt')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Emet un JWT court dedie a Dynamic third-party auth',
+  })
+  dynamicExternalToken(
+    @CurrentUser() user: User,
+  ): Promise<DynamicExternalJwtResult> {
+    if (user.provider !== AuthProvider.FRANCECONNECT) {
+      throw new ForbiddenException(
+        'Dynamic sandbox binding requires a FranceConnect account',
+      );
+    }
+
+    if (
+      this.config.get('DYNAMIC_ENVIRONMENT_KIND', { infer: true }) !== 'sandbox'
+    ) {
+      throw new ForbiddenException(
+        'Dynamic external JWT issuance is enabled only for sandbox',
+      );
+    }
+
+    return this.dynamicExternalJwt.issueForUser({
+      userId: user.id,
+      email: user.email,
+      holderId: user.id,
+      identityProvider: user.provider,
+    });
   }
 
   /** Create a local (email + password) account. */
@@ -78,6 +137,41 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Identifiants incorrects' })
   async login(@Body() dto: LoginRequest): Promise<TokenResponse> {
     return this.loginWithCredentials.execute(dto);
+  }
+
+  @Public()
+  @Post('check-identity-match')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Vérifier si un profil mobilité existant peut être récupéré',
+  })
+  @ApiOkResponse({ type: CheckIdentityMatchResponse })
+  async checkIdentityMatch(
+    @Body() dto: CheckIdentityMatchRequest,
+  ): Promise<CheckIdentityMatchResponse> {
+    return this.checkIdentityMatchUseCase.execute(dto);
+  }
+
+  @Public()
+  @Post('request-recovery')
+  @ApiOperation({ summary: 'Demander la récupération d’un profil mobilité' })
+  @ApiCreatedResponse({ type: RequestRecoveryResponse })
+  async requestRecovery(
+    @Body() dto: RequestRecoveryRequest,
+  ): Promise<RequestRecoveryResponse> {
+    return this.requestRecoveryUseCase.execute(dto);
+  }
+
+  @Public()
+  @Post('complete-recovery')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Finaliser la récupération avec le code reçu' })
+  @ApiOkResponse({ type: TokenResponse })
+  @ApiUnauthorizedResponse({ description: 'Code invalide ou expiré' })
+  async completeRecovery(
+    @Body() dto: CompleteRecoveryRequest,
+  ): Promise<TokenResponse> {
+    return this.completeRecoveryUseCase.execute(dto);
   }
 
   /** Step 1: redirect the user to FranceConnect to authenticate. */

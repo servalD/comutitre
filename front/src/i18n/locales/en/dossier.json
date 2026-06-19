@@ -1,0 +1,69 @@
+{
+  "subStepperAria": "Application steps",
+  "detail": {
+    "title": "My application",
+    "summaryAria": "Application summary",
+    "documents": "Documents",
+    "instruction": "Upload the following documents to continue your application.",
+    "uploadAria": "Document upload",
+    "submitDocuments": "Upload my documents"
+  },
+  "signature": {
+    "context": "As the payer, you must sign the terms to validate {{name}}'s subscription.",
+    "cgvuTitle": "General Terms of Sale and Use",
+    "accept": "I have read and accept the terms",
+    "secureSignature": "Secure electronic signature",
+    "via": "via",
+    "recap": "Summary",
+    "plan": "Plan",
+    "beneficiary": "Beneficiary",
+    "payer": "Payer",
+    "annualAmount": "Annual amount",
+    "sign": "Sign the terms"
+  },
+  "paiement": {
+    "title": "Payment",
+    "choosePayMode": "Choose your payment method",
+    "fourTimes": "Pay in 4 instalments",
+    "fourInstalments": "4 payments of €96.00",
+    "monthly": "Monthly direct debit",
+    "twelveInstalments": "12 payments of €32.00",
+    "paymentInfo": "Payment information",
+    "cardNumber": "Card number",
+    "expiry": "Expiry date",
+    "secure": "Secure payment (simulation)",
+    "annualTotal": "Annual total",
+    "payerNote": "The payer will be charged each month",
+    "pay": "Pay {{amount}}"
+  },
+  "validation": {
+    "steps": {
+      "informations": "Information",
+      "justificatifs": "Documents",
+      "photo": "Photo",
+      "recapitulatif": "Summary",
+      "validation": "Validation"
+    },
+    "heroTitle": "Your application is being validated",
+    "heroSubtitle": "Our teams are checking your documents. You'll be notified as soon as your pass is ready.",
+    "track": "Track my application",
+    "helpLink": "A question? View help"
+  },
+  "confirmation": {
+    "activeBadge": "Active pass",
+    "title": "{{product}} is active!",
+    "subtitle": "{{name}} can travel right now on the Île-de-France network.",
+    "validUntil": "Valid until {{date}}",
+    "viewPass": "View my pass",
+    "download": "Download the certificate",
+    "renewal_one": "Next deadline: renewal in {{count}} month",
+    "renewal_other": "Next deadline: renewal in {{count}} months"
+  },
+  "stepHints": {
+    "1": "Complete the information to move forward with the application.",
+    "2": "Complete your supporting documents to move forward with the application.",
+    "3": "Check your file to move to the next step.",
+    "4": "Finalise the payment to validate the subscription.",
+    "5": "Your application is being validated."
+  }
+}

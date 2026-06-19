@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Trans, useTranslation } from 'react-i18next'
 import { PublicAppFrame } from '../components/layout/PublicAppFrame'
 import { authApi } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
@@ -57,6 +58,7 @@ function EyeIcon({ visible }: { visible: boolean }) {
 
 export default function Login({ zone = 'mobility' }: LoginProps) {
   const { login } = useAuth()
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from
@@ -81,7 +83,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
       const { accessToken } = await authApi.login({ email, password })
       await afterLogin(accessToken)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+      setError(err instanceof Error ? err.message : t('errors.generic'))
     } finally {
       setLoading(false)
     }
@@ -99,7 +101,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
       }
       window.location.href = `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'}/auth/franceconnect/login`
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+      setError(err instanceof Error ? err.message : t('errors.generic'))
       setLoading(false)
     }
   }
@@ -116,7 +118,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
             />
           </div>
 
-          <h1 className={styles.title}>Connexion</h1>
+          <h1 className={styles.title}>{t('login.title')}</h1>
 
           {error && (
             <div className={styles.error} role="alert">
@@ -128,7 +130,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
             {/* Email */}
             <div className={styles.field}>
               <label htmlFor="email" className={styles.label}>
-                Adresse e-mail
+                {t('login.email')}
               </label>
               <div className={styles.inputWrap}>
                 <span className={styles.inputIcon}><MailIcon /></span>
@@ -138,7 +140,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
                   autoComplete="email"
                   required
                   className={styles.input}
-                  placeholder="exemple@email.fr"
+                  placeholder={t('login.emailPlaceholder')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -148,7 +150,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
             {/* Password */}
             <div className={styles.field}>
               <label htmlFor="password" className={styles.label}>
-                Mot de passe
+                {t('login.password')}
               </label>
               <div className={styles.inputWrap}>
                 <span className={styles.inputIcon}><LockIcon /></span>
@@ -166,7 +168,7 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
                   type="button"
                   className={styles.eyeBtn}
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                  aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
                 >
                   <EyeIcon visible={showPassword} />
                 </button>
@@ -175,17 +177,17 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
 
             {/* Mot de passe oublié */}
             <div className={styles.forgotRow}>
-              <a href="#" className={styles.forgotLink}>Mot de passe oublié ?</a>
+              <a href="#" className={styles.forgotLink}>{t('login.forgot')}</a>
             </div>
 
             <button type="submit" className={styles.btnPrimary} disabled={loading}>
               {loading && <span className={styles.spinner} aria-hidden="true" />}
-              {loading ? 'Connexion…' : 'Se connecter'}
+              {loading ? t('login.connecting') : t('login.submit')}
             </button>
           </form>
 
           {/* Séparateur */}
-          <div className={styles.divider}><span>ou</span></div>
+          <div className={styles.divider}><span>{t('or')}</span></div>
 
           {/* FranceConnect */}
           <button
@@ -201,22 +203,32 @@ export default function Login({ zone = 'mobility' }: LoginProps) {
                 className={styles.fcLogo}
               />
             </span>
-            <span>S&apos;identifier avec FranceConnect</span>
+            <span>{t('login.franceConnect')}</span>
           </button>
 
           {/* Créer un compte */}
           <p className={styles.createRow}>
             <Link to={registerForZone(zone)} className={styles.createLink}>
-              Créer un compte <span aria-hidden="true">›</span>
+              {t('login.createAccount')} <span aria-hidden="true">›</span>
             </Link>
           </p>
 
           {/* CGU */}
           <p className={styles.legal}>
-            En continuant vous acceptez les{' '}
-            <a href="https://www.comutitres.fr/cgu" className={styles.legalLink} target="_blank" rel="noopener noreferrer">
-              CGU
-            </a>
+            <Trans
+              i18nKey="login.legal"
+              ns="auth"
+              components={{
+                cgu: (
+                  <a
+                    href="https://www.comutitres.fr/cgu"
+                    className={styles.legalLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                ),
+              }}
+            />
           </p>
 
         </div>

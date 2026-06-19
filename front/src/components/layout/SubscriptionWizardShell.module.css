@@ -1,0 +1,127 @@
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-page-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  color: var(--color-anthracite);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.closeBtn:hover {
+  background: var(--color-bg-medium);
+  color: var(--color-interaction);
+}
+
+.closeBtn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.logo {
+  height: 36px;
+  width: auto;
+  max-width: 140px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.headerSpacer {
+  width: 44px;
+}
+
+.frame {
+  flex: 1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+  padding-top: var(--space-sm);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.stepBadge {
+  display: inline-flex;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-medium);
+  color: var(--color-interaction);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: var(--space-md) var(--space-xl);
+  }
+
+  .logo {
+    height: 44px;
+    max-width: 168px;
+  }
+
+  .frame {
+    padding: var(--space-xl);
+    gap: var(--space-xl);
+    max-width: 800px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .intro {
+    padding-top: var(--space-md);
+  }
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    max-width: 860px;
+    padding: var(--space-xl) var(--space-xl) 48px;
+  }
+}

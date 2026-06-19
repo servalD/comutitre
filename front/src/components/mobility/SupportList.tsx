@@ -1,4 +1,5 @@
-import { supportStatusLabels } from '../../constants/labels'
+import { useTranslation } from 'react-i18next'
+import { useLabels } from '../../constants/labels'
 import type { Support, SupportStatus } from '../../domain/types/mobility'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
@@ -14,6 +15,8 @@ function supportTone(status: SupportStatus): 'success' | 'warning' | 'danger' | 
 }
 
 export function SupportList({ supports }: { supports: Support[] }) {
+  const { t, i18n } = useTranslation('mobility')
+  const { supportStatusLabels } = useLabels()
   if (supports.length === 0) return null
 
   return (
@@ -26,11 +29,13 @@ export function SupportList({ supports }: { supports: Support[] }) {
                 💳
               </span>
               <div>
-                <strong>Carte Navigo</strong>
+                <strong>{t('support.navigoCard')}</strong>
                 <p className={styles.sub}>
                   {support.activatedAt
-                    ? `Activée le ${new Date(support.activatedAt).toLocaleDateString('fr-FR')}`
-                    : 'Carte physique'}
+                    ? t('support.activatedOn', {
+                        date: new Date(support.activatedAt).toLocaleDateString(i18n.language),
+                      })
+                    : t('support.physicalCard')}
                 </p>
               </div>
               <Badge tone={supportTone(support.status)}>

@@ -23,7 +23,6 @@ export enum JustificatifStatus {
 /** Types that trigger a YouSign Document Verification call. */
 export const YOUSIGN_VERIFIED_TYPES = new Set<JustificatifType>([
   JustificatifType.PIECE_IDENTITE,
-  JustificatifType.JUSTIFICATIF_DOMICILE,
 ]);
 
 export class Justificatif {

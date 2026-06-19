@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "subscription": "My subscription",
+    "sav": "Customer support",
+    "documents": "Documents",
+    "account": "My account"
+  },
+  "user": "User",
+  "logoutTitle": "Log out",
+  "greeting": "Hello, {{name}}",
+  "you": "you",
+  "subtitle": "Here is a summary of your Comutitres account",
+  "notifications": "Notifications",
+  "alertRenewal_one": "Your renewal is approaching in {{count}} day.",
+  "alertRenewal_other": "Your renewal is approaching in {{count}} days.",
+  "active": "Active",
+  "valid": "Valid",
+  "zones": "Zones {{zones}}",
+  "kpi": {
+    "status": "Subscription status",
+    "nextPayment": "Next payment",
+    "paymentOn": "on {{date}}",
+    "renewalIn": "Renewal in",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "physicalSupport": "Physical support"
+  },
+  "card": {
+    "start": "Start",
+    "renewal": "Renewal",
+    "contractNo": "Contract no."
+  },
+  "actions": {
+    "renew": "Renew",
+    "contactSav": "Contact support",
+    "lostStolen": "Lost/stolen pass"
+  },
+  "recentActivity": "Recent activity",
+  "activity": {
+    "renewalScheduled": "Automatic renewal scheduled",
+    "paymentDone": "Payment of €86.40 completed",
+    "emailSent": "Confirmation email sent",
+    "subscriptionActivated": "Subscription activated"
+  },
+  "holderInfo": "Holder information",
+  "info": {
+    "name": "Name",
+    "email": "Email",
+    "account": "Account",
+    "local": "Local",
+    "role": "Role"
+  }
+}

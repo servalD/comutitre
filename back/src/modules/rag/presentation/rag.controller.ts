@@ -32,6 +32,7 @@ export class RagController {
       for await (const event of this.rag.streamAnswer(
         dto.question,
         dto.history ?? [],
+        dto.language ?? 'fr',
       )) {
         write(event);
       }

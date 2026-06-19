@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { getFranceConnectLoginUrl } from '../../api/mobility-api'
 import { useAuth } from '../../auth/use-auth'
 import { Button } from '../../components/ui/Button'
@@ -10,6 +11,7 @@ import styles from './AuthPages.module.css'
 
 export function LoginPage() {
   const { setToken, isAuthenticated } = useAuth()
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const [devToken, setDevToken] = useState('')
 
@@ -36,23 +38,23 @@ export function LoginPage() {
           <span className={styles.icon} aria-hidden="true">
             🚇
           </span>
-          <h1>Comutitres Mobilité</h1>
-          <p>Connectez-vous pour gérer vos identités de mobilité.</p>
+          <h1>{t('devLogin.title')}</h1>
+          <p>{t('devLogin.subtitle')}</p>
         </div>
 
         <Button onClick={handleFranceConnect} className={styles.fullWidth}>
-          <span aria-hidden="true">🇫🇷</span> Se connecter avec FranceConnect
+          <span aria-hidden="true">🇫🇷</span> {t('devLogin.franceConnect')}
         </Button>
 
         <div className={styles.divider}>
-          <span>ou mode développement</span>
+          <span>{t('devLogin.orDev')}</span>
         </div>
 
         <form onSubmit={handleDevLogin}>
           <Field
-            label="Token JWT"
+            label={t('devLogin.tokenLabel')}
             htmlFor="devToken"
-            hint="Collez le token reçu après FranceConnect mock"
+            hint={t('devLogin.tokenHint')}
           >
             <input
               id="devToken"
@@ -64,12 +66,12 @@ export function LoginPage() {
             />
           </Field>
           <Button type="submit" variant="secondary" className={styles.fullWidth}>
-            Utiliser ce token
+            {t('devLogin.useToken')}
           </Button>
         </form>
 
         <p className={styles.footer}>
-          <Link to="/mobility">Retour</Link>
+          <Link to="/mobility">{t('common:actions.back')}</Link>
         </p>
       </Card>
     </div>

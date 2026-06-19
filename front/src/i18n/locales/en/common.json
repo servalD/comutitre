@@ -1,0 +1,62 @@
+{
+  "loading": "Loading…",
+  "errors": {
+    "loading": "Loading error",
+    "http": "Error {{status}}"
+  },
+  "actions": {
+    "logout": "Log out",
+    "back": "Back",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "close": "Close"
+  },
+  "stepOf": "Step {{step}} of {{total}}",
+  "logoAria": "Comutitres — Home",
+  "myProfile": "My profile",
+  "newSubscription": "New subscription",
+  "nav": {
+    "dashboard": "Dashboard",
+    "mobility": "Mobility",
+    "ariaLabel": "Main navigation",
+    "mobileAriaLabel": "Mobile navigation"
+  },
+  "tabs": {
+    "accueil": "Home",
+    "foyer": "My household",
+    "foyerShort": "Household",
+    "aide": "Help"
+  },
+  "mobileTabs": {
+    "home": "Home",
+    "titres": "Passes",
+    "admin": "Admin",
+    "compte": "Account"
+  },
+  "brand": {
+    "name": "Comutitres",
+    "tagline": "Customer area"
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "upload": {
+    "title": "Upload a document",
+    "hint": "Accepted formats: PDF, JPG, PNG — 10 MB max"
+  },
+  "chatbot": {
+    "title": "Comutitres Assistant",
+    "greeting": "Hello! I'm the Comutitres assistant. Ask me a question about Île-de-France transport passes (plans, Navigo, imagine R, Transport Solidarity, support…).",
+    "placeholder": "Ask your question about transport passes…",
+    "audioOn": "Read answers aloud",
+    "audioOff": "Mute voice playback",
+    "audioEnabled": "Voice playback enabled.",
+    "errorPrefix": "Sorry, an error occurred: {{message}}",
+    "noAnswer": "Sorry, I couldn't generate an answer.",
+    "requestFailed": "Assistant request failed ({{status}})"
+  }
+}

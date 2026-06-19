@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import type {
   CreateRelationshipPayload,
   RelationshipType,
 } from '../../../domain/types/mobility'
-import { relationshipLabels } from '../../../constants/labels'
+import { useLabels } from '../../../constants/labels'
 import { Button } from '../../ui/Button'
 import { Field } from '../../ui/Field'
 import { selectClassName } from '../../ui/field-class-names'
@@ -18,11 +19,13 @@ export function CreateRelationshipForm({
   existingTypes: RelationshipType[]
   onSubmit: (payload: CreateRelationshipPayload) => Promise<void>
 }) {
+  const { t } = useTranslation('mobility')
+  const { relationshipLabels } = useLabels()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const available = (
     ['owner', 'legal_guardian', 'payer', 'manager', 'read_only'] as RelationshipType[]
-  ).filter((t) => !existingTypes.includes(t))
+  ).filter((type) => !existingTypes.includes(type))
   const [relationshipType, setRelationshipType] = useState<RelationshipType>(
     available[0] ?? 'read_only',
   )
@@ -39,21 +42,21 @@ export function CreateRelationshipForm({
   }
 
   if (available.length === 0) {
-    return <p className={styles.hint}>Tous les liens disponibles sont déjà créés.</p>
+    return <p className={styles.hint}>{t('createRelationship.allCreated')}</p>
   }
 
   if (!open) {
     return (
       <Button variant="secondary" onClick={() => setOpen(true)}>
-        <span aria-hidden="true">🔗</span> Lier au compte
+        <span aria-hidden="true">🔗</span> {t('createRelationship.link')}
       </Button>
     )
   }
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h3>Nouveau lien compte</h3>
-      <Field label="Type de lien" htmlFor="relType">
+      <h3>{t('createRelationship.title')}</h3>
+      <Field label={t('createRelationship.linkType')} htmlFor="relType">
         <select
           id="relType"
           className={selectClassName()}
@@ -69,10 +72,10 @@ export function CreateRelationshipForm({
       </Field>
       <div className={styles.actions}>
         <Button type="submit" disabled={loading}>
-          Enregistrer
+          {t('common:actions.save')}
         </Button>
         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-          Annuler
+          {t('common:actions.cancel')}
         </Button>
       </div>
     </form>

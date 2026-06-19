@@ -138,3 +138,113 @@
   cursor: pointer;
 }
 .btnCancel:hover { background: #c0d9f5; }
+
+.agentOverview {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+}
+
+.agentHeader {
+  margin-bottom: 12px;
+}
+
+.agentTitle {
+  margin: 0 0 4px;
+  color: var(--color-text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.agentSubtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.agentNav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.agentNavLink {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-secondary);
+  border-radius: 8px;
+  background: var(--color-background-primary);
+  color: var(--blue-int);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.agentNavLink:hover,
+.agentNavLink:focus-visible {
+  border-color: var(--blue-int);
+  background: var(--blue-light);
+  outline: none;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.kpiTile {
+  min-height: 74px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px;
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: 8px;
+  background: var(--color-background-secondary);
+}
+
+.kpiValue {
+  color: var(--blue-int);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.kpiLabel {
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.sectionToolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+.refreshButton {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+@media (min-width: 900px) {
+  .agentOverview {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+  }
+
+  .agentNav,
+  .kpiGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

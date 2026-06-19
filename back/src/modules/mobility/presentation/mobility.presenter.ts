@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Address } from '../domain/address';
+import { AnomalyCase } from '../domain/anomaly-case';
 import { Contract } from '../domain/contract';
 import { Document } from '../domain/document';
 import { FoundSupportCaseResult } from '../application/use-cases/declare-found-support.use-case';
@@ -13,9 +14,12 @@ import { RelationshipType } from '../domain/enums/relationship-type.enum';
 import { RelationshipStatus } from '../domain/enums/relationship-status.enum';
 import { MobilityIdentity } from '../domain/mobility-identity';
 import { PermissionSet } from '../domain/permission-set';
+import { ProofEvent } from '../domain/proof-event';
 import { Relationship } from '../domain/relationship';
 import { Support } from '../domain/support';
 import { TimelineEvent } from '../domain/timeline-event';
+import { TransportRight } from '../domain/transport-right';
+import { ValidationEvent } from '../domain/validation-event';
 
 export class AddressResponse {
   @ApiPropertyOptional()
@@ -215,6 +219,12 @@ export class SupportResponse {
   @ApiPropertyOptional({ nullable: true })
   publicKey: string | null;
 
+  @ApiPropertyOptional({ nullable: true })
+  walletAddress: string | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  supportCommitment: string | null;
+
   @ApiPropertyOptional({ format: 'date-time', nullable: true })
   activatedAt: string | null;
 
@@ -232,6 +242,147 @@ export class SupportResponse {
 
   @ApiProperty({ format: 'date-time' })
   updatedAt: string;
+}
+
+export class TransportRightResponse {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  mobilityIdentityId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  contractId: string;
+
+  @ApiProperty()
+  productType: string;
+
+  @ApiProperty()
+  status: string;
+
+  @ApiProperty({ format: 'date-time' })
+  validFrom: string;
+
+  @ApiProperty({ format: 'date-time' })
+  validTo: string;
+
+  @ApiProperty()
+  rightCommitment: string;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: string;
+
+  @ApiProperty({ format: 'date-time' })
+  updatedAt: string;
+}
+
+export class ProofEventResponse {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  mobilityIdentityId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  transportRightId: string;
+
+  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  supportId: string | null;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  eventHash: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  previousHash: string | null;
+
+  @ApiPropertyOptional({ nullable: true })
+  payload: Record<string, unknown> | null;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: string;
+}
+
+export class ValidationEventResponse {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  mobilityIdentityId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  transportRightId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  supportId: string;
+
+  @ApiProperty()
+  stationId: string;
+
+  @ApiProperty()
+  validatorId: string;
+
+  @ApiProperty()
+  result: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  reasonCode: string | null;
+
+  @ApiProperty({ format: 'date-time' })
+  occurredAt: string;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: string;
+}
+
+export class AnomalyCaseResponse {
+  @ApiProperty({ format: 'uuid' })
+  id: string;
+
+  @ApiProperty({ format: 'uuid' })
+  mobilityIdentityId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  transportRightId: string;
+
+  @ApiProperty({ format: 'uuid' })
+  supportId: string;
+
+  @ApiProperty()
+  type: string;
+
+  @ApiProperty()
+  severity: string;
+
+  @ApiProperty()
+  status: string;
+
+  @ApiProperty()
+  summary: string;
+
+  @ApiProperty({ format: 'date-time' })
+  createdAt: string;
+
+  @ApiProperty({ format: 'date-time' })
+  updatedAt: string;
+}
+
+export class ActivateSupportResponse {
+  @ApiProperty({ type: SupportResponse })
+  support: SupportResponse;
+
+  @ApiProperty({ type: ProofEventResponse })
+  proofEvent: ProofEventResponse;
+}
+
+export class ValidateJourneyResponse {
+  @ApiProperty({ type: ValidationEventResponse })
+  validation: ValidationEventResponse;
+
+  @ApiPropertyOptional({ type: AnomalyCaseResponse, nullable: true })
+  anomaly: AnomalyCaseResponse | null;
 }
 
 export class TimelineEventResponse {
@@ -416,12 +567,73 @@ export const toSupportResponse = (support: Support): SupportResponse => ({
   type: support.type,
   status: support.status,
   publicKey: support.publicKey,
+  walletAddress: support.walletAddress,
+  supportCommitment: support.supportCommitment,
   activatedAt: support.activatedAt?.toISOString() ?? null,
   revokedAt: support.revokedAt?.toISOString() ?? null,
   expiresAt: support.expiresAt?.toISOString() ?? null,
   lastUsedAt: support.lastUsedAt?.toISOString() ?? null,
   createdAt: support.createdAt.toISOString(),
   updatedAt: support.updatedAt.toISOString(),
+});
+
+export const toTransportRightResponse = (
+  right: TransportRight,
+): TransportRightResponse => ({
+  id: right.id,
+  mobilityIdentityId: right.mobilityIdentityId,
+  contractId: right.contractId,
+  productType: right.productType,
+  status: right.status,
+  validFrom: right.validFrom.toISOString(),
+  validTo: right.validTo.toISOString(),
+  rightCommitment: right.rightCommitment,
+  createdAt: right.createdAt.toISOString(),
+  updatedAt: right.updatedAt.toISOString(),
+});
+
+export const toProofEventResponse = (
+  event: ProofEvent,
+): ProofEventResponse => ({
+  id: event.id,
+  mobilityIdentityId: event.mobilityIdentityId,
+  transportRightId: event.transportRightId,
+  supportId: event.supportId,
+  type: event.type,
+  eventHash: event.eventHash,
+  previousHash: event.previousHash,
+  payload: event.payload,
+  createdAt: event.createdAt.toISOString(),
+});
+
+export const toValidationEventResponse = (
+  event: ValidationEvent,
+): ValidationEventResponse => ({
+  id: event.id,
+  mobilityIdentityId: event.mobilityIdentityId,
+  transportRightId: event.transportRightId,
+  supportId: event.supportId,
+  stationId: event.stationId,
+  validatorId: event.validatorId,
+  result: event.result,
+  reasonCode: event.reasonCode,
+  occurredAt: event.occurredAt.toISOString(),
+  createdAt: event.createdAt.toISOString(),
+});
+
+export const toAnomalyCaseResponse = (
+  anomaly: AnomalyCase,
+): AnomalyCaseResponse => ({
+  id: anomaly.id,
+  mobilityIdentityId: anomaly.mobilityIdentityId,
+  transportRightId: anomaly.transportRightId,
+  supportId: anomaly.supportId,
+  type: anomaly.type,
+  severity: anomaly.severity,
+  status: anomaly.status,
+  summary: anomaly.summary,
+  createdAt: anomaly.createdAt.toISOString(),
+  updatedAt: anomaly.updatedAt.toISOString(),
 });
 
 export const toTimelineEventResponse = (

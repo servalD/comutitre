@@ -4,6 +4,11 @@ import { Mistral } from '@mistralai/mistralai';
 import { Env } from '../../../infrastructure/config/env.validation';
 import { ChatMessage } from '../domain/rag.types';
 
+export interface DocumentAnalysisResult {
+  conforme: boolean;
+  motif: string;
+}
+
 /**
  * Thin wrapper over the official Mistral SDK. Holds the API key server-side and
  * exposes just what the RAG flow needs: batch embeddings and a streamed chat.
@@ -13,6 +18,7 @@ export class MistralClient {
   private readonly client: Mistral | null;
   private readonly chatModel: string;
   private readonly embedModel: string;
+  private readonly visionModel: string;
 
   constructor(config: ConfigService<Env, true>) {
     const apiKey = config.get('MISTRAL_API_KEY', { infer: true });
@@ -20,6 +26,7 @@ export class MistralClient {
     this.client = apiKey ? new Mistral({ apiKey, serverURL }) : null;
     this.chatModel = config.get('MISTRAL_CHAT_MODEL', { infer: true });
     this.embedModel = config.get('MISTRAL_EMBED_MODEL', { infer: true });
+    this.visionModel = config.get('MISTRAL_VISION_MODEL', { infer: true });
   }
 
   get hasKey(): boolean {
@@ -47,6 +54,64 @@ export class MistralClient {
       }
       return d.embedding;
     });
+  }
+
+  /** Analyse a document image with a vision model. Returns structured JSON. */
+  async analyzeDocumentImage(
+    fileBuffer: Buffer,
+    mimeType: string,
+    prompt: string,
+  ): Promise<DocumentAnalysisResult> {
+    const base64 = fileBuffer.toString('base64');
+    const dataUrl = `data:${mimeType};base64,${base64}`;
+
+    const res = await this.require().chat.complete({
+      model: this.visionModel,
+      temperature: 0.1,
+      responseFormat: { type: 'json_object' },
+      messages: [
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', imageUrl: dataUrl },
+          ],
+        },
+      ],
+    });
+
+    const raw = res.choices[0]?.message?.content;
+    const text =
+      typeof raw === 'string'
+        ? raw
+        : Array.isArray(raw)
+          ? raw
+              .map((part) =>
+                typeof part === 'string'
+                  ? part
+                  : 'text' in part && typeof part.text === 'string'
+                    ? part.text
+                    : '',
+              )
+              .join('')
+          : '';
+
+    try {
+      const parsed = JSON.parse(text) as {
+        conforme?: boolean;
+        motif?: string;
+      };
+      return {
+        conforme: parsed.conforme === true,
+        motif: parsed.motif?.trim() || 'Analyse automatique terminée.',
+      };
+    } catch {
+      return {
+        conforme: false,
+        motif:
+          'Réponse IA illisible — merci de déposer un document plus lisible.',
+      };
+    }
   }
 
   /** Stream a chat completion, yielding text deltas as they arrive. */

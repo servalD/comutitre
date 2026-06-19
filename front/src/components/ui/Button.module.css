@@ -4,10 +4,11 @@
   justify-content: center;
   gap: var(--space-sm);
   min-height: 44px;
-  padding: 0 var(--space-md);
-  border-radius: var(--radius-sm);
+  padding: 0 var(--space-lg);
+  border-radius: var(--radius-full);
   border: 1px solid transparent;
   font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
@@ -15,6 +16,10 @@
 .button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.fullWidth {
+  width: 100%;
 }
 
 .primary {

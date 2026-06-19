@@ -1,0 +1,395 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ── Summary card ── */
+.summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: linear-gradient(135deg, var(--color-bg-medium) 0%, var(--color-white) 100%);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.cardVisual {
+  position: relative;
+  width: 88px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-interaction) 0%, var(--color-idfm-blue) 100%);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-xs);
+  color: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardChip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 18px;
+  height: 14px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.cardBrand {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cardType {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.summaryInfo {
+  min-width: 0;
+}
+
+.productName {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-anthracite);
+}
+
+.beneficiary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.contractStatus {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-orange);
+}
+
+.registeredCard {
+  padding: var(--space-md);
+}
+
+.registeredTitle {
+  margin: 0 0 var(--space-sm);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-anthracite);
+}
+
+.registeredGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm) var(--space-md);
+}
+
+.registeredGrid dt {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.registeredGrid dd {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--color-anthracite);
+  word-break: break-word;
+}
+
+.contractRef {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+
+/* ── Stepper ── */
+.stepperSection {
+  padding: 0 var(--space-xs);
+}
+
+/* ── Content layout ── */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.accordionCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.accordionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-md);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.accordionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.accordionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-medium);
+  color: var(--color-interaction);
+}
+
+.accordionIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.accordionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-anthracite);
+}
+
+.chevron,
+.chevronOpen {
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.accordionBody {
+  border-top: 1px solid var(--color-border);
+}
+
+.instruction {
+  padding: var(--space-md);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.documentList {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Actions panel ── */
+.actionsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.submitBtn {
+  gap: var(--space-sm);
+  min-height: 52px;
+}
+
+.submitBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Desktop ── */
+@media (min-width: 768px) {
+  .page {
+    gap: var(--space-lg);
+  }
+
+  .summary {
+    padding: var(--space-lg) var(--space-xl);
+    gap: var(--space-xl);
+  }
+
+  .cardVisual {
+    width: 120px;
+    height: 76px;
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+  }
+
+  .cardChip {
+    width: 24px;
+    height: 18px;
+  }
+
+  .cardBrand {
+    font-size: 11px;
+  }
+
+  .cardType {
+    font-size: 14px;
+  }
+
+  .productName {
+    font-size: 24px;
+  }
+
+  .beneficiary {
+    font-size: 16px;
+    margin-top: var(--space-xs);
+  }
+
+  .stepperSection {
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .actionsPanel {
+    position: sticky;
+    top: calc(var(--header-height) + var(--space-md));
+    padding: var(--space-lg);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .accordionCard {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .accordionHeader {
+    padding: var(--space-lg);
+  }
+
+  .accordionTitle {
+    font-size: 18px;
+  }
+
+  .instruction {
+    padding: var(--space-md) var(--space-lg);
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content {
+    grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr);
+    gap: var(--space-xl);
+  }
+}
+
+.loadError,
+.uploadError {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-red, #c52625);
+}
+
+.uploadSuccess {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-success, #007d44);
+}
+
+.uploadHint {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+}
+
+.uploadTypeLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.uploadTypeSelect {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  background: var(--color-white);
+}
+
+.hiddenFile {
+  display: none;
+}
+
+.uploadHintTitle {
+  margin: 0 0 var(--space-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.uploadContext {
+  margin: 0 0 var(--space-sm);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.uploadContext strong {
+  color: var(--color-interaction);
+}
+
+.selectedFile {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-interaction);
+}
+
+.hubIntro {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.dossierList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.newSubscriptionLink {
+  display: inline-block;
+  margin-top: var(--space-md);
+  text-decoration: none;
+}

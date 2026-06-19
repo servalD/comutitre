@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { CreateDocumentPayload, DocumentType } from '../../../domain/types/mobility'
-import { documentTypeLabels } from '../../../constants/labels'
+import { useLabels } from '../../../constants/labels'
 import { Button } from '../../ui/Button'
 import { Field } from '../../ui/Field'
 import { selectClassName } from '../../ui/field-class-names'
@@ -11,6 +12,8 @@ export function CreateDocumentForm({
 }: {
   onSubmit: (payload: CreateDocumentPayload) => Promise<void>
 }) {
+  const { t } = useTranslation('mobility')
+  const { documentTypeLabels } = useLabels()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [type, setType] = useState<DocumentType>('school_certificate')
@@ -29,15 +32,15 @@ export function CreateDocumentForm({
   if (!open) {
     return (
       <Button variant="secondary" onClick={() => setOpen(true)}>
-        <span aria-hidden="true">➕</span> Ajouter un document
+        <span aria-hidden="true">➕</span> {t('createDocument.add')}
       </Button>
     )
   }
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h3>Nouveau document</h3>
-      <Field label="Type" htmlFor="docType">
+      <h3>{t('createDocument.title')}</h3>
+      <Field label={t('forms.type')} htmlFor="docType">
         <select
           id="docType"
           className={selectClassName()}
@@ -53,10 +56,10 @@ export function CreateDocumentForm({
       </Field>
       <div className={styles.actions}>
         <Button type="submit" disabled={loading}>
-          Enregistrer
+          {t('common:actions.save')}
         </Button>
         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-          Annuler
+          {t('common:actions.cancel')}
         </Button>
       </div>
     </form>

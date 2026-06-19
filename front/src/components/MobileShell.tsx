@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { LanguageSwitcher } from './ui/LanguageSwitcher';
 import styles from './MobileShell.module.css';
 
 type TabId = 'home' | 'titres' | 'alertes' | 'compte' | 'admin';
@@ -75,14 +77,15 @@ export default function MobileShell({
 }: MobileShellProps) {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation('common');
 
   const tabs = [
-    { id: 'home' as const, label: 'Accueil', to: '/abonnements' },
-    { id: 'titres' as const, label: 'Titres', to: '/justificatifs' },
+    { id: 'home' as const, label: t('mobileTabs.home'), to: '/abonnements' },
+    { id: 'titres' as const, label: t('mobileTabs.titres'), to: '/justificatifs' },
     ...(user?.roles?.includes('ADMIN')
-      ? [{ id: 'admin' as const, label: 'Admin', to: '/admin/dossiers' }]
+      ? [{ id: 'admin' as const, label: t('mobileTabs.admin'), to: '/admin/dossiers' }]
       : []),
-    { id: 'compte' as const, label: 'Compte', to: '/abonnements' },
+    { id: 'compte' as const, label: t('mobileTabs.compte'), to: '/abonnements' },
   ];
 
   const isActive = (tab: (typeof tabs)[number]) =>
@@ -107,7 +110,7 @@ export default function MobileShell({
               {subtitle && <p className={styles.topbarSub}>{subtitle}</p>}
             </div>
             {showNav && (
-            <nav className={styles.desktopNav} aria-label="Navigation principale">
+            <nav className={styles.desktopNav} aria-label={t('nav.ariaLabel')}>
               {tabs.map((tab) => (
                 <Link
                   key={tab.id}
@@ -119,6 +122,7 @@ export default function MobileShell({
               ))}
             </nav>
             )}
+            <LanguageSwitcher />
           </div>
         </header>
 
@@ -144,7 +148,7 @@ export default function MobileShell({
         <main className={styles.main}>{children}</main>
 
         {showNav && (
-        <nav className={styles.navTabs} aria-label="Navigation mobile">
+        <nav className={styles.navTabs} aria-label={t('nav.mobileAriaLabel')}>
           {tabs.map((tab) => (
             <Link
               key={tab.id}

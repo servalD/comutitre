@@ -28,6 +28,12 @@ export class SupportOrmEntity {
   @Column({ type: 'varchar', nullable: true })
   publicKey: string | null;
 
+  @Column({ type: 'varchar', nullable: true })
+  walletAddress: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  supportCommitment: string | null;
+
   @Column({ type: 'timestamptz', nullable: true })
   activatedAt: Date | null;
 

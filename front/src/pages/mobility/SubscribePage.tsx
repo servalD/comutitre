@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { mobilityApi } from '../../api/mobility-api'
 import { ApiError } from '../../api/http-client'
 import type { MobilityIdentity } from '../../domain/types/mobility'
@@ -9,6 +10,7 @@ import styles from './MobilityPages.module.css'
 export function SubscribePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation('mobility')
   const [identity, setIdentity] = useState<MobilityIdentity | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +25,7 @@ export function SubscribePage() {
       })
       .catch((err) => {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Chargement impossible')
+          setError(err instanceof ApiError ? err.message : t('subscribe.loadError'))
         }
       })
       .finally(() => {
@@ -32,22 +34,22 @@ export function SubscribePage() {
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, t])
 
-  if (!id) return <p className={styles.status}>Identité introuvable.</p>
-  if (loading) return <p className={styles.loading}>Chargement…</p>
+  if (!id) return <p className={styles.status}>{t('subscribe.notFound')}</p>
+  if (loading) return <p className={styles.loading}>{t('common:loading')}</p>
   if (error || !identity) {
-    return <p className={styles.status}>{error ?? 'Identité introuvable.'}</p>
+    return <p className={styles.status}>{error ?? t('subscribe.notFound')}</p>
   }
 
   return (
     <div className={styles.page}>
       <Link to={`/mobility/${id}`} className={styles.back}>
-        <span aria-hidden="true">←</span> Retour à la fiche
+        <span aria-hidden="true">←</span> {t('subscribe.backToDetail')}
       </Link>
       <header className={styles.header}>
         <div>
-          <h1>Souscrire un forfait</h1>
+          <h1>{t('subscribe.title')}</h1>
           <p>
             {identity.firstName} {identity.lastName}
           </p>

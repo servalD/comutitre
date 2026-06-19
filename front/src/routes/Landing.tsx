@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PublicAppFrame } from '../components/layout/PublicAppFrame'
 import styles from './Landing.module.css'
 
@@ -19,13 +20,9 @@ function CheckIcon() {
   )
 }
 
-const BENEFITS = [
-  'Trouvez le bon forfait',
-  'Suivez votre dossier en temps réel',
-  'Gérez votre foyer',
-] as const
-
 export default function Landing() {
+  const { t } = useTranslation('landing')
+  const benefits = t('benefits', { returnObjects: true }) as string[]
   return (
     <PublicAppFrame variant="white">
       <div className={styles.landing}>
@@ -60,10 +57,10 @@ export default function Landing() {
           </header>
 
           <main className={styles.body}>
-            <h1 className={styles.headline}>Votre titre de transport, simplement</h1>
+            <h1 className={styles.headline}>{t('headline')}</h1>
 
             <ul className={styles.benefits}>
-              {BENEFITS.map((text) => (
+              {benefits.map((text) => (
                 <li key={text} className={styles.benefit}>
                   <span className={styles.benefitIcon}>
                     <CheckIcon />
@@ -75,10 +72,10 @@ export default function Landing() {
 
             <div className={styles.actions}>
               <Link to="/login" className={styles.cta}>
-                Se connecter / Créer un compte
+                {t('cta')}
               </Link>
               <a href="https://www.comutitres.fr/contact" className={styles.helpLink}>
-                Besoin d&apos;aide ?
+                {t('help')}
               </a>
             </div>
           </main>

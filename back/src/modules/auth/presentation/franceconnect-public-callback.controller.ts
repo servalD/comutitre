@@ -17,7 +17,7 @@ export class FranceConnectPublicCallbackController {
 
   /** Compatibility callback for FranceConnect public sandbox credentials. */
   @Public()
-  @Get('callback')
+  @Get(['callback', 'login-callback'])
   @ApiOperation({
     summary: 'Callback racine FranceConnect sandbox : émet un token applicatif',
   })

@@ -1,0 +1,130 @@
+{
+  "profile": {
+    "junior": "Junior",
+    "scolaire": "School",
+    "etudiant": "Student",
+    "adulte": "Adult",
+    "senior": "Senior",
+    "tst": "TST",
+    "amethyste": "Amethyst"
+  },
+  "identityStatus": {
+    "active": "Active",
+    "pending_recovery": "Recovery in progress",
+    "transferred": "Transferred",
+    "blocked": "Blocked",
+    "archived": "Archived"
+  },
+  "relationship": {
+    "owner": "You",
+    "payer": "Payer",
+    "legal_guardian": "Legal guardian",
+    "manager": "Manager",
+    "read_only": "Read only",
+    "former_guardian": "Former guardian"
+  },
+  "product": {
+    "imagine_r_junior": "Imagine R Junior",
+    "imagine_r_scolaire": "Imagine R School",
+    "imagine_r_etudiant": "Imagine R Student",
+    "navigo_annuel": "Navigo Annual",
+    "navigo_senior": "Navigo Senior",
+    "liberte_plus": "Navigo Liberte+",
+    "tst": "TST",
+    "amethyste": "Amethyst"
+  },
+  "contractStatus": {
+    "draft": "Draft",
+    "pending_document": "Missing document",
+    "pending_payment": "Payment pending",
+    "pending_payer_signature": "Payer signature",
+    "active": "Active",
+    "suspended": "Suspended",
+    "expired": "Expired",
+    "cancelled": "Cancelled",
+    "blocked_unpaid": "Blocked (unpaid)"
+  },
+  "documentType": {
+    "identity_document": "ID document",
+    "photo": "Photo",
+    "school_certificate": "School certificate",
+    "student_certificate": "Student certificate",
+    "scholarship_certificate": "Scholarship certificate",
+    "address_proof": "Proof of address",
+    "social_right": "Social right",
+    "payment_mandate": "Payment mandate"
+  },
+  "documentStatus": {
+    "uploaded": "Received",
+    "pending_verification": "Under verification",
+    "accepted": "Accepted",
+    "refused": "Refused",
+    "expired": "Expired",
+    "missing": "Missing"
+  },
+  "supportStatus": {
+    "active": "Active",
+    "lost": "Lost",
+    "stolen": "Stolen",
+    "revoked": "Revoked",
+    "replaced": "Replaced",
+    "expired": "Expired",
+    "pending_activation": "Pending",
+    "support_non_reclame": "Unclaimed"
+  },
+  "supportType": {
+    "physical_card": "Physical card",
+    "phone": "Phone",
+    "watch": "Watch"
+  },
+  "transportRightStatus": {
+    "active": "Active",
+    "suspended": "Suspended",
+    "expired": "Expired",
+    "revoked": "Revoked"
+  },
+  "validationResult": {
+    "accepted": "Accepted",
+    "rejected": "Rejected",
+    "anomaly": "Anomaly"
+  },
+  "anomalyStatus": {
+    "open": "Open",
+    "in_review": "In review",
+    "closed": "Closed"
+  },
+  "timelineEvent": {
+    "MOBILITY_IDENTITY_CREATED": "Identity created",
+    "MOBILITY_IDENTITY_UPDATED": "Identity updated",
+    "RELATIONSHIP_CREATED": "Account link created",
+    "CONTRACT_CREATED": "Contract created",
+    "DOCUMENT_UPLOADED": "Document uploaded",
+    "SUPPORT_ADDED": "Card added",
+    "SUPPORT_FOUND": "Pass found at agency",
+    "SUPPORT_FOUND_CLOSED": "Found pass case closed"
+  },
+  "foundSupportDecision": {
+    "FOUND_PICKUP_ALLOWED": "Awaiting pickup",
+    "CONTROLLED_REUSE_ELIGIBLE": "Controlled reuse possible",
+    "BACKOFFICE_REVIEW_REQUIRED": "Back-office review required",
+    "SUPPORT_ALREADY_REPLACED": "Support already replaced",
+    "SUPPORT_UNUSABLE": "Unusable support",
+    "UNKNOWN_SUPPORT": "Unknown support"
+  },
+  "foundSupportNotification": {
+    "SECURITY_NOTICE": "Security notice",
+    "PICKUP_AVAILABLE": "Pickup available",
+    "LEGAL_GUARDIAN_OR_PAYER": "Legal guardian / payer",
+    "REVIEW_BEFORE_NOTIFICATION": "Review before notification",
+    "SUPPORT_UNUSABLE_NOTICE": "Unusable support notice",
+    "UNKNOWN_SUPPORT_NO_NOTIFICATION": "No notification"
+  },
+  "foundSupportFinalStatus": {
+    "withdrawn": "Withdrawn",
+    "not_claimed": "Not claimed",
+    "archived": "Archived",
+    "destroyed": "Destroyed",
+    "sent_to_backoffice": "Sent to back-office",
+    "unusable_confirmed": "Unusable confirmed"
+  }
+}

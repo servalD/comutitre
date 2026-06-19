@@ -1,0 +1,49 @@
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  color: var(--color-white);
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.character {
+  background: var(--color-bg-medium);
+  padding: 0;
+}
+
+.character svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sm {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+.md {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+}
+
+.lg {
+  width: 72px;
+  height: 72px;
+  font-size: 22px;
+}
+
+.child {
+  background: var(--color-bg-medium) !important;
+  color: var(--color-interaction);
+}
+
+.icon {
+  width: 60%;
+  height: 60%;
+}

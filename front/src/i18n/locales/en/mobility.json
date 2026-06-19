@@ -1,0 +1,264 @@
+{
+  "hub": {
+    "loading": "Loading identities…",
+    "title": "My mobility identities",
+    "subtitle": "Manage your household profiles and their subscriptions.",
+    "addPerson": "Add a person",
+    "emptyTitle": "No identity",
+    "emptyDescription": "Create a first mobility identity to get started.",
+    "createIdentity": "Create an identity"
+  },
+  "add": {
+    "title": "Add a person",
+    "subtitle": "Child, nephew or relative: add a mobility identity to manage from your area.",
+    "createError": "Unable to create"
+  },
+  "subscribe": {
+    "title": "Subscribe to a plan",
+    "backToDetail": "Back to profile",
+    "notFound": "Identity not found.",
+    "loadError": "Unable to load"
+  },
+  "detail": {
+    "backToList": "My identities",
+    "bornOn": "born on {{date}}",
+    "tabs": {
+      "resume": "Summary",
+      "contracts": "Subscriptions",
+      "documents": "Documents",
+      "supports": "Card",
+      "timeline": "History",
+      "access": "Access"
+    },
+    "noContracts": "No subscription",
+    "noContractsDesc": "Start the assistant to find the right plan.",
+    "noDocuments": "No document",
+    "noSupports": "No card",
+    "noTimeline": "No event",
+    "noAccess": "No account link"
+  },
+  "forms": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "birthDate": "Date of birth",
+    "estimatedProfile": "Estimated profile:",
+    "product": "Product",
+    "status": "Status",
+    "start": "Start",
+    "end": "End",
+    "tariff": "Price (€)",
+    "type": "Type"
+  },
+  "createIdentity": {
+    "hint": "Add a person to manage from your area. You will be their payer and legal representative until they have their own account.",
+    "submit": "Add to my area"
+  },
+  "editIdentity": {
+    "edit": "Edit",
+    "title": "Edit identity"
+  },
+  "createContract": {
+    "add": "Add a subscription",
+    "title": "New subscription"
+  },
+  "createDocument": {
+    "add": "Add a document",
+    "title": "New document"
+  },
+  "createRelationship": {
+    "allCreated": "All available links are already created.",
+    "link": "Link to account",
+    "title": "New account link",
+    "linkType": "Link type"
+  },
+  "createSupport": {
+    "add": "Add a card",
+    "title": "New physical card"
+  },
+  "recommendation": {
+    "recommended": "Recommended",
+    "why": "Why this plan?",
+    "documents": "Documents to provide",
+    "alternative": "Alternative:"
+  },
+  "wizard": {
+    "intro": "We guide you to the plan that suits <strong>{{name}}</strong> ({{age}} years old). Answer the questions — no need to know the pass names in advance.",
+    "notEnrolledError": "Without schooling or enrolment, no Imagine R plan matches this situation.",
+    "notCovered": "Situation not covered.",
+    "subscribeError": "Unable to subscribe",
+    "success": "File created — upload the supporting documents in the Documents tab.",
+    "creating": "Creating…",
+    "confirmOpen": "Confirm and open the file"
+  },
+  "support": {
+    "navigoCard": "Navigo card",
+    "activatedOn": "Activated on {{date}}",
+    "physicalCard": "Physical card"
+  },
+  "relationship": {
+    "since": "Since {{date}}",
+    "revoke": "Revoke"
+  },
+  "document": {
+    "uploadedOn": "Uploaded on {{date}}"
+  },
+  "identity": {
+    "ageYears_one": "{{count}} year old",
+    "ageYears_other": "{{count}} years old",
+    "noActiveSubscription": "No active subscription"
+  },
+  "timeline": {
+    "pickupBefore": "Pick up before {{date}}"
+  },
+  "advisor": {
+    "common": { "yes": "Yes", "no": "No" },
+    "q": {
+      "isEnrolled": {
+        "labelScolaire": "Is this person in school this year?",
+        "labelEtudiant": "Is this person enrolled in an institution this year?",
+        "hint": "A school or student certificate will be requested."
+      },
+      "scholarship": {
+        "label": "Do they receive a scholarship (reduced fare)?",
+        "hint": "Scholarship certificate to provide if yes.",
+        "yes": "Yes, on scholarship",
+        "no": "No, full fare"
+      },
+      "travelHabit": {
+        "label": "How does this person use public transport?",
+        "daily": "Every day or almost",
+        "occasional": "From time to time",
+        "socialRights": "I have social rights (TST)",
+        "departmentAssigned": "Amethyst right (department)"
+      },
+      "socialLevel": {
+        "label": "Which Transport Solidarity Pricing level?",
+        "hint": "Based on your situation: RSA, CAF, France Travail, MDPH…",
+        "gratuite": "Free",
+        "solidarite75": "Solidarity −75%",
+        "reduction50": "Reduction −50%"
+      },
+      "travelHabitTst": {
+        "label": "Do you want to renew or change your right?",
+        "renew": "Renew my TST",
+        "annual": "Switch to annual plan (full fare)",
+        "liberte": "Switch to Liberté+"
+      },
+      "liberteSupport": {
+        "label": "Which support do you want for Liberté+?",
+        "passe": "Personalised Navigo card",
+        "passeDesc": "Load Liberté+ onto your physical Navigo card — managed by Comutitres.",
+        "telephone": "Mobile app (phone)",
+        "telephoneDesc": "Available exclusively via the IDFM app.",
+        "telephoneUnavailable": "Not available on Comutitres",
+        "telephoneBlock": "Liberté+ on phone is managed exclusively by the Île-de-France Mobilités app. Comutitres does not handle this option. Download the IDFM app to subscribe."
+      },
+      "socialLevelTst": {
+        "label": "Which TST level?"
+      },
+      "navigoCard": {
+        "label": "Do you already have a personalised Navigo card?",
+        "hint": "Required to load most plans onto a physical support.",
+        "toOrder": "No, to be ordered"
+      }
+    },
+    "errors": {
+      "minAge": "Registration is possible from age 4.",
+      "scolaireNotEnrolled": "Without schooling, Imagine R School is not suitable.",
+      "etudiantNotEnrolled": "Imagine R Student requires a current enrolment.",
+      "unsupportedProfile": "Unsupported profile.",
+      "answerToContinue": "Answer the questions to continue.",
+      "specifyTst": "Specify your TST level.",
+      "unrecognized": "Situation not recognised."
+    },
+    "why": {
+      "juniorAge": "Age {{age}}: eligible for Imagine R Junior.",
+      "juniorGuardian": "The payer and legal representative manages the subscription.",
+      "scolaireAge": "Age {{age}}: school profile.",
+      "scholarshipFare": "Scholarship fare: scholarship certificate required.",
+      "fullFareSchool": "Full fare: school certificate required.",
+      "etudiantAge": "Age {{age}}: student profile.",
+      "scholarshipReduction": "Scholarship reduction applicable with certificate.",
+      "studentCertificate": "School or student certificate required.",
+      "dailyFrequent": "Frequent trips: an annual plan is the most economical over 12 months.",
+      "seniorFare": "Age {{age}}: senior fare applicable.",
+      "allZones": "All-zones coverage, automatic renewal.",
+      "occasionalNoYear": "Occasional trips: no need for a yearly subscription.",
+      "perValidation": "Each validation is billed; monthly SEPA direct debit.",
+      "tstEligible": "Transport Solidarity Pricing eligibility.",
+      "tstRenewed": "Right renewed in 3-month periods.",
+      "amethysteAssigned": "Amethyst plan: assigned by the department.",
+      "amethysteCheck": "Assignment check before activation."
+    },
+    "usage": {
+      "shortTickets": "Navigo Month and Navigo Week also exist for short needs — not handled in this demo."
+    },
+    "tstTariffHint": {
+      "gratuite": "Free transport",
+      "solidarite_75": "Solidarity fare −75%",
+      "reduction_50": "Reduction −50%"
+    },
+    "tariff": {
+      "liberte": "Monthly billing for validated trips (SEPA direct debit)",
+      "tst": "Based on verified social right",
+      "amethyste": "Based on department assignment",
+      "perYear": "{{amount}} € / year"
+    },
+    "alternatives": {
+      "toLiberte": "If your trips become rarer, with no annual commitment.",
+      "toAnnual": "If you travel almost daily, the annual plan is more advantageous."
+    }
+  },
+  "catalog": {
+    "imagine_r_junior": {
+      "desc": "Youth plan for ages 4 to 10, valid for the school year.",
+      "duration": "12 months (school season)"
+    },
+    "imagine_r_scolaire": {
+      "desc": "School plan for ages 11 to 17, renewed each year.",
+      "duration": "12 months (school season)"
+    },
+    "imagine_r_etudiant": {
+      "desc": "Student plan for ages 18 to 25, with proof of enrolment.",
+      "duration": "12 months (season)"
+    },
+    "navigo_annuel": {
+      "desc": "All-zones subscription, ideal for daily commuting.",
+      "duration": "12 months, automatic renewal"
+    },
+    "navigo_senior": {
+      "desc": "Preferential fare from age 62 for regular travel.",
+      "duration": "12 months"
+    },
+    "liberte_plus": {
+      "desc": "No annual commitment: your validated trips are billed monthly by IDFM (SEPA direct debit).",
+      "duration": "No fixed duration (monthly trip billing)"
+    },
+    "tst": {
+      "desc": "Reduction or free travel based on your social rights (RSA, CAF, etc.).",
+      "duration": "3 months renewable"
+    },
+    "amethyste": {
+      "desc": "Right granted by your department, loaded onto a Navigo pass.",
+      "duration": "Based on department assignment"
+    },
+    "habit": {
+      "daily": {
+        "title": "Daily trips",
+        "body": "You use public transport almost every day (work, studies). An annual plan is generally the most advantageous over 12 months."
+      },
+      "occasional": {
+        "title": "Occasional trips",
+        "body": "You travel from time to time, with no need for a yearly subscription. Navigo Liberté+ bills each validated trip. Navigo Month and Navigo Week (short tickets) also exist — outside the scope of this demo."
+      },
+      "social_rights": {
+        "title": "Social rights",
+        "body": "You benefit from Transport Solidarity Pricing (TST): free, −75% or −50% depending on your situation (RSA, CAF, France Travail, MDPH…)."
+      },
+      "department_assigned": {
+        "title": "Department right",
+        "body": "The Amethyst plan is granted by your department. It is not a regular subscription: we check your eligibility then load the right onto your pass."
+      }
+    }
+  }
+}

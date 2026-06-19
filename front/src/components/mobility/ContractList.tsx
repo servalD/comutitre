@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import type { ContractStatus } from '../../domain/types/mobility'
-import { contractStatusLabels, productLabels } from '../../constants/labels'
+import { useLabels } from '../../constants/labels'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
 import styles from './ResourceList.module.css'
@@ -16,7 +17,12 @@ interface ContractListProps {
 }
 
 export function ContractList({ contracts }: ContractListProps) {
+  const { i18n } = useTranslation('mobility')
+  const { contractStatusLabels, productLabels } = useLabels()
   if (contracts.length === 0) return null
+
+  const formatDate = (iso: string): string =>
+    new Date(iso).toLocaleDateString(i18n.language)
 
   return (
     <ul className={styles.list}>
@@ -43,8 +49,4 @@ export function ContractList({ contracts }: ContractListProps) {
       ))}
     </ul>
   )
-}
-
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('fr-FR')
 }

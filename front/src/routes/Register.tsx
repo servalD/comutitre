@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Trans, useTranslation } from 'react-i18next'
 import { PublicAppFrame } from '../components/layout/PublicAppFrame'
 import { authApi } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
@@ -15,6 +16,8 @@ import styles from './Register.module.css'
 interface RegisterProps {
   zone?: AuthZone
 }
+
+type RegisterStep = 'form' | 'match' | 'code'
 
 function resolveAfterAuth(zone: AuthZone, from: string | undefined): string {
   if (from && from.startsWith('/')) return from
@@ -73,10 +76,12 @@ function EyeIcon({ visible }: { visible: boolean }) {
 
 export default function Register({ zone = 'mobility' }: RegisterProps) {
   const { login } = useAuth()
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from
 
+  const [step, setStep] = useState<RegisterStep>('form')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [birthDate, setBirthDate] = useState('')
@@ -85,26 +90,103 @@ export default function Register({ zone = 'mobility' }: RegisterProps) {
   const [confirm, setConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [maskedHolder, setMaskedHolder] = useState<string | null>(null)
+  const [maskedGuardianEmail, setMaskedGuardianEmail] = useState<string | null>(null)
+  const [devCodeHint, setDevCodeHint] = useState<string | null>(null)
+  const [verificationCode, setVerificationCode] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError(null)
+  const title =
+    step === 'form'
+      ? t('register.title')
+      : step === 'match'
+        ? 'Profil mobilité trouvé'
+        : 'Vérification par e-mail'
+
+  async function finishAuth(accessToken: string) {
+    await login(accessToken)
+    const target = consumePostAuthRedirect(resolveAfterAuth(zone, from))
+    navigate(target, { replace: true })
+  }
+
+  function validatePasswords(): boolean {
     if (password !== confirm) {
-      setError('Les mots de passe ne correspondent pas.')
-      return
+      setError(t('register.passwordMismatch'))
+      return false
     }
     if (password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.')
-      return
+      setError(t('register.passwordTooShort'))
+      return false
     }
+    return true
+  }
+
+  async function handleFormSubmit(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!validatePasswords()) return
+
     setLoading(true)
     try {
-      const { accessToken } = await authApi.register({ firstName, lastName, birthDate, email, password })
-      await login(accessToken)
-      const target = consumePostAuthRedirect(resolveAfterAuth(zone, from))
-      navigate(target, { replace: true })
+      const match = await authApi.checkIdentityMatch({ firstName, lastName, birthDate })
+      if (match.matched && match.recoveryEligible) {
+        setMaskedHolder(match.maskedHolder ?? null)
+        setStep('match')
+        return
+      }
+
+      const { accessToken } = await authApi.register({
+        firstName,
+        lastName,
+        birthDate,
+        email,
+        password,
+      })
+      await finishAuth(accessToken)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('errors.generic'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleRequestRecovery() {
+    setError(null)
+    setLoading(true)
+    try {
+      const response = await authApi.requestRecovery({
+        firstName,
+        lastName,
+        birthDate,
+        email,
+        password,
+      })
+      setMaskedGuardianEmail(response.maskedGuardianEmail ?? null)
+      setDevCodeHint(response.devCode ?? null)
+      setStep('code')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleCompleteRecovery(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (verificationCode.length !== 6) {
+      setError('Le code doit contenir 6 chiffres.')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { accessToken } = await authApi.completeRecovery({
+        email,
+        code: verificationCode,
+      })
+      await finishAuth(accessToken)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue.')
     } finally {
@@ -124,7 +206,7 @@ export default function Register({ zone = 'mobility' }: RegisterProps) {
             />
           </div>
 
-          <h1 className={ls.title}>Créer un compte</h1>
+          <h1 className={ls.title}>{title}</h1>
 
           {error && (
             <div className={ls.error} role="alert">
@@ -132,146 +214,225 @@ export default function Register({ zone = 'mobility' }: RegisterProps) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className={ls.form} noValidate>
+          {step === 'form' && (
+            <form onSubmit={handleFormSubmit} className={ls.form} noValidate>
+              <div className={styles.row}>
+                <div className={ls.field}>
+                  <label htmlFor="firstName" className={ls.label}>{t('register.firstName')}</label>
+                  <div className={ls.inputWrap}>
+                    <span className={ls.inputIcon}><UserIcon /></span>
+                    <input
+                      id="firstName"
+                      required
+                      className={ls.input}
+                      placeholder={t('register.firstNamePlaceholder')}
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className={ls.field}>
+                  <label htmlFor="lastName" className={ls.label}>{t('register.lastName')}</label>
+                  <div className={ls.inputWrap}>
+                    <span className={ls.inputIcon}><UserIcon /></span>
+                    <input
+                      id="lastName"
+                      required
+                      className={ls.input}
+                      placeholder={t('register.lastNamePlaceholder')}
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
 
-            {/* Prénom + Nom côte à côte */}
-            <div className={styles.row}>
               <div className={ls.field}>
-                <label htmlFor="firstName" className={ls.label}>Prénom</label>
+                <label htmlFor="birthDate" className={ls.label}>{t('register.birthDate')}</label>
                 <div className={ls.inputWrap}>
-                  <span className={ls.inputIcon}><UserIcon /></span>
+                  <span className={ls.inputIcon}><CalendarIcon /></span>
                   <input
-                    id="firstName"
+                    id="birthDate"
+                    type="date"
                     required
                     className={ls.input}
-                    placeholder="Jean"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
                   />
                 </div>
               </div>
+
               <div className={ls.field}>
-                <label htmlFor="lastName" className={ls.label}>Nom</label>
+                <label htmlFor="email" className={ls.label}>{t('login.email')}</label>
                 <div className={ls.inputWrap}>
-                  <span className={ls.inputIcon}><UserIcon /></span>
+                  <span className={ls.inputIcon}><MailIcon /></span>
                   <input
-                    id="lastName"
+                    id="email"
+                    type="email"
+                    autoComplete="email"
                     required
                     className={ls.input}
-                    placeholder="Dupont"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder={t('login.emailPlaceholder')}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
               </div>
-            </div>
 
-            {/* Date de naissance */}
-            <div className={ls.field}>
-              <label htmlFor="birthDate" className={ls.label}>Date de naissance</label>
-              <div className={ls.inputWrap}>
-                <span className={ls.inputIcon}><CalendarIcon /></span>
-                <input
-                  id="birthDate"
-                  type="date"
-                  required
-                  className={ls.input}
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                />
+              <div className={ls.field}>
+                <label htmlFor="password" className={ls.label}>{t('login.password')}</label>
+                <div className={ls.inputWrap}>
+                  <span className={ls.inputIcon}><LockIcon /></span>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    className={ls.input}
+                    placeholder={t('register.passwordPlaceholder')}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={ls.eyeBtn}
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? t('register.hide') : t('register.show')}
+                  >
+                    <EyeIcon visible={showPassword} />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Email */}
-            <div className={ls.field}>
-              <label htmlFor="email" className={ls.label}>Adresse e-mail</label>
-              <div className={ls.inputWrap}>
-                <span className={ls.inputIcon}><MailIcon /></span>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className={ls.input}
-                  placeholder="exemple@email.fr"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+              <div className={ls.field}>
+                <label htmlFor="confirm" className={ls.label}>{t('register.confirmPassword')}</label>
+                <div className={ls.inputWrap}>
+                  <span className={ls.inputIcon}><LockIcon /></span>
+                  <input
+                    id="confirm"
+                    type={showConfirm ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    className={ls.input}
+                    placeholder="••••••••"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className={ls.eyeBtn}
+                    onClick={() => setShowConfirm((v) => !v)}
+                    aria-label={showConfirm ? t('register.hide') : t('register.show')}
+                  >
+                    <EyeIcon visible={showConfirm} />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Mot de passe */}
-            <div className={ls.field}>
-              <label htmlFor="password" className={ls.label}>Mot de passe</label>
-              <div className={ls.inputWrap}>
-                <span className={ls.inputIcon}><LockIcon /></span>
-                <input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  required
-                  minLength={8}
-                  className={ls.input}
-                  placeholder="8 caractères minimum"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={ls.eyeBtn}
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Masquer' : 'Afficher'}
-                >
-                  <EyeIcon visible={showPassword} />
-                </button>
+              <button type="submit" className={ls.btnPrimary} disabled={loading}>
+                {loading && <span className={ls.spinner} aria-hidden="true" />}
+                {loading ? t('register.creating') : t('register.submit')}
+              </button>
+            </form>
+          )}
+
+          {step === 'match' && (
+            <div className={styles.recoveryPanel}>
+              <p className={styles.recoveryLead}>
+                Nous avons retrouvé un profil mobilité existant
+                {maskedHolder ? ` (${maskedHolder})` : ''}. Vous pouvez récupérer
+                votre historique de titres et documents en créant votre compte
+                personnel. Un code de validation sera envoyé à votre responsable
+                légal.
+              </p>
+              <button
+                type="button"
+                className={ls.btnPrimary}
+                disabled={loading}
+                onClick={() => void handleRequestRecovery()}
+              >
+                {loading && <span className={ls.spinner} aria-hidden="true" />}
+                {loading ? 'Envoi du code…' : 'Récupérer mon historique'}
+              </button>
+              <button
+                type="button"
+                className={styles.secondaryBtn}
+                disabled={loading}
+                onClick={() => {
+                  setStep('form')
+                  setError(null)
+                }}
+              >
+                Modifier mes informations
+              </button>
+            </div>
+          )}
+
+          {step === 'code' && (
+            <form onSubmit={handleCompleteRecovery} className={ls.form} noValidate>
+              <p className={styles.recoveryLead}>
+                Demandez le code à 6 chiffres à votre responsable légal
+                {maskedGuardianEmail ? (
+                  <> (envoyé à <strong>{maskedGuardianEmail}</strong>)</>
+                ) : (
+                  <> puis saisissez-le ci-dessous</>
+                )}
+                .
+              </p>
+              {devCodeHint && (
+                <p className={styles.devHint} role="status">
+                  Mode démo — code envoyé au responsable légal :{' '}
+                  <strong>{devCodeHint}</strong>
+                </p>
+              )}
+              <div className={ls.field}>
+                <label htmlFor="code" className={ls.label}>Code de vérification</label>
+                <div className={ls.inputWrap}>
+                  <span className={ls.inputIcon}><LockIcon /></span>
+                  <input
+                    id="code"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    required
+                    className={ls.input}
+                    placeholder="123456"
+                    value={verificationCode}
+                    onChange={(e) =>
+                      setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
+                  />
+                </div>
               </div>
-            </div>
+              <button type="submit" className={ls.btnPrimary} disabled={loading}>
+                {loading && <span className={ls.spinner} aria-hidden="true" />}
+                {loading ? 'Validation…' : 'Valider et accéder à mon espace'}
+              </button>
+            </form>
+          )}
 
-            {/* Confirmer mot de passe */}
-            <div className={ls.field}>
-              <label htmlFor="confirm" className={ls.label}>Confirmer le mot de passe</label>
-              <div className={ls.inputWrap}>
-                <span className={ls.inputIcon}><LockIcon /></span>
-                <input
-                  id="confirm"
-                  type={showConfirm ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  required
-                  className={ls.input}
-                  placeholder="••••••••"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                />
-                <button
-                  type="button"
-                  className={ls.eyeBtn}
-                  onClick={() => setShowConfirm((v) => !v)}
-                  aria-label={showConfirm ? 'Masquer' : 'Afficher'}
-                >
-                  <EyeIcon visible={showConfirm} />
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" className={ls.btnPrimary} disabled={loading}>
-              {loading && <span className={ls.spinner} aria-hidden="true" />}
-              {loading ? 'Création…' : 'Créer mon compte'}
-            </button>
-          </form>
-
-          {/* Déjà un compte */}
           <p className={ls.createRow}>
             <Link to={loginForZone(zone)} className={ls.createLink}>
-              Déjà un compte ? Se connecter <span aria-hidden="true">›</span>
+              {t('register.haveAccount')} <span aria-hidden="true">›</span>
             </Link>
           </p>
 
-          {/* CGU */}
           <p className={ls.legal}>
-            En continuant vous acceptez les{' '}
-            <a href="https://www.comutitres.fr/cgu" className={ls.legalLink} target="_blank" rel="noopener noreferrer">
-              CGU
-            </a>
+            <Trans
+              i18nKey="login.legal"
+              ns="auth"
+              components={{
+                cgu: (
+                  <a
+                    href="https://www.comutitres.fr/cgu"
+                    className={ls.legalLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                ),
+              }}
+            />
           </p>
         </div>
       </main>

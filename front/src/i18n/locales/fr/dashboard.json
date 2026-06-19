@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "subscription": "Mon abonnement",
+    "sav": "Assistance SAV",
+    "documents": "Justificatifs",
+    "account": "Mon compte"
+  },
+  "user": "Utilisateur",
+  "logoutTitle": "Se déconnecter",
+  "greeting": "Bonjour, {{name}}",
+  "you": "vous",
+  "subtitle": "Voici un résumé de votre compte Comutitres",
+  "notifications": "Notifications",
+  "alertRenewal_one": "Votre renouvellement approche dans {{count}} jour.",
+  "alertRenewal_other": "Votre renouvellement approche dans {{count}} jours.",
+  "active": "Actif",
+  "valid": "Valide",
+  "zones": "Zones {{zones}}",
+  "kpi": {
+    "status": "Statut abonnement",
+    "nextPayment": "Prochain prélèvement",
+    "paymentOn": "le {{date}}",
+    "renewalIn": "Renouvellement dans",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "physicalSupport": "Support physique"
+  },
+  "card": {
+    "start": "Début",
+    "renewal": "Renouvellement",
+    "contractNo": "N° contrat"
+  },
+  "actions": {
+    "renew": "Renouveler",
+    "contactSav": "Contacter le SAV",
+    "lostStolen": "Passe perdu/volé"
+  },
+  "recentActivity": "Activité récente",
+  "activity": {
+    "renewalScheduled": "Renouvellement automatique programmé",
+    "paymentDone": "Prélèvement de 86,40 € effectué",
+    "emailSent": "E-mail de confirmation envoyé",
+    "subscriptionActivated": "Abonnement activé"
+  },
+  "holderInfo": "Informations porteur",
+  "info": {
+    "name": "Nom",
+    "email": "E-mail",
+    "account": "Compte",
+    "local": "Local",
+    "role": "Rôle"
+  }
+}

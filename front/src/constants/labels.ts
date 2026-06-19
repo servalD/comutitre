@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
+import i18n from '../i18n'
 import type {
   ContractStatus,
   DocumentStatus,
@@ -10,129 +13,132 @@ import type {
   Profile,
   RelationshipType,
   SupportStatus,
+  SupportType,
+  TransportRightStatus,
+  ValidationResult,
+  AnomalyStatus,
 } from '../domain/types/mobility'
 
-export const profileLabels: Record<Profile, string> = {
-  junior: 'Junior',
-  scolaire: 'Scolaire',
-  etudiant: 'Etudiant',
-  adulte: 'Adulte',
-  senior: 'Senior',
-  tst: 'TST',
-  amethyste: 'Amethyste',
+type DomainT = TFunction<'domain'>
+
+const PROFILES: Profile[] = ['junior', 'scolaire', 'etudiant', 'adulte', 'senior', 'tst', 'amethyste']
+const IDENTITY_STATUSES: IdentityStatus[] = ['active', 'pending_recovery', 'transferred', 'blocked', 'archived']
+const RELATIONSHIPS: RelationshipType[] = ['owner', 'payer', 'legal_guardian', 'manager', 'read_only', 'former_guardian']
+const PRODUCTS: ProductType[] = [
+  'imagine_r_junior',
+  'imagine_r_scolaire',
+  'imagine_r_etudiant',
+  'navigo_annuel',
+  'navigo_senior',
+  'liberte_plus',
+  'tst',
+  'amethyste',
+]
+const CONTRACT_STATUSES: ContractStatus[] = [
+  'draft',
+  'pending_document',
+  'pending_payment',
+  'pending_payer_signature',
+  'active',
+  'suspended',
+  'expired',
+  'cancelled',
+  'blocked_unpaid',
+]
+const DOCUMENT_TYPES: DocumentType[] = [
+  'identity_document',
+  'photo',
+  'school_certificate',
+  'student_certificate',
+  'scholarship_certificate',
+  'address_proof',
+  'social_right',
+  'payment_mandate',
+]
+const DOCUMENT_STATUSES: DocumentStatus[] = [
+  'uploaded',
+  'pending_verification',
+  'accepted',
+  'refused',
+  'expired',
+  'missing',
+]
+const SUPPORT_STATUSES: SupportStatus[] = [
+  'active',
+  'lost',
+  'stolen',
+  'revoked',
+  'replaced',
+  'expired',
+  'pending_activation',
+  'support_non_reclame',
+]
+const SUPPORT_TYPES: SupportType[] = ['physical_card', 'phone', 'watch']
+const TRANSPORT_RIGHT_STATUSES: TransportRightStatus[] = ['active', 'suspended', 'expired', 'revoked']
+const VALIDATION_RESULTS: ValidationResult[] = ['accepted', 'rejected', 'anomaly']
+const ANOMALY_STATUSES: AnomalyStatus[] = ['open', 'in_review', 'closed']
+
+function record<K extends string>(t: DomainT, section: string, keys: K[]): Record<K, string> {
+  return Object.fromEntries(keys.map((k) => [k, t(`${section}.${k}`)])) as Record<K, string>
 }
 
-export const identityStatusLabels: Record<IdentityStatus, string> = {
-  active: 'Actif',
-  pending_recovery: 'Recuperation en cours',
-  transferred: 'Transfere',
-  blocked: 'Bloque',
-  archived: 'Archive',
+const td = (key: string) => i18n.t(key, { ns: 'domain' })
+
+export interface DomainLabels {
+  profileLabels: Record<Profile, string>
+  identityStatusLabels: Record<IdentityStatus, string>
+  relationshipLabels: Record<RelationshipType, string>
+  productLabels: Record<ProductType, string>
+  contractStatusLabels: Record<ContractStatus, string>
+  documentTypeLabels: Record<DocumentType, string>
+  documentStatusLabels: Record<DocumentStatus, string>
+  supportStatusLabels: Record<SupportStatus, string>
+  supportTypeLabels: Record<SupportType, string>
+  transportRightStatusLabels: Record<TransportRightStatus, string>
+  validationResultLabels: Record<ValidationResult, string>
+  anomalyStatusLabels: Record<AnomalyStatus, string>
 }
 
-export const relationshipLabels: Record<RelationshipType, string> = {
-  owner: 'Vous',
-  payer: 'Payeur',
-  legal_guardian: 'Responsable legal',
-  manager: 'Gestionnaire',
-  read_only: 'Lecture seule',
-  former_guardian: 'Ancien responsable',
+export function buildDomainLabels(t: DomainT): DomainLabels {
+  return {
+    profileLabels: record(t, 'profile', PROFILES),
+    identityStatusLabels: record(t, 'identityStatus', IDENTITY_STATUSES),
+    relationshipLabels: record(t, 'relationship', RELATIONSHIPS),
+    productLabels: record(t, 'product', PRODUCTS),
+    contractStatusLabels: record(t, 'contractStatus', CONTRACT_STATUSES),
+    documentTypeLabels: record(t, 'documentType', DOCUMENT_TYPES),
+    documentStatusLabels: record(t, 'documentStatus', DOCUMENT_STATUSES),
+    supportStatusLabels: record(t, 'supportStatus', SUPPORT_STATUSES),
+    supportTypeLabels: record(t, 'supportType', SUPPORT_TYPES),
+    transportRightStatusLabels: record(t, 'transportRightStatus', TRANSPORT_RIGHT_STATUSES),
+    validationResultLabels: record(t, 'validationResult', VALIDATION_RESULTS),
+    anomalyStatusLabels: record(t, 'anomalyStatus', ANOMALY_STATUSES),
+  }
 }
 
-export const productLabels: Record<ProductType, string> = {
-  imagine_r_junior: 'Imagine R Junior',
-  imagine_r_scolaire: 'Imagine R Scolaire',
-  imagine_r_etudiant: 'Imagine R Etudiant',
-  navigo_annuel: 'Navigo Annuel',
-  navigo_senior: 'Navigo Senior',
-  liberte_plus: 'Navigo Liberte+',
-  tst: 'TST',
-  amethyste: 'Amethyste',
+/** Reactive domain labels for use inside React components. */
+export function useLabels(): DomainLabels {
+  const { t } = useTranslation('domain')
+  return buildDomainLabels(t)
 }
 
-export const contractStatusLabels: Record<ContractStatus, string> = {
-  draft: 'Brouillon',
-  pending_document: 'Document manquant',
-  pending_payment: 'Paiement en attente',
-  pending_payer_signature: 'Signature payeur',
-  active: 'Actif',
-  suspended: 'Suspendu',
-  expired: 'Expire',
-  cancelled: 'Annule',
-  blocked_unpaid: 'Bloque (impaye)',
-}
-
-export const documentTypeLabels: Record<DocumentType, string> = {
-  identity_document: "Piece d'identite",
-  photo: 'Photo',
-  school_certificate: 'Certificat scolaire',
-  student_certificate: 'Certificat etudiant',
-  scholarship_certificate: 'Attestation bourse',
-  address_proof: 'Justificatif de domicile',
-  social_right: 'Droit social',
-  payment_mandate: 'Mandat de paiement',
-}
-
-export const documentStatusLabels: Record<DocumentStatus, string> = {
-  uploaded: 'Recu',
-  pending_verification: 'En verification',
-  accepted: 'Accepte',
-  refused: 'Refuse',
-  expired: 'Expire',
-  missing: 'Manquant',
-}
-
-export const supportStatusLabels: Record<SupportStatus, string> = {
-  active: 'Active',
-  lost: 'Perdue',
-  stolen: 'Volee',
-  revoked: 'Revoquee',
-  replaced: 'Remplacee',
-  expired: 'Expiree',
-  pending_activation: 'En attente',
-  support_non_reclame: 'Non reclamee',
-}
-
-export const timelineEventLabels: Record<string, string> = {
-  MOBILITY_IDENTITY_CREATED: 'Identite creee',
-  MOBILITY_IDENTITY_UPDATED: 'Identite mise a jour',
-  RELATIONSHIP_CREATED: 'Lien compte cree',
-  CONTRACT_CREATED: 'Contrat cree',
-  DOCUMENT_UPLOADED: 'Document depose',
-  SUPPORT_ADDED: 'Carte ajoutee',
-  SUPPORT_FOUND: 'Pass retrouve en agence',
-  SUPPORT_FOUND_CLOSED: 'Dossier pass retrouve cloture',
-}
-
-export const foundSupportDecisionLabels: Record<FoundSupportDecision, string> = {
-  FOUND_PICKUP_ALLOWED: 'En attente de retrait',
-  CONTROLLED_REUSE_ELIGIBLE: 'Remise en circulation controlee possible',
-  BACKOFFICE_REVIEW_REQUIRED: 'Revue back-office requise',
-  SUPPORT_ALREADY_REPLACED: 'Support deja remplace',
-  SUPPORT_UNUSABLE: 'Support inutilisable',
-  UNKNOWN_SUPPORT: 'Support inconnu',
-}
-
-export const foundSupportNotificationLabels: Record<
-  FoundSupportNotificationStrategy,
-  string
-> = {
-  SECURITY_NOTICE: 'Notification securite',
-  PICKUP_AVAILABLE: 'Retrait possible',
-  LEGAL_GUARDIAN_OR_PAYER: 'Responsable legal / payeur',
-  REVIEW_BEFORE_NOTIFICATION: 'Revue avant notification',
-  SUPPORT_UNUSABLE_NOTICE: 'Information support inutilisable',
-  UNKNOWN_SUPPORT_NO_NOTIFICATION: 'Aucune notification',
-}
-
-export const foundSupportFinalStatusLabels: Record<
-  FoundSupportFinalStatus,
-  string
-> = {
-  withdrawn: 'Retire',
-  not_claimed: 'Non reclame',
-  archived: 'Archive',
-  destroyed: 'Detruit',
-  sent_to_backoffice: 'Envoye au back-office',
-  unusable_confirmed: 'Inutilisable confirme',
+/** Single-label resolvers for use outside React (data/domain modules). */
+export const labelFor = {
+  profile: (value: Profile) => td(`profile.${value}`),
+  identityStatus: (value: IdentityStatus) => td(`identityStatus.${value}`),
+  relationship: (value: RelationshipType) => td(`relationship.${value}`),
+  product: (value: ProductType) => td(`product.${value}`),
+  contractStatus: (value: ContractStatus) => td(`contractStatus.${value}`),
+  documentType: (value: DocumentType) => td(`documentType.${value}`),
+  documentStatus: (value: DocumentStatus) => td(`documentStatus.${value}`),
+  supportStatus: (value: SupportStatus) => td(`supportStatus.${value}`),
+  supportType: (value: SupportType) => td(`supportType.${value}`),
+  transportRightStatus: (value: TransportRightStatus) => td(`transportRightStatus.${value}`),
+  validationResult: (value: ValidationResult) => td(`validationResult.${value}`),
+  anomalyStatus: (value: AnomalyStatus) => td(`anomalyStatus.${value}`),
+  timelineEvent: (value: string) => td(`timelineEvent.${value}`),
+  foundSupportDecision: (value: FoundSupportDecision) => td(`foundSupportDecision.${value}`),
+  foundSupportNotification: (value: FoundSupportNotificationStrategy) =>
+    td(`foundSupportNotification.${value}`),
+  foundSupportFinalStatus: (value: FoundSupportFinalStatus) => td(`foundSupportFinalStatus.${value}`),
 }

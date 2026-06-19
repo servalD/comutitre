@@ -8,6 +8,8 @@ export interface CreateSupportParams {
   type?: SupportType;
   status?: SupportStatus;
   publicKey?: string | null;
+  walletAddress?: string | null;
+  supportCommitment?: string | null;
   activatedAt?: Date | null;
   expiresAt?: Date | null;
 }

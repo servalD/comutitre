@@ -1,4 +1,5 @@
-import { relationshipLabels } from '../../constants/labels'
+import { useTranslation } from 'react-i18next'
+import { useLabels } from '../../constants/labels'
 import type { Relationship } from '../../domain/types/mobility'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
@@ -16,6 +17,8 @@ export function RelationshipList({
   onRevoke,
   revokingId,
 }: RelationshipListProps) {
+  const { t, i18n } = useTranslation('mobility')
+  const { relationshipLabels } = useLabels()
   if (relationships.length === 0) return null
 
   return (
@@ -28,7 +31,9 @@ export function RelationshipList({
               <div>
                 <Badge tone="info">{relationshipLabels[rel.relationshipType]}</Badge>
                 <p className={styles.sub}>
-                  Depuis le {new Date(rel.createdAt).toLocaleDateString('fr-FR')}
+                  {t('relationship.since', {
+                    date: new Date(rel.createdAt).toLocaleDateString(i18n.language),
+                  })}
                 </p>
               </div>
               {onRevoke && rel.status === 'active' ? (
@@ -37,7 +42,7 @@ export function RelationshipList({
                   onClick={() => onRevoke(rel.id)}
                   disabled={revokingId === rel.id}
                 >
-                  Révoquer
+                  {t('relationship.revoke')}
                 </Button>
               ) : null}
             </div>

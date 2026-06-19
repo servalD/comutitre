@@ -8,9 +8,14 @@ import { JustificatifOrmEntity } from '../../modules/justificatifs/infrastructur
 import { ContractOrmEntity as MobilityContractOrmEntity } from '../../modules/mobility/infrastructure/contract.orm-entity';
 import { DocumentOrmEntity } from '../../modules/mobility/infrastructure/document.orm-entity';
 import { MobilityIdentityOrmEntity } from '../../modules/mobility/infrastructure/mobility-identity.orm-entity';
+import { AnomalyCaseOrmEntity } from '../../modules/mobility/infrastructure/anomaly-case.orm-entity';
+import { ProofEventOrmEntity } from '../../modules/mobility/infrastructure/proof-event.orm-entity';
 import { RelationshipOrmEntity } from '../../modules/mobility/infrastructure/relationship.orm-entity';
 import { SupportOrmEntity } from '../../modules/mobility/infrastructure/support.orm-entity';
 import { TimelineEventOrmEntity } from '../../modules/mobility/infrastructure/timeline-event.orm-entity';
+import { TransportRightOrmEntity } from '../../modules/mobility/infrastructure/transport-right.orm-entity';
+import { ValidationEventOrmEntity } from '../../modules/mobility/infrastructure/validation-event.orm-entity';
+import { RecoveryRequestOrmEntity } from '../../modules/auth/infrastructure/recovery-request.orm-entity';
 import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entity';
 
 @Module({
@@ -33,9 +38,14 @@ import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entit
           DocumentOrmEntity,
           SupportOrmEntity,
           TimelineEventOrmEntity,
+          TransportRightOrmEntity,
+          ProofEventOrmEntity,
+          ValidationEventOrmEntity,
+          AnomalyCaseOrmEntity,
           SubscriptionContractOrmEntity,
           CgvuAcceptanceOrmEntity,
           JustificatifOrmEntity,
+          RecoveryRequestOrmEntity,
         ],
         migrations: [__dirname + '/migrations/*.{ts,js}'],
         // Never auto-sync schema: migrations are the single source of truth.

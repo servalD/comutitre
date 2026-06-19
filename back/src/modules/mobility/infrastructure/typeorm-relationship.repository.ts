@@ -7,6 +7,7 @@ import {
   RelationshipRepository,
 } from '../domain/relationship.repository';
 import { RelationshipStatus } from '../domain/enums/relationship-status.enum';
+import { RelationshipType } from '../domain/enums/relationship-type.enum';
 import { RelationshipOrmEntity } from './relationship.orm-entity';
 
 @Injectable()
@@ -51,6 +52,17 @@ export class TypeOrmRelationshipRepository extends RelationshipRepository {
       },
     });
     return entities.map((entity) => this.toDomain(entity));
+  }
+
+  async hasActiveOwner(mobilityIdentityId: string): Promise<boolean> {
+    const count = await this.repository.count({
+      where: {
+        mobilityIdentityId,
+        relationshipType: RelationshipType.OWNER,
+        status: RelationshipStatus.ACTIVE,
+      },
+    });
+    return count > 0;
   }
 
   async create(params: CreateRelationshipParams): Promise<Relationship> {

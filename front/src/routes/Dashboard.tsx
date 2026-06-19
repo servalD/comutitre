@@ -1,5 +1,7 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { LanguageSwitcher } from '../components/ui/LanguageSwitcher';
 import styles from './Dashboard.module.css';
 
 const RENEWAL_DATE = new Date('2026-09-01').getTime();
@@ -10,26 +12,22 @@ const MOCK_CONTRACT = {
   id: 'CTR-2024-084521',
   produit: 'Navigo Annuel',
   zones: '1 – 5',
-  statut: 'Actif',
   dateDebut: '01/09/2025',
   dateRenouvellement: '01/09/2026',
   prochainPrelevement: { date: '28/06/2026', montant: '86,40 €' },
-  support: { type: 'Passe Navigo physique', ref: '****  4521', statut: 'Valide' },
+  support: { ref: '****  4521' },
 };
-
-const MOCK_ACTIVITE = [
-  { id: 1, icon: '✔', label: 'Renouvellement automatique programmé', date: '15 juin 2026', type: 'success' },
-  { id: 2, icon: '💳', label: 'Prélèvement de 86,40 € effectué', date: '28 mai 2026', type: 'info' },
-  { id: 3, icon: '📧', label: 'E-mail de confirmation envoyé', date: '01 mai 2026', type: 'info' },
-  { id: 4, icon: '✔', label: 'Abonnement activé', date: '01 sept. 2025', type: 'success' },
-];
-
-const MOCK_ALERTES = [
-  { id: 1, label: 'Votre renouvellement approche dans 76 jours.', type: 'warning' },
-];
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation('dashboard');
+
+  const activity = [
+    { id: 1, icon: '✔', label: t('activity.renewalScheduled'), date: '15 juin 2026', type: 'success' },
+    { id: 2, icon: '💳', label: t('activity.paymentDone'), date: '28 mai 2026', type: 'info' },
+    { id: 3, icon: '📧', label: t('activity.emailSent'), date: '01 mai 2026', type: 'info' },
+    { id: 4, icon: '✔', label: t('activity.subscriptionActivated'), date: '01 sept. 2025', type: 'success' },
+  ];
 
   const initials = user?.displayName
     ? user.displayName
@@ -55,7 +53,7 @@ export default function Dashboard() {
               />
             </svg>
           </div>
-          <span className={styles.sidebarBrandName}>Comutitres</span>
+          <span className={styles.sidebarBrandName}>{t('common:brand.name')}</span>
         </div>
 
         <nav className={styles.sidebarNav}>
@@ -69,7 +67,7 @@ export default function Dashboard() {
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Tableau de bord
+            {t('common:nav.dashboard')}
           </NavLink>
           <NavLink
             to="/mobility"
@@ -83,7 +81,7 @@ export default function Dashboard() {
               <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Mobilité
+            {t('common:nav.mobility')}
           </NavLink>
           <a className={styles.navItem} href="#">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -91,7 +89,7 @@ export default function Dashboard() {
               <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            Mon abonnement
+            {t('nav.subscription')}
           </a>
           <a className={styles.navItem} href="#">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -99,7 +97,7 @@ export default function Dashboard() {
               <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
               <circle cx="12" cy="16" r="1" fill="currentColor"/>
             </svg>
-            Assistance SAV
+            {t('nav.sav')}
           </a>
           <a className={styles.navItem} href="#">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -109,23 +107,23 @@ export default function Dashboard() {
               <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Justificatifs
+            {t('nav.documents')}
           </a>
           <a className={styles.navItem} href="#">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Mon compte
+            {t('nav.account')}
           </a>
         </nav>
 
         <div className={styles.sidebarUser}>
           <div className={styles.avatarSmall}>{initials}</div>
           <div className={styles.sidebarUserInfo}>
-            <span className={styles.sidebarUserName}>{user?.displayName ?? 'Utilisateur'}</span>
+            <span className={styles.sidebarUserName}>{user?.displayName ?? t('user')}</span>
             <span className={styles.sidebarUserEmail}>{user?.email ?? ''}</span>
           </div>
-          <button className={styles.logoutBtn} onClick={logout} title="Se déconnecter">
+          <button className={styles.logoutBtn} onClick={logout} title={t('logoutTitle')}>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -140,56 +138,55 @@ export default function Dashboard() {
         <header className={styles.topbar}>
           <div>
             <h1 className={styles.pageTitle}>
-              Bonjour, {user?.displayName?.split(' ')[0] ?? 'vous'} 👋
+              {t('greeting', { name: user?.displayName?.split(' ')[0] ?? t('you') })} 👋
             </h1>
-            <p className={styles.pageSubtitle}>Voici un résumé de votre compte Comutitres</p>
+            <p className={styles.pageSubtitle}>{t('subtitle')}</p>
           </div>
           <div className={styles.topbarActions}>
+            <LanguageSwitcher />
             <button className={styles.btnAction}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Notifications
+              {t('notifications')}
               <span className={styles.badge}>1</span>
             </button>
           </div>
         </header>
 
         {/* Alertes */}
-        {MOCK_ALERTES.map((a) => (
-          <div key={a.id} className={`${styles.alert} ${styles[`alert_${a.type}`]}`}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
-              <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="12" cy="16" r="1" fill="currentColor"/>
-            </svg>
-            {a.label}
-          </div>
-        ))}
+        <div className={`${styles.alert} ${styles.alert_warning}`}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            <circle cx="12" cy="16" r="1" fill="currentColor"/>
+          </svg>
+          {t('alertRenewal', { count: days })}
+        </div>
 
         {/* KPI row */}
         <div className={styles.kpiRow}>
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Statut abonnement</span>
+            <span className={styles.kpiLabel}>{t('kpi.status')}</span>
             <span className={`${styles.kpiValue} ${styles.kpiGreen}`}>
-              <span className={styles.dot} /> {MOCK_CONTRACT.statut}
+              <span className={styles.dot} /> {t('active')}
             </span>
           </div>
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Prochain prélèvement</span>
+            <span className={styles.kpiLabel}>{t('kpi.nextPayment')}</span>
             <span className={styles.kpiValue}>{MOCK_CONTRACT.prochainPrelevement.montant}</span>
-            <span className={styles.kpiSub}>le {MOCK_CONTRACT.prochainPrelevement.date}</span>
+            <span className={styles.kpiSub}>{t('kpi.paymentOn', { date: MOCK_CONTRACT.prochainPrelevement.date })}</span>
           </div>
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Renouvellement dans</span>
-            <span className={styles.kpiValue}>{days} jours</span>
+            <span className={styles.kpiLabel}>{t('kpi.renewalIn')}</span>
+            <span className={styles.kpiValue}>{t('kpi.days', { count: days })}</span>
             <span className={styles.kpiSub}>{MOCK_CONTRACT.dateRenouvellement}</span>
           </div>
           <div className={styles.kpiCard}>
-            <span className={styles.kpiLabel}>Support physique</span>
+            <span className={styles.kpiLabel}>{t('kpi.physicalSupport')}</span>
             <span className={`${styles.kpiValue} ${styles.kpiGreen}`}>
-              <span className={styles.dot} /> {MOCK_CONTRACT.support.statut}
+              <span className={styles.dot} /> {t('valid')}
             </span>
             <span className={styles.kpiSub}>{MOCK_CONTRACT.support.ref}</span>
           </div>
@@ -199,28 +196,28 @@ export default function Dashboard() {
         <div className={styles.contentRow}>
           {/* Carte abonnement */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Mon abonnement</h2>
+            <h2 className={styles.sectionTitle}>{t('nav.subscription')}</h2>
             <div className={styles.navigoCard}>
               <div className={styles.navigoCardHeader}>
                 <div>
                   <div className={styles.navigoCardProduct}>{MOCK_CONTRACT.produit}</div>
-                  <div className={styles.navigoCardZones}>Zones {MOCK_CONTRACT.zones}</div>
+                  <div className={styles.navigoCardZones}>{t('zones', { zones: MOCK_CONTRACT.zones })}</div>
                 </div>
-                <span className={styles.statusBadge}>Actif</span>
+                <span className={styles.statusBadge}>{t('active')}</span>
               </div>
               <div className={styles.navigoCardChip} aria-hidden="true" />
               <div className={styles.navigoCardRef}>{MOCK_CONTRACT.support.ref}</div>
               <div className={styles.navigoCardFooter}>
                 <div>
-                  <div className={styles.navigoCardFooterLabel}>Début</div>
+                  <div className={styles.navigoCardFooterLabel}>{t('card.start')}</div>
                   <div className={styles.navigoCardFooterValue}>{MOCK_CONTRACT.dateDebut}</div>
                 </div>
                 <div>
-                  <div className={styles.navigoCardFooterLabel}>Renouvellement</div>
+                  <div className={styles.navigoCardFooterLabel}>{t('card.renewal')}</div>
                   <div className={styles.navigoCardFooterValue}>{MOCK_CONTRACT.dateRenouvellement}</div>
                 </div>
                 <div>
-                  <div className={styles.navigoCardFooterLabel}>N° contrat</div>
+                  <div className={styles.navigoCardFooterLabel}>{t('card.contractNo')}</div>
                   <div className={styles.navigoCardFooterValue}>{MOCK_CONTRACT.id}</div>
                 </div>
               </div>
@@ -232,29 +229,29 @@ export default function Dashboard() {
                   <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                Renouveler
+                {t('actions.renew')}
               </button>
               <button className={styles.quickActionBtn}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                Contacter le SAV
+                {t('actions.contactSav')}
               </button>
               <button className={styles.quickActionBtn}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   <circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/>
                 </svg>
-                Passe perdu/volé
+                {t('actions.lostStolen')}
               </button>
             </div>
           </div>
 
           {/* Activité récente */}
           <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Activité récente</h2>
+            <h2 className={styles.sectionTitle}>{t('recentActivity')}</h2>
             <ul className={styles.activityList}>
-              {MOCK_ACTIVITE.map((item) => (
+              {activity.map((item) => (
                 <li key={item.id} className={styles.activityItem}>
                   <span className={`${styles.activityIcon} ${styles[`activityIcon_${item.type}`]}`}>
                     {item.icon}
@@ -268,24 +265,24 @@ export default function Dashboard() {
             </ul>
 
             <div className={styles.infoBox}>
-              <div className={styles.infoBoxTitle}>Informations porteur</div>
+              <div className={styles.infoBoxTitle}>{t('holderInfo')}</div>
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoKey}>Nom</span>
+                  <span className={styles.infoKey}>{t('info.name')}</span>
                   <span className={styles.infoVal}>{user?.displayName ?? '—'}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoKey}>E-mail</span>
+                  <span className={styles.infoKey}>{t('info.email')}</span>
                   <span className={styles.infoVal}>{user?.email ?? '—'}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoKey}>Compte</span>
+                  <span className={styles.infoKey}>{t('info.account')}</span>
                   <span className={styles.infoVal}>
-                    {user?.provider === 'franceconnect' ? 'FranceConnect' : 'Local'}
+                    {user?.provider === 'franceconnect' ? 'FranceConnect' : t('info.local')}
                   </span>
                 </div>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoKey}>Rôle</span>
+                  <span className={styles.infoKey}>{t('info.role')}</span>
                   <span className={styles.infoVal}>{user?.roles?.[0] ?? 'user'}</span>
                 </div>
               </div>

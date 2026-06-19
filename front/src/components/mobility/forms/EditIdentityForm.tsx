@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { MobilityIdentity, UpdateMobilityIdentityPayload } from '../../../domain/types/mobility'
 import { formatEstimatedProfile } from '../identity-utils'
 import { Button } from '../../ui/Button'
@@ -13,6 +14,7 @@ export function EditIdentityForm({
   identity: MobilityIdentity
   onSubmit: (payload: UpdateMobilityIdentityPayload) => Promise<void>
 }) {
+  const { t } = useTranslation('mobility')
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [firstName, setFirstName] = useState(identity.firstName)
@@ -38,16 +40,16 @@ export function EditIdentityForm({
   if (!open) {
     return (
       <Button variant="secondary" onClick={() => setOpen(true)}>
-        <span aria-hidden="true">✏️</span> Modifier
+        <span aria-hidden="true">✏️</span> {t('editIdentity.edit')}
       </Button>
     )
   }
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h3>Modifier l&apos;identité</h3>
+      <h3>{t('editIdentity.title')}</h3>
       <div className={styles.row}>
-        <Field label="Prénom" htmlFor="firstName">
+        <Field label={t('forms.firstName')} htmlFor="firstName">
           <input
             id="firstName"
             className={inputClassName()}
@@ -56,7 +58,7 @@ export function EditIdentityForm({
             onChange={(e) => setFirstName(e.target.value)}
           />
         </Field>
-        <Field label="Nom" htmlFor="lastName">
+        <Field label={t('forms.lastName')} htmlFor="lastName">
           <input
             id="lastName"
             className={inputClassName()}
@@ -66,7 +68,7 @@ export function EditIdentityForm({
           />
         </Field>
       </div>
-      <Field label="Date de naissance" htmlFor="birthDate">
+      <Field label={t('forms.birthDate')} htmlFor="birthDate">
         <input
           id="birthDate"
           type="date"
@@ -78,16 +80,16 @@ export function EditIdentityForm({
       </Field>
       {estimatedProfile ? (
         <p className={styles.estimatedProfile}>
-          <span aria-hidden="true">🎫</span> Profil estimé :{' '}
+          <span aria-hidden="true">🎫</span> {t('forms.estimatedProfile')}{' '}
           <strong>{estimatedProfile}</strong>
         </p>
       ) : null}
       <div className={styles.actions}>
         <Button type="submit" disabled={loading}>
-          Enregistrer
+          {t('common:actions.save')}
         </Button>
         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-          Annuler
+          {t('common:actions.cancel')}
         </Button>
       </div>
     </form>

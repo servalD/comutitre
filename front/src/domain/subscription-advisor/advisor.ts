@@ -1,4 +1,5 @@
 import type { ProductType } from '../types/mobility'
+import i18n from '../../i18n'
 import { calculateAge, deduceProfileFromBirthDate } from '../mobility/profile-calculator'
 import {
   documentLabelsFor,
@@ -15,6 +16,9 @@ import type {
   SubscriptionRecommendation,
 } from './types'
 
+const at = (key: string, options?: Record<string, unknown>): string =>
+  i18n.t(`advisor.${key}`, { ns: 'mobility', ...options })
+
 const TARIFFS: Record<ProductType, { base: number; scholarship?: number }> = {
   imagine_r_junior: { base: 120 },
   imagine_r_scolaire: { base: 350, scholarship: 175 },
@@ -26,11 +30,7 @@ const TARIFFS: Record<ProductType, { base: number; scholarship?: number }> = {
   amethyste: { base: 0 },
 }
 
-const TST_TARIFF_HINT: Record<SocialRightLevel, string> = {
-  gratuite: 'Gratuité transport',
-  solidarite_75: 'Tarif solidarité −75 %',
-  reduction_50: 'Réduction −50 %',
-}
+const tstTariffHint = (level: SocialRightLevel): string => at(`tstTariffHint.${level}`)
 
 function buildContext(
   identityId: string,
@@ -68,22 +68,22 @@ export function getAdvisorStep(
         id: 'is_enrolled',
         label:
           context.profile === 'scolaire'
-            ? 'Cette personne est-elle scolarisée cette année ?'
-            : 'Cette personne est-elle inscrite dans un établissement cette année ?',
-        hint: 'Un justificatif scolaire ou étudiant sera demandé.',
+            ? at('q.isEnrolled.labelScolaire')
+            : at('q.isEnrolled.labelEtudiant'),
+        hint: at('q.isEnrolled.hint'),
         options: [
-          { value: 'yes', label: 'Oui' },
-          { value: 'no', label: 'Non' },
+          { value: 'yes', label: at('common.yes') },
+          { value: 'no', label: at('common.no') },
         ],
       })
     } else if (answers.isEnrolled && answers.hasScholarship === undefined) {
       questions.push({
         id: 'has_scholarship',
-        label: 'Bénéficie-t-elle d’une bourse (tarif réduit) ?',
-        hint: 'Attestation de bourse à fournir si oui.',
+        label: at('q.scholarship.label'),
+        hint: at('q.scholarship.hint'),
         options: [
-          { value: 'yes', label: 'Oui, boursier(ère)' },
-          { value: 'no', label: 'Non, tarif plein' },
+          { value: 'yes', label: at('q.scholarship.yes') },
+          { value: 'no', label: at('q.scholarship.no') },
         ],
       })
     }
@@ -91,26 +91,26 @@ export function getAdvisorStep(
     if (answers.travelHabit === undefined) {
       questions.push({
         id: 'travel_habit',
-        label: 'Comment cette personne utilise-t-elle les transports ?',
+        label: at('q.travelHabit.label'),
         options: [
           {
             value: 'daily',
-            label: 'Tous les jours ou presque',
+            label: at('q.travelHabit.daily'),
             description: travelHabitHelp.daily.body,
           },
           {
             value: 'occasional',
-            label: 'De temps en temps',
+            label: at('q.travelHabit.occasional'),
             description: travelHabitHelp.occasional.body,
           },
           {
             value: 'social_rights',
-            label: 'J’ai des droits sociaux (TST)',
+            label: at('q.travelHabit.socialRights'),
             description: travelHabitHelp.social_rights.body,
           },
           {
             value: 'department_assigned',
-            label: 'Droit Améthyste (département)',
+            label: at('q.travelHabit.departmentAssigned'),
             description: travelHabitHelp.department_assigned.body,
           },
         ],
@@ -121,12 +121,12 @@ export function getAdvisorStep(
     ) {
       questions.push({
         id: 'social_right_level',
-        label: 'Quel niveau de Tarification Solidarité Transport ?',
-        hint: 'Selon votre situation : RSA, CAF, France Travail, MDPH…',
+        label: at('q.socialLevel.label'),
+        hint: at('q.socialLevel.hint'),
         options: [
-          { value: 'gratuite', label: 'Gratuité' },
-          { value: 'solidarite_75', label: 'Solidarité −75 %' },
-          { value: 'reduction_50', label: 'Réduction −50 %' },
+          { value: 'gratuite', label: at('q.socialLevel.gratuite') },
+          { value: 'solidarite_75', label: at('q.socialLevel.solidarite75') },
+          { value: 'reduction_50', label: at('q.socialLevel.reduction50') },
         ],
       })
     }
@@ -134,11 +134,11 @@ export function getAdvisorStep(
     if (answers.travelHabit === undefined) {
       questions.push({
         id: 'travel_habit',
-        label: 'Souhaitez-vous renouveler ou modifier votre droit ?',
+        label: at('q.travelHabitTst.label'),
         options: [
-          { value: 'social_rights', label: 'Renouveler ma TST' },
-          { value: 'daily', label: 'Passer au forfait annuel (plein tarif)' },
-          { value: 'occasional', label: 'Passer à Liberté+ (à l’usage)' },
+          { value: 'social_rights', label: at('q.travelHabitTst.renew') },
+          { value: 'daily', label: at('q.travelHabitTst.annual') },
+          { value: 'occasional', label: at('q.travelHabitTst.liberte') },
         ],
       })
     } else if (
@@ -147,26 +147,56 @@ export function getAdvisorStep(
     ) {
       questions.push({
         id: 'social_right_level',
-        label: 'Quel niveau de TST ?',
+        label: at('q.socialLevelTst.label'),
         options: [
-          { value: 'gratuite', label: 'Gratuité' },
-          { value: 'solidarite_75', label: 'Solidarité −75 %' },
-          { value: 'reduction_50', label: 'Réduction −50 %' },
+          { value: 'gratuite', label: at('q.socialLevel.gratuite') },
+          { value: 'solidarite_75', label: at('q.socialLevel.solidarite75') },
+          { value: 'reduction_50', label: at('q.socialLevel.reduction50') },
         ],
       })
     }
   }
 
+  if (questions.length === 0 && answers.travelHabit === 'occasional') {
+    if (answers.liberteSupport === undefined) {
+      questions.push({
+        id: 'liberte_support',
+        label: at('q.liberteSupport.label'),
+        options: [
+          {
+            value: 'passe',
+            label: at('q.liberteSupport.passe'),
+            description: at('q.liberteSupport.passeDesc'),
+          },
+          {
+            value: 'telephone',
+            label: at('q.liberteSupport.telephone'),
+            description: at('q.liberteSupport.telephoneDesc'),
+            disabled: true,
+            disabledReason: at('q.liberteSupport.telephoneUnavailable'),
+          },
+        ],
+      })
+    } else if (answers.liberteSupport === 'telephone') {
+      return {
+        questions: [],
+        canRecommend: false,
+        isBlocked: true,
+        blockMessage: at('q.liberteSupport.telephoneBlock'),
+      }
+    }
+  }
+
   if (questions.length === 0 && answers.hasNavigoCard === undefined) {
     const product = peekProduct(context, answers)
-    if (product && product !== 'liberte_plus') {
+    if (product && (product !== 'liberte_plus' || answers.liberteSupport === 'passe')) {
       questions.push({
         id: 'has_navigo_card',
-        label: 'Avez-vous déjà une carte Navigo personnalisée ?',
-        hint: 'Nécessaire pour charger la plupart des forfaits sur support physique.',
+        label: at('q.navigoCard.label'),
+        hint: at('q.navigoCard.hint'),
         options: [
-          { value: 'yes', label: 'Oui' },
-          { value: 'no', label: 'Non, à commander' },
+          { value: 'yes', label: at('common.yes') },
+          { value: 'no', label: at('q.navigoCard.toOrder') },
         ],
       })
     }
@@ -196,29 +226,27 @@ export function buildRecommendation(
   const { profile, age } = context
 
   if (age < 4) {
-    throw new Error('L’enregistrement est possible à partir de 4 ans.')
+    throw new Error(at('errors.minAge'))
   }
 
   if (profile === 'junior') {
     return recommend('imagine_r_junior', [
-      `Âge ${age} ans : éligible Imagine R Junior.`,
-      'Le payeur et représentant légal gère la souscription.',
+      at('why.juniorAge', { age }),
+      at('why.juniorGuardian'),
     ])
   }
 
   if (profile === 'scolaire') {
     if (!answers.isEnrolled) {
-      throw new Error('Sans scolarité, Imagine R Scolaire n’est pas adapté.')
+      throw new Error(at('errors.scolaireNotEnrolled'))
     }
     const product: ProductType = 'imagine_r_scolaire'
     const withScholarship = Boolean(answers.hasScholarship)
     return recommend(
       product,
       [
-        `Âge ${age} ans : profil scolaire.`,
-        withScholarship
-          ? 'Tarif boursier : attestation de bourse requise.'
-          : 'Tarif plein : certificat scolaire requis.',
+        at('why.scolaireAge', { age }),
+        withScholarship ? at('why.scholarshipFare') : at('why.fullFareSchool'),
       ],
       withScholarship,
     )
@@ -226,16 +254,14 @@ export function buildRecommendation(
 
   if (profile === 'etudiant') {
     if (!answers.isEnrolled) {
-      throw new Error('Imagine R Étudiant nécessite une inscription en cours.')
+      throw new Error(at('errors.etudiantNotEnrolled'))
     }
     const withScholarship = Boolean(answers.hasScholarship)
     return recommend(
       'imagine_r_etudiant',
       [
-        `Âge ${age} ans : profil étudiant.`,
-        withScholarship
-          ? 'Réduction bourse applicable avec justificatif.'
-          : 'Certificat de scolarité ou étudiant requis.',
+        at('why.etudiantAge', { age }),
+        withScholarship ? at('why.scholarshipReduction') : at('why.studentCertificate'),
       ],
       withScholarship,
     )
@@ -253,7 +279,7 @@ export function buildRecommendation(
     return resolveAdultSeniorRecommendation(context, answers, profile === 'tst')
   }
 
-  throw new Error('Profil non pris en charge.')
+  throw new Error(at('errors.unsupportedProfile'))
 }
 
 function resolveAdultSeniorRecommendation(
@@ -262,53 +288,44 @@ function resolveAdultSeniorRecommendation(
   preferSenior: boolean,
 ): SubscriptionRecommendation {
   const habit = answers.travelHabit
-  if (!habit) throw new Error('Répondez aux questions pour continuer.')
+  if (!habit) throw new Error(at('errors.answerToContinue'))
 
   if (habit === 'daily') {
     const product: ProductType = preferSenior ? 'navigo_senior' : 'navigo_annuel'
     return recommend(product, [
-      'Trajets fréquents : un forfait annuel est le plus économique sur 12 mois.',
-      preferSenior
-        ? `Âge ${context.age} ans : tarif senior applicable.`
-        : 'Couverture toutes zones, renouvellement automatique.',
+      at('why.dailyFrequent'),
+      preferSenior ? at('why.seniorFare', { age: context.age }) : at('why.allZones'),
     ])
   }
 
   if (habit === 'occasional') {
     return recommend(
       'liberte_plus',
-      [
-        'Trajets occasionnels : pas besoin d’un abonnement à l’année.',
-        'Chaque validation est facturée ; prélèvement mensuel SEPA.',
-      ],
+      [at('why.occasionalNoYear'), at('why.perValidation')],
       false,
-      'Existent aussi Navigo Mois et Navigo Semaine pour des besoins courts — non gérés dans cette démo.',
+      at('usage.shortTickets'),
     )
   }
 
   if (habit === 'social_rights') {
     const level = answers.socialRightLevel
-    if (!level) throw new Error('Précisez votre niveau TST.')
+    if (!level) throw new Error(at('errors.specifyTst'))
     return recommend(
       'tst',
-      [
-        'Éligibilité Tarification Solidarité Transport.',
-        TST_TARIFF_HINT[level],
-        'Droit renouvelé par périodes de 3 mois.',
-      ],
+      [at('why.tstEligible'), tstTariffHint(level), at('why.tstRenewed')],
       false,
-      TST_TARIFF_HINT[level],
+      tstTariffHint(level),
     )
   }
 
   if (habit === 'department_assigned') {
     return recommend('amethyste', [
-      'Forfait Améthyste : attribué par le département.',
-      'Vérification de l’attribution avant activation.',
+      at('why.amethysteAssigned'),
+      at('why.amethysteCheck'),
     ])
   }
 
-  throw new Error('Situation non reconnue.')
+  throw new Error(at('errors.unrecognized'))
 }
 
 function recommend(
@@ -332,13 +349,13 @@ function recommend(
   if (tariffOverride) {
     tariffLabel = tariffOverride
   } else if (productType === 'liberte_plus') {
-    tariffLabel = 'Facturation à l’usage (pas de forfait fixe)'
+    tariffLabel = at('tariff.liberte')
   } else if (productType === 'tst') {
-    tariffLabel = 'Selon droit social vérifié'
+    tariffLabel = at('tariff.tst')
   } else if (productType === 'amethyste') {
-    tariffLabel = 'Selon attribution départementale'
+    tariffLabel = at('tariff.amethyste')
   } else {
-    tariffLabel = `${estimatedTariff.toFixed(0)} € / an`
+    tariffLabel = at('tariff.perYear', { amount: estimatedTariff.toFixed(0) })
   }
 
   const alternatives = buildAlternatives(productType)
@@ -363,7 +380,7 @@ function buildAlternatives(
     return [
       {
         productLabel: productCatalog.liberte_plus.label,
-        reason: 'Si vos trajets deviennent plus rares, sans engagement annuel.',
+        reason: at('alternatives.toLiberte'),
       },
     ]
   }
@@ -371,7 +388,7 @@ function buildAlternatives(
     return [
       {
         productLabel: productCatalog.navigo_annuel.label,
-        reason: 'Si vous voyagez quasi quotidiennement, l’annuel est plus avantageux.',
+        reason: at('alternatives.toAnnual'),
       },
     ]
   }

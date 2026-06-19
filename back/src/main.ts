@@ -12,7 +12,9 @@ async function bootstrap() {
   // Toutes les routes sont préfixées par /api : front et back cohabitent derrière
   // la même IP via Traefik, séparés par chemin (/ -> front, /api -> back).
   // /health reste à la racine pour le healthcheck du conteneur.
-  app.setGlobalPrefix('api', { exclude: ['health'] });
+  app.setGlobalPrefix('api', {
+    exclude: ['health', 'callback', 'login-callback'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

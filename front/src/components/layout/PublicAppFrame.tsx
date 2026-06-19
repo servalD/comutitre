@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { LanguageSwitcher } from '../ui/LanguageSwitcher'
 import styles from './PublicAppFrame.module.css'
 
 interface PublicAppFrameProps {
@@ -31,6 +32,9 @@ export function PublicAppFrame({ children, variant = 'default' }: PublicAppFrame
           .filter(Boolean)
           .join(' ')}
       >
+        <div className={styles.langBar}>
+          <LanguageSwitcher />
+        </div>
         {children}
       </div>
     </div>

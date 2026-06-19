@@ -1,0 +1,155 @@
+{
+  "ageYears_one": "{{count}} year old",
+  "ageYears_other": "{{count}} years old",
+  "espace": {
+    "title": "My area",
+    "hello": "Hello, <strong>{{name}}</strong> — find your applications and household members here.",
+    "demoFallback": "Showing demo data.",
+    "dossierInProgress": "Application in progress",
+    "dossierFor": "{{product}} for {{name}}",
+    "seeAll": "See all",
+    "loadingHousehold": "Loading household…",
+    "you": "You",
+    "foyerHint": "Manage the people linked to your account and start a subscription for each of them."
+  },
+  "foyer": {
+    "subtitle": "Manage the people on your account",
+    "count": "<strong>{{count}}</strong> linked people",
+    "addPerson": "Add a person",
+    "membersAria": "Household members",
+    "addHint": "Child, spouse or dependent"
+  },
+  "addPerson": {
+    "subtitle": "This person will be added to your household",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "birthDate": "Date of birth",
+    "birthHint": "Helps determine the suitable plan",
+    "relation": "Relationship to you",
+    "optional": "(optional)",
+    "relations": { "child": "Child", "partner": "Spouse", "other": "Other" },
+    "minorNotice": "If the person is a minor, you will be the payer and legal guardian by default.",
+    "submit": "Add and continue"
+  },
+  "fiche": {
+    "title": "Person profile",
+    "tabsAria": "Person profile tabs",
+    "tabs": { "resume": "Summary", "titres": "Passes", "documents": "Documents", "historique": "History" },
+    "roles": "Roles",
+    "holder": "Holder",
+    "payer": "Payer",
+    "legalGuardian": "Legal guardian",
+    "youLower": "you",
+    "subscribe": "Subscribe to a pass",
+    "placeholderTitres": "Active and archived passes will appear here.",
+    "placeholderDocuments": "Uploaded documents will appear here.",
+    "placeholderHistorique": "The event history will appear here."
+  },
+  "aide": {
+    "title": "Help & support",
+    "searchPlaceholder": "Search for a question",
+    "popular": "Popular questions",
+    "reportProblem": "Report a problem",
+    "callCustomerService": "Call customer service"
+  },
+  "household": {
+    "activeSubscription": "{{product}} active",
+    "inProgress": "Application in progress",
+    "noSubscription": "No subscription"
+  },
+  "mock": {
+    "household": {
+      "marie": { "role": "Payer", "status": "Navigo Annual active" },
+      "lea": { "role": "Junior", "status": "Application in progress" }
+    },
+    "dossierSteps": {
+      "informations": "Information",
+      "justificatifs": "Documents",
+      "verification": "Verification",
+      "paiement": "Payment",
+      "validation": "Validation"
+    },
+    "dossierDetailSteps": {
+      "identite": "Identity",
+      "justificatifs": "Documents",
+      "signature": "Signature",
+      "paiement": "Payment",
+      "validation": "Validation"
+    },
+    "dossierDocs": {
+      "idCard": "ID document",
+      "school": "School certificate",
+      "photo": "ID photo",
+      "uploaded": "Uploaded",
+      "uploadedFem": "Uploaded"
+    },
+    "processingDelay": "Processing time: 5 to 10 business days",
+    "products": {
+      "navigo": {
+        "feature1": "Unlimited travel in Île-de-France",
+        "feature2": "Zones 1 to 5 included",
+        "feature3": "Automatic renewal",
+        "description": "For daily home-to-work commutes"
+      },
+      "junior": {
+        "feature1": "Suitable for ages 4 to 11",
+        "feature2": "Daily school trips",
+        "feature3": "Youth discount in Île-de-France",
+        "description": "For young children in school"
+      },
+      "scolaire": {
+        "feature1": "For middle and high school students",
+        "feature2": "Valid in Île-de-France",
+        "feature3": "Full school year",
+        "description": "Suitable for middle and high school students in Île-de-France"
+      }
+    },
+    "docs": {
+      "idCard": "ID document",
+      "addressProof": "Proof of address",
+      "schoolCertificate": "School certificate",
+      "idPhoto": "ID photo"
+    },
+    "beneficiaryOptions": {
+      "self": "Myself",
+      "child": "My child",
+      "other": "Another person"
+    },
+    "payment": {
+      "label": "Imagine R Junior — school year"
+    },
+    "usage": {
+      "daily": { "label": "Daily", "description": "Regular round trips to work or school" },
+      "occasional": { "label": "Occasional", "description": "A few trips per week" },
+      "payPerUse": { "label": "Liberté+ (usage-based)", "description": "Trips billed monthly by IDFM, no annual subscription" }
+    },
+    "person": {
+      "ageBascule": "Switch to School plan expected at age 11",
+      "validity": "Valid in Île-de-France",
+      "status": "Application in progress"
+    },
+    "help": {
+      "perteVol": "Lost or stolen pass",
+      "renouvellement": "Renewal",
+      "impaye": "Unpaid",
+      "imagineR": "Imagine R",
+      "tst": "TST",
+      "contactSav": "Contact support"
+    },
+    "problems": {
+      "brokenPass": "My pass no longer works",
+      "notReceived": "I haven't received my pass",
+      "refusedDoc": "My document was refused"
+    },
+    "timeline": {
+      "sent": { "label": "Application sent", "date": "Today" },
+      "verify": { "label": "Document verification", "date": "In progress" },
+      "activate": { "label": "Pass activation", "date": "Pending" }
+    },
+    "subSteps": {
+      "justificatifs": "Documents",
+      "signature": "Signature",
+      "paiement": "Payment"
+    }
+  }
+}

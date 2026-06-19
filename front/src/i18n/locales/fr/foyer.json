@@ -1,0 +1,155 @@
+{
+  "ageYears_one": "{{count}} an",
+  "ageYears_other": "{{count}} ans",
+  "espace": {
+    "title": "Mon espace",
+    "hello": "Bonjour, <strong>{{name}}</strong> — retrouvez ici vos démarches et les personnes de votre foyer.",
+    "demoFallback": "Affichage de démonstration.",
+    "dossierInProgress": "Dossier en cours",
+    "dossierFor": "{{product}} pour {{name}}",
+    "seeAll": "Voir tout",
+    "loadingHousehold": "Chargement du foyer…",
+    "you": "Vous",
+    "foyerHint": "Gérez les personnes rattachées à votre compte et lancez une souscription pour chacune d'elles."
+  },
+  "foyer": {
+    "subtitle": "Gérez les personnes de votre compte",
+    "count": "<strong>{{count}}</strong> personnes rattachées",
+    "addPerson": "Ajouter une personne",
+    "membersAria": "Membres du foyer",
+    "addHint": "Enfant, conjoint ou personne à charge"
+  },
+  "addPerson": {
+    "subtitle": "Cette personne sera ajoutée à votre foyer",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "birthDate": "Date de naissance",
+    "birthHint": "Permet de déterminer le forfait adapté",
+    "relation": "Lien avec vous",
+    "optional": "(optionnel)",
+    "relations": { "child": "Enfant", "partner": "Conjoint", "other": "Autre" },
+    "minorNotice": "Si la personne est mineure, vous serez payeur et responsable légal par défaut.",
+    "submit": "Ajouter et continuer"
+  },
+  "fiche": {
+    "title": "Fiche personne",
+    "tabsAria": "Onglets fiche personne",
+    "tabs": { "resume": "Résumé", "titres": "Titres", "documents": "Documents", "historique": "Historique" },
+    "roles": "Rôles",
+    "holder": "Porteur",
+    "payer": "Payeur",
+    "legalGuardian": "Responsable légal",
+    "youLower": "vous",
+    "subscribe": "Souscrire un titre",
+    "placeholderTitres": "Les titres actifs et archives apparaîtront ici.",
+    "placeholderDocuments": "Les documents déposés apparaîtront ici.",
+    "placeholderHistorique": "L'historique des événements apparaîtra ici."
+  },
+  "aide": {
+    "title": "Aide & SAV",
+    "searchPlaceholder": "Rechercher une question",
+    "popular": "Questions populaires",
+    "reportProblem": "Signaler un problème",
+    "callCustomerService": "Appeler le service client"
+  },
+  "household": {
+    "activeSubscription": "{{product}} actif",
+    "inProgress": "Dossier en cours",
+    "noSubscription": "Aucun abonnement"
+  },
+  "mock": {
+    "household": {
+      "marie": { "role": "Payeur", "status": "Navigo Annuel actif" },
+      "lea": { "role": "Junior", "status": "Dossier en cours" }
+    },
+    "dossierSteps": {
+      "informations": "Informations",
+      "justificatifs": "Justificatifs",
+      "verification": "Vérification",
+      "paiement": "Paiement",
+      "validation": "Validation"
+    },
+    "dossierDetailSteps": {
+      "identite": "Identité",
+      "justificatifs": "Justificatifs",
+      "signature": "Signature",
+      "paiement": "Paiement",
+      "validation": "Validation"
+    },
+    "dossierDocs": {
+      "idCard": "Pièce d'identité",
+      "school": "Certificat de scolarité",
+      "photo": "Photo d'identité",
+      "uploaded": "Déposé",
+      "uploadedFem": "Déposée"
+    },
+    "processingDelay": "Délai de traitement : 5 à 10 jours ouvrés",
+    "products": {
+      "navigo": {
+        "feature1": "Voyages illimités en Île-de-France",
+        "feature2": "Zones 1 à 5 incluses",
+        "feature3": "Renouvellement automatique",
+        "description": "Pour les trajets quotidiens domicile-travail"
+      },
+      "junior": {
+        "feature1": "Adapté de 4 à 11 ans",
+        "feature2": "Trajets quotidiens scolaires",
+        "feature3": "Réduction jeune en Île-de-France",
+        "description": "Pour les jeunes enfants scolarisés"
+      },
+      "scolaire": {
+        "feature1": "Pour les collégiens et lycéens",
+        "feature2": "Valable en Île-de-France",
+        "feature3": "Année scolaire complète",
+        "description": "Adapté aux collégiens et lycéens scolarisés en Île-de-France"
+      }
+    },
+    "docs": {
+      "idCard": "Pièce d'identité",
+      "addressProof": "Justificatif de domicile",
+      "schoolCertificate": "Certificat de scolarité",
+      "idPhoto": "Photo d'identité"
+    },
+    "beneficiaryOptions": {
+      "self": "Moi-même",
+      "child": "Mon enfant",
+      "other": "Une autre personne"
+    },
+    "payment": {
+      "label": "Imagine R Junior — année scolaire"
+    },
+    "usage": {
+      "daily": { "label": "Quotidien", "description": "Allers-retours réguliers travail ou école" },
+      "occasional": { "label": "Occasionnel", "description": "Quelques trajets par semaine" },
+      "payPerUse": { "label": "À l'usage", "description": "Trajets facturés mensuellement, sans engagement annuel" }
+    },
+    "person": {
+      "ageBascule": "Bascule Scolaire prévue à 11 ans",
+      "validity": "Valable en Île-de-France",
+      "status": "Dossier en cours"
+    },
+    "help": {
+      "perteVol": "Perte ou vol de passe",
+      "renouvellement": "Renouvellement",
+      "impaye": "Impayé",
+      "imagineR": "Imagine R",
+      "tst": "TST",
+      "contactSav": "Contact SAV"
+    },
+    "problems": {
+      "brokenPass": "Mon passe ne fonctionne plus",
+      "notReceived": "Je n'ai pas reçu mon titre",
+      "refusedDoc": "Mon justificatif a été refusé"
+    },
+    "timeline": {
+      "sent": { "label": "Dossier envoyé", "date": "Aujourd'hui" },
+      "verify": { "label": "Vérification documents", "date": "En cours" },
+      "activate": { "label": "Activation titre", "date": "En attente" }
+    },
+    "subSteps": {
+      "justificatifs": "Justificatifs",
+      "signature": "Signature",
+      "paiement": "Paiement"
+    }
+  }
+}

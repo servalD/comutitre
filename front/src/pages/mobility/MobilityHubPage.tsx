@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { mobilityApi } from '../../api/mobility-api'
 import { ApiError } from '../../api/http-client'
 import type { MobilityIdentityWithRelationships } from '../../domain/types/mobility'
@@ -10,6 +11,7 @@ import styles from './MobilityPages.module.css'
 
 export function MobilityHubPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation('mobility')
   const [identities, setIdentities] = useState<MobilityIdentityWithRelationships[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +25,7 @@ export function MobilityHubPage() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof ApiError ? err.message : 'Erreur de chargement')
+          setError(err instanceof ApiError ? err.message : t('common:errors.loading'))
         }
       })
       .finally(() => {
@@ -32,10 +34,10 @@ export function MobilityHubPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [t])
 
   if (loading) {
-    return <p className={styles.loading}>Chargement des identités…</p>
+    return <p className={styles.loading}>{t('hub.loading')}</p>
   }
 
   if (error) {
@@ -46,21 +48,21 @@ export function MobilityHubPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <h1>Mes identités de mobilité</h1>
-          <p>Gérez les profils de votre foyer et leurs abonnements.</p>
+          <h1>{t('hub.title')}</h1>
+          <p>{t('hub.subtitle')}</p>
         </div>
         <Button onClick={() => navigate('/mobility/new')}>
-          <span aria-hidden="true">➕</span> Ajouter une personne
+          <span aria-hidden="true">➕</span> {t('hub.addPerson')}
         </Button>
       </header>
 
       {identities.length === 0 ? (
         <EmptyState
           icon="👤"
-          title="Aucune identité"
-          description="Créez une première identité de mobilité pour commencer."
+          title={t('hub.emptyTitle')}
+          description={t('hub.emptyDescription')}
           action={
-            <Button onClick={() => navigate('/mobility/new')}>Créer une identité</Button>
+            <Button onClick={() => navigate('/mobility/new')}>{t('hub.createIdentity')}</Button>
           }
         />
       ) : (

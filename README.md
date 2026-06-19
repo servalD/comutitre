@@ -82,6 +82,7 @@ CI/CD           : push main → build+scan+push GHCR → SSH deploy (migrations 
 cp .env.dev.example .env.dev   # fill DYNAMIC_ENVIRONMENT_ID etc.
 docker compose -f docker/docker-compose.dev.yml up
 # back  -> http://localhost:3000  (GET /health)
+# swagger -> http://localhost:3000/api/docs
 # front -> http://localhost:5173
 ```
 

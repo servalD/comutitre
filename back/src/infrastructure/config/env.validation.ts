@@ -32,6 +32,12 @@ const FRANCECONNECT_SANDBOX_CALLBACK_URIS = new Set([
   'http://localhost:1337/login-callback',
 ]);
 
+const FRANCECONNECT_SANDBOX_ISSUER_URL =
+  'https://fcp-low.sbx.dev-franceconnect.fr/api/v2';
+
+const FRANCECONNECT_LEGACY_PUBLIC_CLIENT_ID =
+  '211286433e39cce01db448d80181bdfd005554b19cd51b3fe7943f6b3b86ab6e';
+
 /**
  * Docker/Swarm secrets are mounted as files. For any `FOO_FILE` variable whose
  * `FOO` is not already set, read the file and expose its trimmed content as
@@ -79,10 +85,32 @@ export const envSchema = z
     APP_JWT_SECRET: z.string().min(16),
     APP_JWT_EXPIRES_IN: z.string().default('1h'),
 
-    // Dynamic.xyz — the back verifies tokens against this environment's JWKS
-    DYNAMIC_ENVIRONMENT_ID: z.string().min(1),
+    // Dynamic.xyz — incoming JWT verification + third-party auth external JWT.
+    DYNAMIC_ENVIRONMENT_ID: z
+      .string()
+      .default('0ac8438d-93b8-41dc-baba-e830a96687bc'),
+    DYNAMIC_ENVIRONMENT_KIND: z.enum(['sandbox', 'live']).default('sandbox'),
+    DYNAMIC_JWKS_URL: z
+      .string()
+      .url()
+      .default(
+        'https://app.dynamicauth.com/api/v0/sdk/0ac8438d-93b8-41dc-baba-e830a96687bc/.well-known/jwks',
+      ),
+    DYNAMIC_TOKEN_ISSUER: z.string().default(''),
+    DYNAMIC_TOKEN_AUDIENCE: z
+      .string()
+      .default('0ac8438d-93b8-41dc-baba-e830a96687bc'),
+    DYNAMIC_API_VERSION: z.string().default('2026_04_01'),
+    DYNAMIC_EXTERNAL_JWT_ISSUER: z
+      .string()
+      .url()
+      .default('http://localhost:3000/api/auth/dynamic'),
+    DYNAMIC_EXTERNAL_JWT_AUDIENCE: z.string().default('dynamic'),
+    DYNAMIC_EXTERNAL_JWT_KID: z.string().default('comutitres-demo-1'),
+    DYNAMIC_EXTERNAL_JWT_PRIVATE_KEY: z.string().default(''),
 
-    // FranceConnect (OIDC). Mocked by default; sandbox uses public demo keys.
+    // FranceConnect (OIDC). Mocked by default; sandbox targets current v2 with
+    // provisioned partner credentials.
     FRANCECONNECT_MODE: z.enum(['mock', 'sandbox', 'live']).default('mock'),
     FRANCECONNECT_CLIENT_ID: z.string().default('placeholder-client-id'),
     FRANCECONNECT_CLIENT_SECRET: z
@@ -90,10 +118,10 @@ export const envSchema = z
       .default('placeholder-client-secret'),
     FRANCECONNECT_ISSUER_URL: z
       .string()
-      .default('https://fcp.integ01.dev-franceconnect.fr/api/v1'),
+      .default(FRANCECONNECT_SANDBOX_ISSUER_URL),
     FRANCECONNECT_REDIRECT_URI: z
       .string()
-      .default('http://localhost:3000/auth/franceconnect/callback'),
+      .default('http://localhost:3000/callback'),
     FRANCECONNECT_FALLBACK_TO_MOCK: booleanFromEnv(true),
 
     // External public APIs and sensitive administrative API mocks.
@@ -138,6 +166,7 @@ export const envSchema = z
     MISTRAL_BASE_URL: z.string().url().optional(),
     MISTRAL_CHAT_MODEL: z.string().default('ministral-3b-2512'),
     MISTRAL_EMBED_MODEL: z.string().default('mistral-embed'),
+    MISTRAL_VISION_MODEL: z.string().default('pixtral-12b-2409'),
   })
   .superRefine((config, ctx) => {
     if (config.FRANCECONNECT_MODE === 'sandbox') {
@@ -158,7 +187,18 @@ export const envSchema = z
           code: z.ZodIssueCode.custom,
           path: ['FRANCECONNECT_REDIRECT_URI'],
           message:
-            'FRANCECONNECT_REDIRECT_URI must be one of the public FranceConnect sandbox callback URLs',
+            'FRANCECONNECT_REDIRECT_URI must be one of the local FranceConnect sandbox callback URLs',
+        });
+      }
+
+      if (
+        config.FRANCECONNECT_ISSUER_URL !== FRANCECONNECT_SANDBOX_ISSUER_URL
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['FRANCECONNECT_ISSUER_URL'],
+          message:
+            'FRANCECONNECT_ISSUER_URL must be the current FranceConnect sandbox issuer',
         });
       }
 
@@ -170,7 +210,18 @@ export const envSchema = z
           code: z.ZodIssueCode.custom,
           path: ['FRANCECONNECT_CLIENT_ID'],
           message:
-            'FranceConnect sandbox mode requires public integration credentials in the local env file',
+            'FranceConnect sandbox mode requires provisioned v2 sandbox credentials in the local env file',
+        });
+      }
+
+      if (
+        config.FRANCECONNECT_CLIENT_ID === FRANCECONNECT_LEGACY_PUBLIC_CLIENT_ID
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['FRANCECONNECT_CLIENT_ID'],
+          message:
+            'The legacy FranceConnect service-provider-example client_id is not registered on the current v2 sandbox; use FRANCECONNECT_MODE=mock for the hackathon demo or provision v2 sandbox credentials',
         });
       }
     }
@@ -184,7 +235,7 @@ export const envSchema = z
         code: z.ZodIssueCode.custom,
         path: ['FRANCECONNECT_CLIENT_ID'],
         message:
-          'Real FranceConnect credentials are required in live mode; use sandbox for public demo keys',
+          'Real FranceConnect credentials are required in live mode; use mock for demos or sandbox with provisioned credentials',
       });
     }
 

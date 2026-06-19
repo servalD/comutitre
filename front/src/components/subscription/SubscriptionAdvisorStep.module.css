@@ -1,0 +1,89 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.option:hover {
+  border-color: var(--color-interaction);
+}
+
+.optionSelected {
+  border-color: var(--color-interaction);
+  background: var(--color-bg-light, #f5f9ff);
+}
+
+.optionDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.optionDisabled:hover {
+  border-color: var(--color-border);
+}
+
+.optionLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.optionLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-anthracite);
+}
+
+.optionBadge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.optionDesc {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-red, #c52625);
+}
+
+.ready {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-success, #007d44);
+}

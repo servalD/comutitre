@@ -1,7 +1,5 @@
-import {
-  documentStatusLabels,
-  documentTypeLabels,
-} from '../../constants/labels'
+import { useTranslation } from 'react-i18next'
+import { useLabels } from '../../constants/labels'
 import type { Document, DocumentStatus } from '../../domain/types/mobility'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
@@ -15,6 +13,8 @@ function docTone(status: DocumentStatus): 'success' | 'warning' | 'danger' | 'ne
 }
 
 export function DocumentList({ documents }: { documents: Document[] }) {
+  const { t, i18n } = useTranslation('mobility')
+  const { documentStatusLabels, documentTypeLabels } = useLabels()
   if (documents.length === 0) return null
 
   return (
@@ -29,7 +29,9 @@ export function DocumentList({ documents }: { documents: Document[] }) {
               <div>
                 <strong>{documentTypeLabels[doc.type]}</strong>
                 <p className={styles.sub}>
-                  Déposé le {new Date(doc.uploadedAt).toLocaleDateString('fr-FR')}
+                  {t('document.uploadedOn', {
+                    date: new Date(doc.uploadedAt).toLocaleDateString(i18n.language),
+                  })}
                 </p>
               </div>
               <Badge tone={docTone(doc.status)}>

@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 import MobileShell from '../components/MobileShell';
 import {
   justificatifsApi,
-  JUSTIFICATIF_TYPES,
+  justificatifTypes,
   clientStatusHint,
   type JustificatifResponse,
-  STATUS_LABELS,
+  docStatusLabel,
 } from '../api/justificatifs';
 import { useAuth } from '../contexts/AuthContext';
+import { allRequiredDocumentsReady, buildRequiredDocumentSlots } from '../domain/justificatif-slots';
+import { contractsApi } from '../api/contracts';
 import styles from './Justificatifs.module.css';
 
 function formatFileSize(bytes: number): string {
@@ -26,10 +29,13 @@ function statusBadgeClass(status: string): string {
 
 export default function Justificatifs() {
   const { token } = useAuth();
+  const { t } = useTranslation('subscription');
+  const types = justificatifTypes();
   const [searchParams] = useSearchParams();
   const contractId = searchParams.get('contractId') ?? '';
 
   const [items, setItems] = useState<JustificatifResponse[]>([]);
+  const [productCode, setProductCode] = useState('');
   const [loading, setLoading] = useState(!!contractId);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<JustificatifResponse | null>(null);
@@ -38,20 +44,32 @@ export default function Justificatifs() {
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const [selectedType, setSelectedType] = useState<string>(JUSTIFICATIF_TYPES[0].value);
+  const [selectedType, setSelectedType] = useState<string>(types[0].value);
   const fileRef = useRef<HTMLInputElement>(null);
   const listSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!token || !contractId) return;
     let cancelled = false;
-    justificatifsApi
-      .list(token, contractId)
-      .then((data) => { if (!cancelled) setItems(data); })
+    Promise.all([
+      justificatifsApi.list(token, contractId),
+      contractsApi.get(token, contractId),
+    ])
+      .then(([data, contract]) => {
+        if (!cancelled) {
+          setItems(data);
+          setProductCode(contract.productCode);
+        }
+      })
       .catch(() => {})
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
   }, [token, contractId]);
+
+  const documentSlots = productCode
+    ? buildRequiredDocumentSlots(productCode, items)
+    : [];
+  const documentsReady = allRequiredDocumentsReady(documentSlots);
 
   useEffect(() => {
     if (!uploadSuccess) return;
@@ -104,11 +122,11 @@ export default function Justificatifs() {
     if (!file) return;
     const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
     if (!allowed.includes(file.type)) {
-      setUploadError('Format non supporté (PDF, JPEG ou PNG requis)');
+      setUploadError(t('justificatifs.unsupportedFormat'));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setUploadError('Fichier trop volumineux (10 Mo max)');
+      setUploadError(t('justificatifs.fileTooLarge'));
       return;
     }
     handleFileSelect(file);
@@ -145,22 +163,22 @@ export default function Justificatifs() {
       clearSelectedFile();
       listSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Erreur lors du dépôt');
+      setUploadError(err instanceof Error ? err.message : t('justificatifs.uploadFailed'));
     } finally {
       setUploading(false);
     }
   }
 
   const selectedTypeLabel =
-    JUSTIFICATIF_TYPES.find((t) => t.value === selectedType)?.label ?? selectedType;
+    types.find((jt) => jt.value === selectedType)?.label ?? selectedType;
 
   if (!contractId) {
     return (
-      <MobileShell title="Justificatifs" activeTab="titres">
+      <MobileShell title={t('justificatifs.title')} activeTab="titres">
         <div className={styles.screenBody}>
           <div className={styles.empty}>
-            <p>Aucun contrat sélectionné.</p>
-            <Link to="/" className={styles.btnPrimary}>Retour au tableau de bord</Link>
+            <p>{t('justificatifs.noContract')}</p>
+            <Link to="/" className={styles.btnPrimary}>{t('justificatifs.backDashboard')}</Link>
           </div>
         </div>
       </MobileShell>
@@ -169,8 +187,8 @@ export default function Justificatifs() {
 
   return (
     <MobileShell
-      title="Justificatifs"
-      subtitle="Étape 3 sur 4"
+      title={t('justificatifs.title')}
+      subtitle={t('justificatifs.step')}
       step={3}
       totalSteps={4}
       activeTab="titres"
@@ -180,15 +198,15 @@ export default function Justificatifs() {
         <div className={styles.layoutGrid}>
           {/* ── Upload ── */}
           <form onSubmit={handleUpload} className={styles.uploadPanel}>
-            <p className={styles.sectionLabel}>Type de document</p>
+            <p className={styles.sectionLabel}>{t('justificatifs.docType')}</p>
             <div className={styles.field}>
               <select
                 className={styles.select}
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
               >
-                {JUSTIFICATIF_TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>{t.label}</option>
+                {types.map((jt) => (
+                  <option key={jt.value} value={jt.value}>{jt.label}</option>
                 ))}
               </select>
             </div>
@@ -198,13 +216,13 @@ export default function Justificatifs() {
             <div className={styles.iaCard}>
               <span className={styles.iaIcon} aria-hidden="true">✦</span>
               <div>
-                <p>
-                  Vérification automatique YouSign : authenticité du document et
-                  concordance des noms du porteur.
-                </p>
+                <p>{t('justificatifs.iaText')}</p>
                 <small>
-                  Sandbox : nommez le fichier{' '}
-                  <code>verified_id_document_verification.pdf</code> pour simuler un succès.
+                  <Trans
+                    i18nKey="justificatifs.sandboxHint"
+                    ns="subscription"
+                    components={{ code: <code /> }}
+                  />
                 </small>
               </div>
             </div>
@@ -227,27 +245,27 @@ export default function Justificatifs() {
               {uploading ? (
                 <div className={styles.uploadingState} aria-live="polite">
                   <span className={styles.spinner} />
-                  <p>Envoi en cours…</p>
+                  <p>{t('justificatifs.uploading')}</p>
                   <small>{selectedFile?.name}</small>
                 </div>
               ) : selectedFile ? (
                 <div className={styles.fileSelected}>
                   <span className={styles.uploadIcon} aria-hidden="true">📄</span>
                   <p className={styles.fileName}>{selectedFile.name}</p>
-                  <small>{formatFileSize(selectedFile.size)} · PDF, JPG ou PNG · max 10 Mo</small>
+                  <small>{t('justificatifs.fileSelectedHint', { size: formatFileSize(selectedFile.size) })}</small>
                   <button
                     type="button"
                     className={styles.fileRemove}
                     onClick={(e) => { e.stopPropagation(); clearSelectedFile(); }}
                   >
-                    Changer de fichier
+                    {t('justificatifs.changeFile')}
                   </button>
                 </div>
               ) : (
                 <>
                   <span className={styles.uploadIcon} aria-hidden="true">↑</span>
-                  <p>Déposer un fichier ou prendre en photo</p>
-                  <small>PDF, JPG, PNG · max 10 Mo</small>
+                  <p>{t('justificatifs.dropOrPhoto')}</p>
+                  <small>{t('justificatifs.fileConstraints')}</small>
                 </>
               )}
             </div>
@@ -264,10 +282,10 @@ export default function Justificatifs() {
                 <span className={styles.iaIcon} aria-hidden="true">✓</span>
                 <div>
                   <p>
-                    <strong>Document déposé</strong> — {uploadSuccess.originalFilename}
+                    <strong>{t('justificatifs.uploadedTitle')}</strong> — {uploadSuccess.originalFilename}
                   </p>
                   <small>
-                    {STATUS_LABELS[uploadSuccess.status] ?? uploadSuccess.status}
+                    {docStatusLabel(uploadSuccess.status)}
                   </small>
                 </div>
               </div>
@@ -278,30 +296,30 @@ export default function Justificatifs() {
               className={styles.btnPrimary}
               disabled={uploading || !selectedFile}
             >
-              {uploading ? 'Envoi en cours…' : 'Déposer le document →'}
+              {uploading ? t('justificatifs.uploading') : t('justificatifs.submit')}
             </button>
 
             <Link to="/" className={styles.humanLink}>
-              ← Retour au tableau de bord
+              ← {t('justificatifs.backDashboard')}
             </Link>
           </form>
 
           {/* ── Liste ── */}
           <div className={styles.listPanel} ref={listSectionRef}>
             <p className={styles.sectionLabel}>
-              Documents déposés
+              {t('justificatifs.uploadedDocs')}
               {!loading && items.length > 0 && (
                 <span className={styles.countPill}>{items.length}</span>
               )}
             </p>
 
-            {loading && <p className={styles.hint}>Chargement…</p>}
+            {loading && <p className={styles.hint}>{t('common:loading')}</p>}
 
             {!loading && items.length === 0 && (
               <div className={styles.docUpload} style={{ cursor: 'default' }}>
                 <span className={styles.uploadIcon} aria-hidden="true">📋</span>
-                <p>Aucun justificatif pour ce contrat</p>
-                <small>Déposez votre premier document ci-contre</small>
+                <p>{t('justificatifs.noneForContract')}</p>
+                <small>{t('justificatifs.dropFirst')}</small>
               </div>
             )}
 
@@ -309,7 +327,7 @@ export default function Justificatifs() {
               {items.map((j) => {
                 const hint = clientStatusHint(j);
                 const typeLabel =
-                  JUSTIFICATIF_TYPES.find((t) => t.value === j.type)?.label ?? j.type;
+                  types.find((jt) => jt.value === j.type)?.label ?? j.type;
                 return (
                   <li
                     key={j.id}
@@ -318,13 +336,13 @@ export default function Justificatifs() {
                     <div className={styles.docCardTop}>
                       <span className={styles.docCardName}>{typeLabel}</span>
                       <span className={`${styles.statusPill} ${statusBadgeClass(j.status)}`}>
-                        {STATUS_LABELS[j.status] ?? j.status}
+                        {docStatusLabel(j.status)}
                       </span>
                     </div>
                     <p className={styles.docCardFile}>{j.originalFilename}</p>
                     {hint && <p className={styles.docCardHint}>{hint}</p>}
                     {j.agentMotif && j.status !== 'a_revoir' && (
-                      <p className={styles.docCardMotif}>Motif : {j.agentMotif}</p>
+                      <p className={styles.docCardMotif}>{t('justificatifs.motif', { motif: j.agentMotif })}</p>
                     )}
                   </li>
                 );
@@ -334,16 +352,22 @@ export default function Justificatifs() {
             {hasPendingVerification && (
               <div className={styles.warningCard}>
                 <span aria-hidden="true">⏳</span>
-                <p>Analyse YouSign en cours — cette page se met à jour automatiquement.</p>
+                <p>{t('justificatifs.analysisInProgress')}</p>
               </div>
             )}
 
-            <Link
-              to={`/contrat/${contractId}`}
-              className={styles.btnSecondary}
-            >
-              Passer à la signature →
-            </Link>
+            {documentsReady ? (
+              <Link
+                to={`/contrat/${contractId}`}
+                className={styles.btnSecondary}
+              >
+                {t('justificatifs.toSignature')}
+              </Link>
+            ) : (
+              <p className={styles.docCardHint}>
+                Déposez et validez tous les justificatifs requis avant de signer.
+              </p>
+            )}
           </div>
         </div>
       </div>

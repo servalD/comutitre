@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import MobileShell from '../components/MobileShell';
 import { contractsApi } from '../api/contracts';
 import { useAuth } from '../contexts/AuthContext';
 import ui from '../styles/comutitres-ui.module.css';
 
 export default function SignatureCallback() {
+  const { t } = useTranslation('subscription');
   const [searchParams] = useSearchParams();
   const contractId = searchParams.get('contractId') ?? '';
   const status = searchParams.get('status') as 'success' | 'error' | null;
@@ -43,41 +45,38 @@ export default function SignatureCallback() {
   const isSuccess = status === 'success';
 
   return (
-    <MobileShell title="Signature" subtitle="YouSign" showNav={false}>
+    <MobileShell title={t('signatureCallback.title')} subtitle="YouSign" showNav={false}>
       <div className={ui.screenBody}>
         {!polled ? (
           <div style={{ textAlign: 'center', paddingTop: 32 }}>
             <span className={ui.spinnerDark} style={{ width: 32, height: 32, margin: '0 auto 16px', display: 'block' }} />
-            <p className={ui.hint}>Vérification de la signature…</p>
+            <p className={ui.hint}>{t('signatureCallback.checking')}</p>
           </div>
         ) : isSuccess ? (
           <div className={ui.successScreen}>
             <div className={ui.successIcon}>✓</div>
-            <h1 className={ui.successTitle}>Signature reçue</h1>
+            <h1 className={ui.successTitle}>{t('signatureCallback.successTitle')}</h1>
             <p className={ui.successText}>
-              Votre signature a bien été transmise à YouSign.
+              {t('signatureCallback.successText')}
               {contractStatus === 'done'
-                ? ' Votre contrat est maintenant actif.'
-                : ' Votre contrat sera activé sous quelques instants.'}
+                ? ` ${t('signatureCallback.contractActive')}`
+                : ` ${t('signatureCallback.contractSoon')}`}
             </p>
             <Link to={`/contrat/${contractId}`} className={ui.btnPrimary}>
-              Voir le dossier
+              {t('signatureCallback.viewFile')}
             </Link>
           </div>
         ) : (
           <div className={ui.successScreen}>
             <div className={ui.successIcon} style={{ background: 'var(--red-bg)', color: 'var(--red)' }}>✕</div>
-            <h1 className={ui.successTitle}>Signature annulée</h1>
-            <p className={ui.successText}>
-              La procédure a été annulée ou une erreur s'est produite.
-              Vous pouvez réessayer depuis votre dossier.
-            </p>
+            <h1 className={ui.successTitle}>{t('signatureCallback.cancelledTitle')}</h1>
+            <p className={ui.successText}>{t('signatureCallback.cancelledText')}</p>
             <Link to={`/contrat/${contractId}`} className={ui.btnPrimary}>
-              Retour au dossier
+              {t('signatureCallback.backToFile')}
             </Link>
           </div>
         )}
-        <Link to="/" className={ui.humanLink}>← Tableau de bord</Link>
+        <Link to="/" className={ui.humanLink}>← {t('common:nav.dashboard')}</Link>
       </div>
     </MobileShell>
   );

@@ -1,26 +1,41 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
-import { Env } from '../../../../infrastructure/config/env.validation';
 import {
   YousignClient,
   type YouSignVerificationResult,
 } from '../../../../infrastructure/yousign/yousign.client';
 import { ContractRepository } from '../../../contracts/domain/contract.repository';
+import type { Contract } from '../../../contracts/domain/contract';
 import {
   Justificatif,
   JustificatifStatus,
   JustificatifType,
   YOUSIGN_VERIFIED_TYPES,
 } from '../../domain/justificatif';
+import { ContractDocumentGateService } from '../services/contract-document-gate.service';
+import { JustificatifAiVerificationService } from '../services/justificatif-ai-verification.service';
 import { JustificatifRepository } from '../../domain/justificatif.repository';
+
+const LOCKED_JUSTIFICATIF_STATUSES = new Set<JustificatifStatus>([
+  JustificatifStatus.PRE_QUALIFIE,
+  JustificatifStatus.ACCEPTE,
+]);
+
+const REPLACEABLE_JUSTIFICATIF_STATUSES = new Set<JustificatifStatus>([
+  JustificatifStatus.A_REVOIR,
+  JustificatifStatus.REFUSE,
+  JustificatifStatus.INCOMPLET,
+  JustificatifStatus.RECU,
+  JustificatifStatus.EN_COURS_DE_VERIFICATION,
+]);
 
 @Injectable()
 export class UploadJustificatifUseCase {
@@ -31,7 +46,8 @@ export class UploadJustificatifUseCase {
     private readonly justificatifRepo: JustificatifRepository,
     private readonly contractRepo: ContractRepository,
     private readonly yousign: YousignClient,
-    private readonly config: ConfigService<Env, true>,
+    private readonly aiVerification: JustificatifAiVerificationService,
+    private readonly documentGate: ContractDocumentGateService,
   ) {
     this.uploadsDir = join(process.cwd(), 'uploads');
   }
@@ -87,28 +103,78 @@ export class UploadJustificatifUseCase {
     const filePath = join(this.uploadsDir, storedFilename);
     await writeFile(filePath, params.fileBuffer);
 
-    const justificatif = new Justificatif(
-      randomUUID(),
+    const existing = await this.justificatifRepo.findByContractIdAndType(
       params.contractId,
-      params.userId,
       params.type,
-      JustificatifStatus.RECU,
-      filePath,
-      params.originalFilename,
-      null,
-      null,
-      [],
-      null,
-      null,
-      null,
-      null,
-      new Date(),
-      new Date(),
     );
 
-    await this.justificatifRepo.save(justificatif);
+    if (existing && LOCKED_JUSTIFICATIF_STATUSES.has(existing.status)) {
+      throw new ConflictException(
+        'Un document de ce type est déjà déposé et en cours de traitement.',
+      );
+    }
 
-    // Launch YouSign Document Verification for supported types
+    const now = new Date();
+    let justificatif: Justificatif;
+
+    if (existing && REPLACEABLE_JUSTIFICATIF_STATUSES.has(existing.status)) {
+      justificatif = new Justificatif(
+        existing.id,
+        existing.contractId,
+        existing.userId,
+        existing.type,
+        JustificatifStatus.RECU,
+        filePath,
+        params.originalFilename,
+        null,
+        null,
+        [],
+        null,
+        null,
+        null,
+        null,
+        existing.createdAt,
+        now,
+      );
+    } else if (existing) {
+      throw new ConflictException('Document déjà déposé pour ce type.');
+    } else {
+      justificatif = new Justificatif(
+        randomUUID(),
+        params.contractId,
+        params.userId,
+        params.type,
+        JustificatifStatus.RECU,
+        filePath,
+        params.originalFilename,
+        null,
+        null,
+        [],
+        null,
+        null,
+        null,
+        null,
+        now,
+        now,
+      );
+    }
+
+    await this.justificatifRepo.save(justificatif);
+    await this.runVerification(justificatif, contract, params);
+
+    return justificatif;
+  }
+
+  private async runVerification(
+    justificatif: Justificatif,
+    contract: Contract,
+    params: {
+      type: JustificatifType;
+      fileBuffer: Buffer;
+      originalFilename: string;
+      mimeType: string;
+    },
+  ): Promise<void> {
     if (YOUSIGN_VERIFIED_TYPES.has(params.type)) {
       const firstName = contract.holderFirstName.trim();
       const lastName = contract.holderLastName.trim();
@@ -129,7 +195,9 @@ export class UploadJustificatifUseCase {
           );
         }
 
-        justificatif.yousignVerificationId = result.id;
+        if (!result.id.startsWith('sandbox-local-')) {
+          justificatif.yousignVerificationId = result.id;
+        }
         if (result.status === 'pending') {
           justificatif.status = JustificatifStatus.EN_COURS_DE_VERIFICATION;
         } else {
@@ -140,16 +208,28 @@ export class UploadJustificatifUseCase {
         this.logger.warn(
           `YouSign verification rejected for ${justificatif.id}: ${String(err)}`,
         );
-        // Document non reconnu / invalide — pas de passage silencieux en revue agent
         justificatif.applyYousignResult('failed', ['IDDV_1103']);
         await this.justificatifRepo.save(justificatif);
       }
-    } else {
-      // Document handled manually by an agent
-      justificatif.status = JustificatifStatus.EN_COURS_DE_VERIFICATION;
-      await this.justificatifRepo.save(justificatif);
+      await this.documentGate.tryAdvanceContract(justificatif.contractId);
+      return;
     }
 
-    return justificatif;
+    justificatif.status = JustificatifStatus.EN_COURS_DE_VERIFICATION;
+    await this.justificatifRepo.save(justificatif);
+
+    const aiResult = await this.aiVerification.verify({
+      type: params.type,
+      fileBuffer: params.fileBuffer,
+      mimeType: params.mimeType,
+      originalFilename: params.originalFilename,
+    });
+
+    justificatif.status = aiResult.conforme
+      ? JustificatifStatus.PRE_QUALIFIE
+      : JustificatifStatus.A_REVOIR;
+    justificatif.agentMotif = aiResult.motif;
+    await this.justificatifRepo.save(justificatif);
+    await this.documentGate.tryAdvanceContract(justificatif.contractId);
   }
 }

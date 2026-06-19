@@ -1,9 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import type { MobilityIdentityWithRelationships } from '../../domain/types/mobility'
-import {
-  profileLabels,
-  relationshipLabels,
-} from '../../constants/labels'
+import { useLabels } from '../../constants/labels'
 import { Badge } from '../ui/Badge'
 import { Card } from '../ui/Card'
 import styles from './IdentityCard.module.css'
@@ -15,6 +13,8 @@ interface IdentityCardProps {
 
 export function IdentityCard({ identity, activeProductLabel }: IdentityCardProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation('mobility')
+  const { profileLabels, relationshipLabels } = useLabels()
 
   return (
     <Card
@@ -30,14 +30,15 @@ export function IdentityCard({ identity, activeProductLabel }: IdentityCardProps
           {identity.firstName} {identity.lastName}
         </h3>
         <p className={styles.meta}>
-          {profileLabels[identity.currentProfile]} · {identity.calculatedAge} ans
+          {profileLabels[identity.currentProfile]} ·{' '}
+          {t('identity.ageYears', { count: identity.calculatedAge })}
         </p>
         {activeProductLabel ? (
           <p className={styles.product}>
             <span aria-hidden="true">🎫</span> {activeProductLabel}
           </p>
         ) : (
-          <p className={styles.productMuted}>Aucun abonnement actif</p>
+          <p className={styles.productMuted}>{t('identity.noActiveSubscription')}</p>
         )}
         <div className={styles.badges}>
           {identity.relationships.map((rel) => (

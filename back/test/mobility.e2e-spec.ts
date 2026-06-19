@@ -72,15 +72,6 @@ describe('Mobility identity (e2e)', () => {
     const parentIdentityId = (parentIdentityRes.body as { id: string }).id;
 
     await request(app.getHttpServer())
-      .post('/relationships')
-      .set(authHeader)
-      .send({
-        mobilityIdentityId: parentIdentityId,
-        relationshipType: RelationshipType.OWNER,
-      })
-      .expect(201);
-
-    await request(app.getHttpServer())
       .post(`/mobility-identities/${parentIdentityId}/contracts`)
       .set(authHeader)
       .send({
@@ -156,7 +147,7 @@ describe('Mobility identity (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/mobility-identities/${childIdentityId}/supports`)
       .set(authHeader)
-      .send({ status: SupportStatus.ACTIVE })
+      .send({ status: SupportStatus.PENDING_ACTIVATION })
       .expect(201);
 
     const identitiesRes = await request(app.getHttpServer())

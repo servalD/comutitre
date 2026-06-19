@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { In, ILike, Repository } from 'typeorm';
 import { MobilityIdentity } from '../domain/mobility-identity';
 import {
   CreateMobilityIdentityParams,
@@ -31,6 +31,21 @@ export class TypeOrmMobilityIdentityRepository extends MobilityIdentityRepositor
       return [];
     }
     const entities = await this.repository.find({ where: { id: In(ids) } });
+    return entities.map((entity) => this.toDomain(entity));
+  }
+
+  async findByIdentityTriplet(
+    firstName: string,
+    lastName: string,
+    birthDate: Date,
+  ): Promise<MobilityIdentity[]> {
+    const entities = await this.repository.find({
+      where: {
+        firstName: ILike(firstName.trim()),
+        lastName: ILike(lastName.trim()),
+        birthDate: this.toDateString(birthDate),
+      },
+    });
     return entities.map((entity) => this.toDomain(entity));
   }
 

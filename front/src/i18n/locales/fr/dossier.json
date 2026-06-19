@@ -1,0 +1,69 @@
+{
+  "subStepperAria": "Étapes du dossier",
+  "detail": {
+    "title": "Mon dossier",
+    "summaryAria": "Résumé du dossier",
+    "documents": "Justificatifs",
+    "instruction": "Déposez les documents suivants pour continuer votre demande.",
+    "uploadAria": "Dépôt de documents",
+    "submitDocuments": "Déposer mes justificatifs"
+  },
+  "signature": {
+    "context": "En tant que payeur, vous devez signer les CGVU pour valider la souscription de {{name}}.",
+    "cgvuTitle": "Conditions Générales de Vente et d'Utilisation",
+    "accept": "J'ai lu et j'accepte les CGVU",
+    "secureSignature": "Signature électronique sécurisée",
+    "via": "via",
+    "recap": "Récapitulatif",
+    "plan": "Forfait",
+    "beneficiary": "Bénéficiaire",
+    "payer": "Payeur",
+    "annualAmount": "Montant annuel",
+    "sign": "Signer les CGVU"
+  },
+  "paiement": {
+    "title": "Paiement",
+    "choosePayMode": "Choisissez votre mode de paiement",
+    "fourTimes": "Paiement en 4 fois",
+    "fourInstalments": "4 prélèvements de 96,00 €",
+    "monthly": "Prélèvement mensuel",
+    "twelveInstalments": "12 prélèvements de 32,00 €",
+    "paymentInfo": "Informations de paiement",
+    "cardNumber": "Numéro de carte",
+    "expiry": "Date d'expiration",
+    "secure": "Paiement sécurisé (simulation)",
+    "annualTotal": "Total annuel",
+    "payerNote": "Le payeur sera débité chaque mois",
+    "pay": "Payer {{amount}}"
+  },
+  "validation": {
+    "steps": {
+      "informations": "Informations",
+      "justificatifs": "Justificatifs",
+      "photo": "Photo",
+      "recapitulatif": "Récapitulatif",
+      "validation": "Validation"
+    },
+    "heroTitle": "Votre dossier est en cours de validation",
+    "heroSubtitle": "Nos équipes vérifient vos documents. Vous recevrez une notification dès que votre titre sera prêt.",
+    "track": "Suivre mon dossier",
+    "helpLink": "Une question ? Consulter l'aide"
+  },
+  "confirmation": {
+    "activeBadge": "Titre actif",
+    "title": "{{product}} est actif !",
+    "subtitle": "{{name}} peut voyager dès maintenant sur le réseau Île-de-France.",
+    "validUntil": "Valide jusqu'au {{date}}",
+    "viewPass": "Voir mon titre",
+    "download": "Télécharger l'attestation",
+    "renewal_one": "Prochaine échéance : renouvellement dans {{count}} mois",
+    "renewal_other": "Prochaine échéance : renouvellement dans {{count}} mois"
+  },
+  "stepHints": {
+    "1": "Complétez les informations pour avancer dans la demande.",
+    "2": "Complétez vos justificatifs pour avancer dans la demande.",
+    "3": "Vérifiez votre dossier pour passer à l’étape suivante.",
+    "4": "Finalisez le paiement pour valider la souscription.",
+    "5": "Votre demande est en cours de validation."
+  }
+}

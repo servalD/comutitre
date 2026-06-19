@@ -56,20 +56,59 @@ export class CgvuPdfGenerator {
             'dans leur intégralité.',
         );
 
-      doc.moveDown(0.8);
-      doc.text(
-        'Les présentes CGVU régissent les droits et obligations du titulaire et du ' +
-          "payeur dans le cadre de l'utilisation des services de transport. " +
-          "Toute souscription implique l'acceptation sans réserve de ces conditions.",
-      );
+      const articles = [
+        {
+          title: 'Article 1 — Objet et champ d’application',
+          body:
+            'Les présentes CGVU régissent les droits et obligations du titulaire et du ' +
+            'payeur dans le cadre de l’utilisation des services de transport. Toute ' +
+            'souscription implique l’acceptation sans réserve de ces conditions.',
+        },
+        {
+          title: 'Article 2 — Souscription et validation',
+          body:
+            'La souscription est validée après vérification des justificatifs requis, ' +
+            'acceptation des présentes conditions et signature électronique par le payeur ' +
+            'lorsque celui-ci est distinct du titulaire.',
+        },
+        {
+          title: 'Article 3 — Utilisation du titre',
+          body:
+            'Le titulaire s’engage à utiliser son titre de transport conformément aux ' +
+            'règles en vigueur sur le réseau. Le titre est personnel, nominatif et non ' +
+            'cessible. Toute utilisation frauduleuse peut entraîner la suspension du contrat.',
+        },
+        {
+          title: 'Article 4 — Paiement et prélèvement',
+          body:
+            'Le payeur autorise le prélèvement des sommes dues selon les modalités du ' +
+            'produit souscrit. En cas d’incident de paiement, le contrat peut être suspendu ' +
+            'jusqu’à régularisation.',
+        },
+        {
+          title: 'Article 5 — Données personnelles',
+          body:
+            'Conformément aux dispositions légales en vigueur, le titulaire dispose d’un ' +
+            'droit d’accès, de rectification et de suppression de ses données personnelles. ' +
+            'Pour exercer ces droits, contactez le service client Comutitres.',
+        },
+        {
+          title: 'Article 6 — Service après-vente',
+          body:
+            'En cas de perte, vol ou dysfonctionnement du support, le titulaire peut ' +
+            'solliciter une opposition ou un remplacement selon les tarifs en vigueur. ' +
+            'Les démarches sont disponibles en ligne ou en agence.',
+        },
+      ];
 
-      doc.moveDown(0.8);
-      doc.text(
-        'Conformément aux dispositions légales en vigueur, le titulaire dispose ' +
-          "d'un droit d'accès, de rectification et de suppression de ses données " +
-          'personnelles. Pour exercer ces droits, contactez le service client ' +
-          'Comutitres.',
-      );
+      for (const article of articles) {
+        doc.moveDown(0.8);
+        doc.fontSize(11).fillColor('#1972D2').text(article.title);
+        doc.moveDown(0.3);
+        doc.fontSize(10).fillColor('#25303B').text(article.body, {
+          align: 'justify',
+        });
+      }
 
       doc.moveDown(1.5);
       doc

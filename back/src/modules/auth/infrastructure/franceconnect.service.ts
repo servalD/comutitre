@@ -11,9 +11,9 @@ import { ExternalIdentity } from '../domain/external-identity';
  * The back drives the authorization-code flow: it builds the authorize URL,
  * then exchanges the returned code for tokens + userinfo on the callback.
  *
- * `mock` keeps local tests deterministic. `sandbox` uses FranceConnect's public
- * integration credentials and falls back to the mock identity for demos.
- * `live` is reserved for provisioned credentials.
+ * `mock` keeps local tests deterministic. `sandbox` targets FranceConnect's
+ * current v2 sandbox with provisioned credentials and falls back to the mock
+ * identity for demos. `live` is reserved for production credentials.
  */
 @Injectable()
 export class FranceConnectService {
@@ -45,6 +45,7 @@ export class FranceConnectService {
     const issuer = this.config.get('FRANCECONNECT_ISSUER_URL', { infer: true });
     const url = new URL(`${issuer}/authorize`);
     url.searchParams.set('response_type', 'code');
+    url.searchParams.set('acr_values', 'eidas1');
     url.searchParams.set('client_id', this.getClientId());
     url.searchParams.set(
       'redirect_uri',

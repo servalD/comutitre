@@ -13,7 +13,7 @@ const createService = (
     FRANCECONNECT_MODE: 'mock',
     FRANCECONNECT_CLIENT_ID: 'placeholder-client-id',
     FRANCECONNECT_CLIENT_SECRET: 'placeholder-client-secret',
-    FRANCECONNECT_ISSUER_URL: 'https://fcp.integ01.dev-franceconnect.fr/api/v1',
+    FRANCECONNECT_ISSUER_URL: 'https://fcp-low.sbx.dev-franceconnect.fr/api/v2',
     FRANCECONNECT_REDIRECT_URI:
       'http://localhost:3000/auth/franceconnect/callback',
     FRANCECONNECT_FALLBACK_TO_MOCK: true,
@@ -48,9 +48,10 @@ describe('FranceConnectService', () => {
     );
 
     expect(authorizationUrl.toString()).toContain(
-      'https://fcp.integ01.dev-franceconnect.fr/api/v1/authorize',
+      'https://fcp-low.sbx.dev-franceconnect.fr/api/v2/authorize',
     );
     expect(authorizationUrl.searchParams.get('response_type')).toBe('code');
+    expect(authorizationUrl.searchParams.get('acr_values')).toBe('eidas1');
     expect(authorizationUrl.searchParams.get('client_id')).toBe(
       SANDBOX_CLIENT_ID,
     );

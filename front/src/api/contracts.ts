@@ -7,7 +7,10 @@ export interface ContractResponse {
   holderFirstName?: string;
   holderLastName?: string;
   holderEmail: string;
+  payerFirstName?: string | null;
+  payerLastName?: string | null;
   payerEmail?: string | null;
+  legalRepEmail?: string | null;
   cgvuVersion: string;
   yousignSignatureLink?: string | null;
   createdAt: string;
@@ -49,6 +52,39 @@ async function request<T>(
   return res.json() as Promise<T>;
 }
 
+export interface SignatureStatusResponse {
+  yousignStatus: string | null;
+  signatureLink: string | null;
+  contractStatus: string;
+  alreadySigned: boolean;
+  awaitingPayment?: boolean;
+  awaitingValidation?: boolean;
+}
+
+export interface StartSignatureResponse {
+  signatureLink: string | null;
+  contractStatus?: string;
+  alreadySigned?: boolean;
+}
+
+export interface ConfirmPaymentResponse {
+  status: string;
+  alreadyConfirmed: boolean;
+  mobilityIdentityId?: string | null;
+}
+
+export interface ConfirmValidationResponse {
+  status: string;
+  alreadyValidated: boolean;
+  mobilityIdentityId?: string | null;
+}
+
+export interface ContractDocumentsReadiness {
+  complete: boolean;
+  missing: string[];
+  pending: string[];
+}
+
 export const contractsApi = {
   create(token: string, payload: CreateContractPayload): Promise<ContractResponse> {
     return request<ContractResponse>('/contracts', token, {
@@ -65,8 +101,18 @@ export const contractsApi = {
     return request<ContractResponse>(`/contracts/${id}`, token);
   },
 
-  startSignature(token: string, contractId: string): Promise<{ signatureLink: string | null }> {
-    return request<{ signatureLink: string | null }>(
+  getDocumentsReadiness(
+    token: string,
+    contractId: string,
+  ): Promise<ContractDocumentsReadiness> {
+    return request<ContractDocumentsReadiness>(
+      `/contracts/${contractId}/documents/readiness`,
+      token,
+    );
+  },
+
+  startSignature(token: string, contractId: string): Promise<StartSignatureResponse> {
+    return request<StartSignatureResponse>(
       `/contracts/${contractId}/signature`,
       token,
       { method: 'POST', body: '{}' },
@@ -76,7 +122,47 @@ export const contractsApi = {
   getSignatureStatus(
     token: string,
     contractId: string,
-  ): Promise<{ yousignStatus: string | null; signatureLink: string | null }> {
-    return request(`/contracts/${contractId}/signature/status`, token);
+  ): Promise<SignatureStatusResponse> {
+    return request<SignatureStatusResponse>(
+      `/contracts/${contractId}/signature/status`,
+      token,
+    );
+  },
+
+  confirmPayment(
+    token: string,
+    contractId: string,
+  ): Promise<ConfirmPaymentResponse> {
+    return request<ConfirmPaymentResponse>(
+      `/contracts/${contractId}/payment/confirm`,
+      token,
+      { method: 'POST', body: '{}' },
+    );
+  },
+
+  confirmValidation(
+    token: string,
+    contractId: string,
+  ): Promise<ConfirmValidationResponse> {
+    return request<ConfirmValidationResponse>(
+      `/contracts/${contractId}/validation/confirm`,
+      token,
+      { method: 'POST', body: '{}' },
+    );
+  },
+
+  async getCgvuPreview(token: string, contractId: string): Promise<Blob> {
+    const res = await fetch(`${API_BASE}/contracts/${contractId}/cgvu/preview`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const message =
+        (body as { message?: string }).message ?? `Erreur ${res.status}`;
+      throw new Error(message);
+    }
+
+    return res.blob();
   },
 };

@@ -15,6 +15,8 @@ import { TokenVerifier } from '../application/ports/token-verifier.port';
 interface DynamicClaims extends jwt.JwtPayload {
   sub?: string;
   email?: string;
+  environment_id?: string;
+  scope?: string;
   verified_credentials?: Array<{
     address?: string;
     email?: string;
@@ -31,14 +33,30 @@ export class DynamicTokenVerifier extends TokenVerifier {
     const environmentId = this.config.get('DYNAMIC_ENVIRONMENT_ID', {
       infer: true,
     });
+    const jwksUri =
+      this.config.get('DYNAMIC_JWKS_URL', { infer: true }) ??
+      `https://app.dynamicauth.com/api/v0/sdk/${environmentId}/.well-known/jwks`;
+
     this.jwks = new JwksClient({
-      jwksUri: `https://app.dynamic.xyz/api/v0/sdk/${environmentId}/.well-known/jwks`,
+      jwksUri,
       cache: true,
       rateLimit: true,
     });
   }
 
   async verify(token: string): Promise<ExternalIdentity> {
+    const environmentId = this.config.get('DYNAMIC_ENVIRONMENT_ID', {
+      infer: true,
+    });
+    const tokenAudience = this.config.get('DYNAMIC_TOKEN_AUDIENCE', {
+      infer: true,
+    });
+    const verifyOptions: jwt.VerifyOptions = {
+      algorithms: ['RS256'],
+      issuer: this.expectedIssuer,
+    };
+    verifyOptions.audience = tokenAudience.trim() || environmentId;
+
     const claims = await new Promise<DynamicClaims>((resolve, reject) => {
       jwt.verify(
         token,
@@ -48,7 +66,7 @@ export class DynamicTokenVerifier extends TokenVerifier {
             .then((key) => callback(null, key.getPublicKey()))
             .catch((err: Error) => callback(err));
         },
-        { algorithms: ['RS256'] },
+        verifyOptions,
         (err, decoded) => {
           if (err || !decoded || typeof decoded === 'string') {
             reject(new UnauthorizedException('Invalid Dynamic token'));
@@ -62,6 +80,23 @@ export class DynamicTokenVerifier extends TokenVerifier {
     if (!claims.sub) {
       throw new UnauthorizedException('Dynamic token missing subject');
     }
+    if (
+      claims.environment_id !== undefined &&
+      claims.environment_id !== environmentId
+    ) {
+      throw new UnauthorizedException('Dynamic token environment mismatch');
+    }
+    if (!this.includesScope(claims.scope, 'user:basic')) {
+      throw new UnauthorizedException(
+        'Dynamic token authentication incomplete',
+      );
+    }
+    if (
+      claims.iat !== undefined &&
+      claims.iat > Math.floor(Date.now() / 1000) + 60
+    ) {
+      throw new UnauthorizedException('Dynamic token issued in the future');
+    }
 
     const wallet = claims.verified_credentials?.find((c) => c.address)?.address;
 
@@ -72,5 +107,21 @@ export class DynamicTokenVerifier extends TokenVerifier {
       walletAddress: wallet ?? null,
       displayName: claims.email ?? wallet ?? null,
     };
+  }
+
+  private get expectedIssuer(): string {
+    const configured = this.config.get('DYNAMIC_TOKEN_ISSUER', {
+      infer: true,
+    });
+    if (configured.trim()) {
+      return configured;
+    }
+    return `app.dynamic.xyz/${this.config.get('DYNAMIC_ENVIRONMENT_ID', {
+      infer: true,
+    })}`;
+  }
+
+  private includesScope(scope: string | undefined, expected: string): boolean {
+    return (scope ?? '').split(' ').includes(expected);
   }
 }

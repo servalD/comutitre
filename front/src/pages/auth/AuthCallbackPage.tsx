@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/use-auth'
 import styles from './AuthPages.module.css'
 
@@ -10,6 +11,7 @@ function parseAccessTokenFromHash(hash: string): string | null {
 
 export function AuthCallbackPage() {
   const { setToken } = useAuth()
+  const { t } = useTranslation('auth')
   const navigate = useNavigate()
   const token = useMemo(() => parseAccessTokenFromHash(window.location.hash), [])
 
@@ -22,16 +24,14 @@ export function AuthCallbackPage() {
   if (!token) {
     return (
       <div className={styles.page}>
-        <p className={styles.error}>
-          Aucun token reçu. Relancez la connexion FranceConnect.
-        </p>
+        <p className={styles.error}>{t('devLogin.noToken')}</p>
       </div>
     )
   }
 
   return (
     <div className={styles.page}>
-      <p>Connexion en cours…</p>
+      <p>{t('callback.connecting')}</p>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { CreateMobilityIdentityPayload } from '../../../domain/types/mobility'
 import { formatEstimatedProfile } from '../identity-utils'
 import { Button } from '../../ui/Button'
@@ -17,6 +18,7 @@ interface CreateIdentityFormProps {
 }
 
 export function CreateIdentityForm({ onSubmit, loading }: CreateIdentityFormProps) {
+  const { t } = useTranslation('mobility')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [birthDate, setBirthDate] = useState('')
@@ -33,14 +35,10 @@ export function CreateIdentityForm({ onSubmit, loading }: CreateIdentityFormProp
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <p className={styles.hint}>
-        Ajoutez une personne à gérer depuis votre espace. Vous serez son payeur
-        et son représentant légal jusqu&apos;à ce qu&apos;elle dispose de son
-        propre compte.
-      </p>
+      <p className={styles.hint}>{t('createIdentity.hint')}</p>
 
       <div className={styles.row}>
-        <Field label="Prénom" htmlFor="newFirstName">
+        <Field label={t('forms.firstName')} htmlFor="newFirstName">
           <input
             id="newFirstName"
             className={inputClassName()}
@@ -49,7 +47,7 @@ export function CreateIdentityForm({ onSubmit, loading }: CreateIdentityFormProp
             onChange={(e) => setFirstName(e.target.value)}
           />
         </Field>
-        <Field label="Nom" htmlFor="newLastName">
+        <Field label={t('forms.lastName')} htmlFor="newLastName">
           <input
             id="newLastName"
             className={inputClassName()}
@@ -60,7 +58,7 @@ export function CreateIdentityForm({ onSubmit, loading }: CreateIdentityFormProp
         </Field>
       </div>
 
-      <Field label="Date de naissance" htmlFor="newBirthDate">
+      <Field label={t('forms.birthDate')} htmlFor="newBirthDate">
         <input
           id="newBirthDate"
           type="date"
@@ -73,14 +71,14 @@ export function CreateIdentityForm({ onSubmit, loading }: CreateIdentityFormProp
 
       {estimatedProfile ? (
         <p className={styles.estimatedProfile}>
-          <span aria-hidden="true">🎫</span> Profil estimé :{' '}
+          <span aria-hidden="true">🎫</span> {t('forms.estimatedProfile')}{' '}
           <strong>{estimatedProfile}</strong>
         </p>
       ) : null}
 
       <div className={styles.actions}>
         <Button type="submit" disabled={loading}>
-          Ajouter à mon espace
+          {t('createIdentity.submit')}
         </Button>
       </div>
     </form>

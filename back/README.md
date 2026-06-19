@@ -31,9 +31,11 @@ Secrets may be supplied as files via the `<NAME>_FILE` convention (Docker/Swarm 
 | Method | Path | Access |
 | --- | --- | --- |
 | GET | `/health` | public |
+| GET | `/api/docs` | public — Swagger UI (documentation API) |
 | GET | `/auth/franceconnect/login` | public — redirects to FranceConnect |
 | GET | `/auth/franceconnect/callback` | public — issues an app session token |
 | GET | `/auth/me` | authenticated |
 | GET | `/users/me` | authenticated |
 | GET | `/users` | `ADMIN` |
 | PATCH | `/users/:id/roles` | `ADMIN` |
+

@@ -11,6 +11,8 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+export type SupportedLanguage = 'fr' | 'en';
+
 export class ChatHistoryMessageDto {
   @ApiProperty({ enum: ['user', 'assistant'] })
   @IsIn(['user', 'assistant'])
@@ -37,4 +39,9 @@ export class ChatRequestDto {
   @ValidateNested({ each: true })
   @Type(() => ChatHistoryMessageDto)
   history?: ChatHistoryMessageDto[];
+
+  @ApiPropertyOptional({ enum: ['fr', 'en'], default: 'fr' })
+  @IsOptional()
+  @IsIn(['fr', 'en'])
+  language?: SupportedLanguage;
 }

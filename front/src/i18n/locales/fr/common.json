@@ -1,0 +1,62 @@
+{
+  "loading": "Chargement…",
+  "errors": {
+    "loading": "Erreur de chargement",
+    "http": "Erreur {{status}}"
+  },
+  "actions": {
+    "logout": "Déconnexion",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "confirm": "Confirmer",
+    "continue": "Continuer",
+    "close": "Fermer"
+  },
+  "stepOf": "Étape {{step}} sur {{total}}",
+  "logoAria": "Comutitres — Accueil",
+  "myProfile": "Mon profil",
+  "newSubscription": "Nouvelle souscription",
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "mobility": "Mobilité",
+    "ariaLabel": "Navigation principale",
+    "mobileAriaLabel": "Navigation mobile"
+  },
+  "tabs": {
+    "accueil": "Accueil",
+    "foyer": "Mon foyer",
+    "foyerShort": "Foyer",
+    "aide": "Aide"
+  },
+  "mobileTabs": {
+    "home": "Accueil",
+    "titres": "Titres",
+    "admin": "Admin",
+    "compte": "Compte"
+  },
+  "brand": {
+    "name": "Comutitres",
+    "tagline": "Espace client"
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "upload": {
+    "title": "Déposer un document",
+    "hint": "Formats acceptés : PDF, JPG, PNG — 10 Mo max"
+  },
+  "chatbot": {
+    "title": "Assistant Comutitres",
+    "greeting": "Bonjour ! Je suis l'assistant Comutitres. Posez-moi une question sur les titres de transport Île-de-France (forfaits, Navigo, imagine R, Solidarité Transport, SAV…).",
+    "placeholder": "Posez votre question sur les titres de transport…",
+    "audioOn": "Lire les réponses à voix haute",
+    "audioOff": "Couper la lecture vocale",
+    "audioEnabled": "Lecture vocale activée.",
+    "errorPrefix": "Désolé, une erreur est survenue : {{message}}",
+    "noAnswer": "Désolé, je n'ai pas pu générer de réponse.",
+    "requestFailed": "Requête à l'assistant échouée ({{status}})"
+  }
+}

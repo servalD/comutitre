@@ -19,14 +19,18 @@ import { Roles } from '../../../shared/decorators/roles.decorator';
 import { Role } from '../../../shared/enums/role.enum';
 import { User } from '../../users/domain/user';
 import { CloseFoundSupportCaseRequest } from '../application/dto/close-found-support-case.request';
+import { ActivateSupportRequest } from '../application/dto/activate-support.request';
 import { CreateContractRequest } from '../application/dto/create-contract.request';
 import { CreateDocumentRequest } from '../application/dto/create-document.request';
 import { CreateMobilityIdentityRequest } from '../application/dto/create-mobility-identity.request';
 import { CreateRelationshipRequest } from '../application/dto/create-relationship.request';
 import { CreateSupportRequest } from '../application/dto/create-support.request';
+import { CreateTransportRightRequest } from '../application/dto/create-transport-right.request';
 import { DeclareFoundSupportRequest } from '../application/dto/declare-found-support.request';
 import { UpdateMobilityIdentityRequest } from '../application/dto/update-mobility-identity.request';
+import { ValidateJourneyEventRequest } from '../application/dto/validate-journey-event.request';
 import { CloseFoundSupportCaseUseCase } from '../application/use-cases/close-found-support-case.use-case';
+import { ActivateSupportUseCase } from '../application/use-cases/activate-support.use-case';
 import { CreateContractUseCase } from '../application/use-cases/create-contract.use-case';
 import { CreateDocumentUseCase } from '../application/use-cases/create-document.use-case';
 import { CreateMobilityIdentityUseCase } from '../application/use-cases/create-mobility-identity.use-case';
@@ -35,13 +39,20 @@ import { CreateSupportUseCase } from '../application/use-cases/create-support.us
 import { DeclareFoundSupportUseCase } from '../application/use-cases/declare-found-support.use-case';
 import { GetMobilityIdentityUseCase } from '../application/use-cases/get-mobility-identity.use-case';
 import { GetTimelineUseCase } from '../application/use-cases/get-timeline.use-case';
+import { ListOpenAnomaliesUseCase } from '../application/use-cases/list-open-anomalies.use-case';
 import { ListContractsUseCase } from '../application/use-cases/list-contracts.use-case';
 import { ListDocumentsUseCase } from '../application/use-cases/list-documents.use-case';
 import { ListMyIdentitiesUseCase } from '../application/use-cases/list-my-identities.use-case';
+import { ListProofEventsUseCase } from '../application/use-cases/list-proof-events.use-case';
 import { ListSupportsUseCase } from '../application/use-cases/list-supports.use-case';
+import { ListTransportRightsUseCase } from '../application/use-cases/list-transport-rights.use-case';
 import { RevokeRelationshipUseCase } from '../application/use-cases/revoke-relationship.use-case';
+import { RegisterTransportRightUseCase } from '../application/use-cases/register-transport-right.use-case';
 import { UpdateMobilityIdentityUseCase } from '../application/use-cases/update-mobility-identity.use-case';
+import { ValidateJourneyEventUseCase } from '../application/use-cases/validate-journey-event.use-case';
 import {
+  ActivateSupportResponse,
+  AnomalyCaseResponse,
   ContractResponse,
   DocumentResponse,
   FoundSupportCaseResponse,
@@ -51,14 +62,20 @@ import {
   RelationshipResponse,
   SupportResponse,
   TimelineEventResponse,
+  TransportRightResponse,
+  ValidateJourneyResponse,
+  toAnomalyCaseResponse,
   toContractResponse,
   toDocumentResponse,
   toFoundSupportCaseResponse,
   toFoundSupportClosureResponse,
   toMobilityIdentityResponse,
+  toProofEventResponse,
   toRelationshipResponse,
   toSupportResponse,
   toTimelineEventResponse,
+  toTransportRightResponse,
+  toValidationEventResponse,
 } from './mobility.presenter';
 
 @ApiTags('mobility-identities')
@@ -77,7 +94,13 @@ export class MobilityController {
     private readonly createDocument: CreateDocumentUseCase,
     private readonly listDocuments: ListDocumentsUseCase,
     private readonly createSupport: CreateSupportUseCase,
+    private readonly activateSupport: ActivateSupportUseCase,
     private readonly listSupports: ListSupportsUseCase,
+    private readonly registerTransportRight: RegisterTransportRightUseCase,
+    private readonly listTransportRights: ListTransportRightsUseCase,
+    private readonly validateJourneyEvent: ValidateJourneyEventUseCase,
+    private readonly listProofEvents: ListProofEventsUseCase,
+    private readonly listOpenAnomalies: ListOpenAnomaliesUseCase,
     private readonly declareFoundSupport: DeclareFoundSupportUseCase,
     private readonly closeFoundSupportCase: CloseFoundSupportCaseUseCase,
     private readonly getTimeline: GetTimelineUseCase,
@@ -228,6 +251,33 @@ export class MobilityController {
     return supports.map(toSupportResponse);
   }
 
+  @Get('mobility-identities/:id/transport-rights')
+  @ApiTags('transport-rights')
+  @ApiOperation({ summary: 'Lister les droits de transport d’une identite' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkResponse({ type: TransportRightResponse, isArray: true })
+  async getTransportRights(
+    @CurrentUser() user: User,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<TransportRightResponse[]> {
+    const rights = await this.listTransportRights.execute(user, id);
+    return rights.map(toTransportRightResponse);
+  }
+
+  @Post('mobility-identities/:id/transport-rights')
+  @ApiTags('transport-rights')
+  @ApiOperation({ summary: 'Creer un droit de transport demo' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkResponse({ type: TransportRightResponse })
+  async createTransportRight(
+    @CurrentUser() user: User,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: CreateTransportRightRequest,
+  ): Promise<TransportRightResponse> {
+    const right = await this.registerTransportRight.execute(user, id, body);
+    return toTransportRightResponse(right);
+  }
+
   @Post('mobility-identities/:id/supports')
   @ApiTags('supports')
   @ApiOperation({ summary: 'Ajouter un support (carte physique)' })
@@ -240,6 +290,69 @@ export class MobilityController {
   ): Promise<SupportResponse> {
     const support = await this.createSupport.execute(user, id, body);
     return toSupportResponse(support);
+  }
+
+  @Post('mobility-identities/:id/supports/activate')
+  @ApiTags('supports')
+  @ApiOperation({
+    summary: 'Activer un support autorise avec limite de deux supports actifs',
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkResponse({ type: ActivateSupportResponse })
+  async activateIdentitySupport(
+    @CurrentUser() user: User,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: ActivateSupportRequest,
+  ): Promise<ActivateSupportResponse> {
+    const result = await this.activateSupport.execute(user, id, body);
+    return {
+      support: toSupportResponse(result.support),
+      proofEvent: toProofEventResponse(result.proofEvent),
+    };
+  }
+
+  @Post('mobility-identities/:id/validations')
+  @ApiTags('validations')
+  @ApiOperation({
+    summary:
+      'Simuler une validation et creer une anomalie si la fenetre courte est impossible',
+  })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkResponse({ type: ValidateJourneyResponse })
+  async validateJourney(
+    @CurrentUser() user: User,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() body: ValidateJourneyEventRequest,
+  ): Promise<ValidateJourneyResponse> {
+    const result = await this.validateJourneyEvent.execute(user, id, body);
+    return {
+      validation: toValidationEventResponse(result.validation),
+      anomaly: result.anomaly ? toAnomalyCaseResponse(result.anomaly) : null,
+    };
+  }
+
+  @Get('mobility-identities/:id/proof-events')
+  @ApiTags('proof-events')
+  @ApiOperation({ summary: 'Lister le registre de preuve demo' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  async getProofEvents(
+    @CurrentUser() user: User,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    const events = await this.listProofEvents.execute(user, id);
+    return events.map(toProofEventResponse);
+  }
+
+  @Get('anomaly-cases')
+  @ApiTags('anomaly-cases')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Lister les anomalies ouvertes' })
+  @ApiOkResponse({ type: AnomalyCaseResponse, isArray: true })
+  async getOpenAnomalies(
+    @CurrentUser() user: User,
+  ): Promise<AnomalyCaseResponse[]> {
+    const anomalies = await this.listOpenAnomalies.execute(user);
+    return anomalies.map(toAnomalyCaseResponse);
   }
 
   @Post('support-found-cases')

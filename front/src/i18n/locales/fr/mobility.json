@@ -1,0 +1,264 @@
+{
+  "hub": {
+    "loading": "Chargement des identités…",
+    "title": "Mes identités de mobilité",
+    "subtitle": "Gérez les profils de votre foyer et leurs abonnements.",
+    "addPerson": "Ajouter une personne",
+    "emptyTitle": "Aucune identité",
+    "emptyDescription": "Créez une première identité de mobilité pour commencer.",
+    "createIdentity": "Créer une identité"
+  },
+  "add": {
+    "title": "Ajouter une personne",
+    "subtitle": "Enfant, neveu ou proche : ajoutez une identité de mobilité à gérer depuis votre espace.",
+    "createError": "Création impossible"
+  },
+  "subscribe": {
+    "title": "Souscrire un forfait",
+    "backToDetail": "Retour à la fiche",
+    "notFound": "Identité introuvable.",
+    "loadError": "Chargement impossible"
+  },
+  "detail": {
+    "backToList": "Mes identités",
+    "bornOn": "né(e) le {{date}}",
+    "tabs": {
+      "resume": "Résumé",
+      "contracts": "Abonnements",
+      "documents": "Documents",
+      "supports": "Carte",
+      "timeline": "Historique",
+      "access": "Accès"
+    },
+    "noContracts": "Aucun abonnement",
+    "noContractsDesc": "Lancez l’assistant pour trouver le forfait adapté.",
+    "noDocuments": "Aucun document",
+    "noSupports": "Aucune carte",
+    "noTimeline": "Aucun événement",
+    "noAccess": "Aucun lien compte"
+  },
+  "forms": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "birthDate": "Date de naissance",
+    "estimatedProfile": "Profil estimé :",
+    "product": "Produit",
+    "status": "Statut",
+    "start": "Début",
+    "end": "Fin",
+    "tariff": "Tarif (€)",
+    "type": "Type"
+  },
+  "createIdentity": {
+    "hint": "Ajoutez une personne à gérer depuis votre espace. Vous serez son payeur et son représentant légal jusqu'à ce qu'elle dispose de son propre compte.",
+    "submit": "Ajouter à mon espace"
+  },
+  "editIdentity": {
+    "edit": "Modifier",
+    "title": "Modifier l'identité"
+  },
+  "createContract": {
+    "add": "Ajouter un abonnement",
+    "title": "Nouvel abonnement"
+  },
+  "createDocument": {
+    "add": "Ajouter un document",
+    "title": "Nouveau document"
+  },
+  "createRelationship": {
+    "allCreated": "Tous les liens disponibles sont déjà créés.",
+    "link": "Lier au compte",
+    "title": "Nouveau lien compte",
+    "linkType": "Type de lien"
+  },
+  "createSupport": {
+    "add": "Ajouter une carte",
+    "title": "Nouvelle carte physique"
+  },
+  "recommendation": {
+    "recommended": "Recommandé",
+    "why": "Pourquoi ce forfait ?",
+    "documents": "Justificatifs à fournir",
+    "alternative": "Alternative :"
+  },
+  "wizard": {
+    "intro": "Nous vous guidons vers le forfait adapté à <strong>{{name}}</strong> ({{age}} ans). Répondez aux questions — pas besoin de connaître le nom des passes à l’avance.",
+    "notEnrolledError": "Sans scolarité ou inscription, aucun forfait Imagine R ne correspond à cette situation.",
+    "notCovered": "Situation non couverte.",
+    "subscribeError": "Souscription impossible",
+    "success": "Dossier créé — déposez les justificatifs dans l’onglet Documents.",
+    "creating": "Création…",
+    "confirmOpen": "Confirmer et ouvrir le dossier"
+  },
+  "support": {
+    "navigoCard": "Carte Navigo",
+    "activatedOn": "Activée le {{date}}",
+    "physicalCard": "Carte physique"
+  },
+  "relationship": {
+    "since": "Depuis le {{date}}",
+    "revoke": "Révoquer"
+  },
+  "document": {
+    "uploadedOn": "Déposé le {{date}}"
+  },
+  "identity": {
+    "ageYears_one": "{{count}} an",
+    "ageYears_other": "{{count}} ans",
+    "noActiveSubscription": "Aucun abonnement actif"
+  },
+  "timeline": {
+    "pickupBefore": "Retrait avant le {{date}}"
+  },
+  "advisor": {
+    "common": { "yes": "Oui", "no": "Non" },
+    "q": {
+      "isEnrolled": {
+        "labelScolaire": "Cette personne est-elle scolarisée cette année ?",
+        "labelEtudiant": "Cette personne est-elle inscrite dans un établissement cette année ?",
+        "hint": "Un justificatif scolaire ou étudiant sera demandé."
+      },
+      "scholarship": {
+        "label": "Bénéficie-t-elle d’une bourse (tarif réduit) ?",
+        "hint": "Attestation de bourse à fournir si oui.",
+        "yes": "Oui, boursier(ère)",
+        "no": "Non, tarif plein"
+      },
+      "travelHabit": {
+        "label": "Comment cette personne utilise-t-elle les transports ?",
+        "daily": "Tous les jours ou presque",
+        "occasional": "De temps en temps",
+        "socialRights": "J’ai des droits sociaux (TST)",
+        "departmentAssigned": "Droit Améthyste (département)"
+      },
+      "socialLevel": {
+        "label": "Quel niveau de Tarification Solidarité Transport ?",
+        "hint": "Selon votre situation : RSA, CAF, France Travail, MDPH…",
+        "gratuite": "Gratuité",
+        "solidarite75": "Solidarité −75 %",
+        "reduction50": "Réduction −50 %"
+      },
+      "travelHabitTst": {
+        "label": "Souhaitez-vous renouveler ou modifier votre droit ?",
+        "renew": "Renouveler ma TST",
+        "annual": "Passer au forfait annuel (plein tarif)",
+        "liberte": "Passer à Liberté+"
+      },
+      "liberteSupport": {
+        "label": "Sur quel support souhaitez-vous Liberté+ ?",
+        "passe": "Passe Navigo personnalisé",
+        "passeDesc": "Chargez Liberté+ sur votre carte Navigo physique — géré par Comutitres.",
+        "telephone": "Application mobile (téléphone)",
+        "telephoneDesc": "Disponible exclusivement via l’application IDFM.",
+        "telephoneUnavailable": "Non disponible sur Comutitres",
+        "telephoneBlock": "Liberté+ sur téléphone est géré exclusivement par l’application Île-de-France Mobilités. Comutitres ne prend pas en charge cette formule. Téléchargez l’appli IDFM pour souscrire."
+      },
+      "socialLevelTst": {
+        "label": "Quel niveau de TST ?"
+      },
+      "navigoCard": {
+        "label": "Avez-vous déjà une carte Navigo personnalisée ?",
+        "hint": "Nécessaire pour charger la plupart des forfaits sur support physique.",
+        "toOrder": "Non, à commander"
+      }
+    },
+    "errors": {
+      "minAge": "L’enregistrement est possible à partir de 4 ans.",
+      "scolaireNotEnrolled": "Sans scolarité, Imagine R Scolaire n’est pas adapté.",
+      "etudiantNotEnrolled": "Imagine R Étudiant nécessite une inscription en cours.",
+      "unsupportedProfile": "Profil non pris en charge.",
+      "answerToContinue": "Répondez aux questions pour continuer.",
+      "specifyTst": "Précisez votre niveau TST.",
+      "unrecognized": "Situation non reconnue."
+    },
+    "why": {
+      "juniorAge": "Âge {{age}} ans : éligible Imagine R Junior.",
+      "juniorGuardian": "Le payeur et représentant légal gère la souscription.",
+      "scolaireAge": "Âge {{age}} ans : profil scolaire.",
+      "scholarshipFare": "Tarif boursier : attestation de bourse requise.",
+      "fullFareSchool": "Tarif plein : certificat scolaire requis.",
+      "etudiantAge": "Âge {{age}} ans : profil étudiant.",
+      "scholarshipReduction": "Réduction bourse applicable avec justificatif.",
+      "studentCertificate": "Certificat de scolarité ou étudiant requis.",
+      "dailyFrequent": "Trajets fréquents : un forfait annuel est le plus économique sur 12 mois.",
+      "seniorFare": "Âge {{age}} ans : tarif senior applicable.",
+      "allZones": "Couverture toutes zones, renouvellement automatique.",
+      "occasionalNoYear": "Trajets occasionnels : pas besoin d’un abonnement à l’année.",
+      "perValidation": "Chaque validation est facturée ; prélèvement mensuel SEPA.",
+      "tstEligible": "Éligibilité Tarification Solidarité Transport.",
+      "tstRenewed": "Droit renouvelé par périodes de 3 mois.",
+      "amethysteAssigned": "Forfait Améthyste : attribué par le département.",
+      "amethysteCheck": "Vérification de l’attribution avant activation."
+    },
+    "usage": {
+      "shortTickets": "Existent aussi Navigo Mois et Navigo Semaine pour des besoins courts — non gérés dans cette démo."
+    },
+    "tstTariffHint": {
+      "gratuite": "Gratuité transport",
+      "solidarite_75": "Tarif solidarité −75 %",
+      "reduction_50": "Réduction −50 %"
+    },
+    "tariff": {
+      "liberte": "Facturation mensuelle des trajets validés (prélèvement SEPA)",
+      "tst": "Selon droit social vérifié",
+      "amethyste": "Selon attribution départementale",
+      "perYear": "{{amount}} € / an"
+    },
+    "alternatives": {
+      "toLiberte": "Si vos trajets deviennent plus rares, sans engagement annuel.",
+      "toAnnual": "Si vous voyagez quasi quotidiennement, l’annuel est plus avantageux."
+    }
+  },
+  "catalog": {
+    "imagine_r_junior": {
+      "desc": "Forfait jeune de 4 à 10 ans, valable sur l’année scolaire.",
+      "duration": "12 mois (saison scolaire)"
+    },
+    "imagine_r_scolaire": {
+      "desc": "Forfait scolaire de 11 à 17 ans, renouvelé chaque année.",
+      "duration": "12 mois (saison scolaire)"
+    },
+    "imagine_r_etudiant": {
+      "desc": "Forfait étudiant de 18 à 25 ans, sur justificatif d’inscription.",
+      "duration": "12 mois (saison)"
+    },
+    "navigo_annuel": {
+      "desc": "Abonnement toutes zones, idéal pour les trajets quotidiens.",
+      "duration": "12 mois, renouvellement automatique"
+    },
+    "navigo_senior": {
+      "desc": "Tarif préférentiel à partir de 62 ans pour les déplacements réguliers.",
+      "duration": "12 mois"
+    },
+    "liberte_plus": {
+      "desc": "Sans engagement annuel : vos trajets validés sont facturés mensuellement par IDFM (prélèvement SEPA).",
+      "duration": "Sans durée fixe (facturation mensuelle des trajets)"
+    },
+    "tst": {
+      "desc": "Réduction ou gratuité selon vos droits sociaux (RSA, CAF, etc.).",
+      "duration": "3 mois renouvelables"
+    },
+    "amethyste": {
+      "desc": "Droit attribué par votre département, chargé sur passe Navigo.",
+      "duration": "Selon attribution départementale"
+    },
+    "habit": {
+      "daily": {
+        "title": "Trajets quotidiens",
+        "body": "Vous prenez les transports en commun presque tous les jours (travail, études). Un forfait annuel est en général le plus avantageux sur 12 mois."
+      },
+      "occasional": {
+        "title": "Trajets occasionnels",
+        "body": "Vous voyagez de temps en temps, sans besoin d’un abonnement à l’année. Navigo Liberté+ facture chaque trajet validé. Existent aussi Navigo Mois et Navigo Semaine (titres courts) — hors périmètre de cette démo."
+      },
+      "social_rights": {
+        "title": "Droits sociaux",
+        "body": "Vous bénéficiez de la Tarification Solidarité Transport (TST) : gratuité, −75 % ou −50 % selon votre situation (RSA, CAF, France Travail, MDPH…)."
+      },
+      "department_assigned": {
+        "title": "Droit départemental",
+        "body": "Le forfait Améthyste est attribué par votre département. Ce n’est pas une souscription classique : on vérifie votre éligibilité puis on charge le droit sur votre passe."
+      }
+    }
+  }
+}

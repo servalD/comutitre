@@ -26,6 +26,11 @@ export interface UpdateMobilityIdentityParams {
 export abstract class MobilityIdentityRepository {
   abstract findById(id: string): Promise<MobilityIdentity | null>;
   abstract findByIds(ids: string[]): Promise<MobilityIdentity[]>;
+  abstract findByIdentityTriplet(
+    firstName: string,
+    lastName: string,
+    birthDate: Date,
+  ): Promise<MobilityIdentity[]>;
   abstract create(
     params: CreateMobilityIdentityParams,
   ): Promise<MobilityIdentity>;

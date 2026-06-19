@@ -1,13 +1,6 @@
-import {
-  foundSupportDecisionLabels,
-  foundSupportFinalStatusLabels,
-  timelineEventLabels,
-} from '../../constants/labels'
-import type {
-  FoundSupportDecision,
-  FoundSupportFinalStatus,
-  TimelineEvent,
-} from '../../domain/types/mobility'
+import { useTranslation } from 'react-i18next'
+import { labelFor } from '../../constants/labels'
+import type { TimelineEvent } from '../../domain/types/mobility'
 import styles from './TimelineList.module.css'
 
 const eventIcons: Record<string, string> = {
@@ -21,21 +14,25 @@ const eventIcons: Record<string, string> = {
   SUPPORT_FOUND_CLOSED: 'V',
 }
 
-function getMetadataText(event: TimelineEvent): string | null {
+function getMetadataText(
+  event: TimelineEvent,
+  t: ReturnType<typeof useTranslation<'mobility'>>['t'],
+  locale: string,
+): string | null {
   if (event.type === 'SUPPORT_FOUND') {
     const decision = event.metadata?.decision
     const deadline = event.metadata?.pickupDeadline
     const parts: string[] = []
 
     if (typeof decision === 'string') {
-      parts.push(
-        foundSupportDecisionLabels[decision as FoundSupportDecision] ?? decision,
-      )
+      parts.push(labelFor.foundSupportDecision(decision as never) ?? decision)
     }
 
     if (typeof deadline === 'string') {
       parts.push(
-        `Retrait avant le ${new Date(deadline).toLocaleDateString('fr-FR')}`,
+        t('timeline.pickupBefore', {
+          date: new Date(deadline).toLocaleDateString(locale),
+        }),
       )
     }
 
@@ -45,10 +42,7 @@ function getMetadataText(event: TimelineEvent): string | null {
   if (event.type === 'SUPPORT_FOUND_CLOSED') {
     const finalStatus = event.metadata?.finalStatus
     if (typeof finalStatus === 'string') {
-      return (
-        foundSupportFinalStatusLabels[finalStatus as FoundSupportFinalStatus] ??
-        finalStatus
-      )
+      return labelFor.foundSupportFinalStatus(finalStatus as never) ?? finalStatus
     }
   }
 
@@ -56,12 +50,13 @@ function getMetadataText(event: TimelineEvent): string | null {
 }
 
 export function TimelineList({ events }: { events: TimelineEvent[] }) {
+  const { t, i18n } = useTranslation('mobility')
   if (events.length === 0) return null
 
   return (
     <ol className={styles.timeline}>
       {events.map((event) => {
-        const metadataText = getMetadataText(event)
+        const metadataText = getMetadataText(event, t, i18n.language)
 
         return (
           <li key={event.id} className={styles.item}>
@@ -69,10 +64,10 @@ export function TimelineList({ events }: { events: TimelineEvent[] }) {
               {eventIcons[event.type] ?? '-'}
             </span>
             <div>
-              <strong>{timelineEventLabels[event.type] ?? event.type}</strong>
+              <strong>{labelFor.timelineEvent(event.type) ?? event.type}</strong>
               {metadataText && <p className={styles.meta}>{metadataText}</p>}
               <time className={styles.time} dateTime={event.createdAt}>
-                {new Date(event.createdAt).toLocaleString('fr-FR')}
+                {new Date(event.createdAt).toLocaleString(i18n.language)}
               </time>
             </div>
           </li>

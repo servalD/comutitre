@@ -1,4 +1,4 @@
-export const MOBILITY_HOME = '/mobility'
+export const MOBILITY_HOME = '/espace'
 export const TITRES_HOME = '/abonnements'
 
 export const MOBILITY_LOGIN = '/login'

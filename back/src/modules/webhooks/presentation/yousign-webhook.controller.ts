@@ -19,6 +19,7 @@ import { ActorRole, ContractStatus } from '../../contracts/domain/contract';
 import { CgvuAcceptance } from '../../contracts/domain/cgvu-acceptance';
 import { CgvuAcceptanceRepository } from '../../contracts/domain/cgvu-acceptance.repository';
 import { ContractRepository } from '../../contracts/domain/contract.repository';
+import { ContractDocumentGateService } from '../../justificatifs/application/services/contract-document-gate.service';
 import { JustificatifRepository } from '../../justificatifs/domain/justificatif.repository';
 
 interface YouSignVerificationResource {
@@ -56,6 +57,7 @@ export class YousignWebhookController {
     private readonly contractRepo: ContractRepository,
     private readonly cgvuRepo: CgvuAcceptanceRepository,
     private readonly justificatifRepo: JustificatifRepository,
+    private readonly documentGate: ContractDocumentGateService,
     private readonly config: ConfigService<Env, true>,
   ) {}
 
@@ -195,11 +197,11 @@ export class YousignWebhookController {
     );
     await this.cgvuRepo.save(acceptance);
 
-    contract.activate();
+    contract.markAwaitingPayment();
     await this.contractRepo.save(contract);
 
     this.logger.log(
-      `Contract ${contract.id} activated after YouSign signature_request.done`,
+      `Contract ${contract.id} awaiting payment after YouSign signature_request.done`,
     );
   }
 
@@ -258,6 +260,7 @@ export class YousignWebhookController {
     this.logger.log(
       `Justificatif ${justificatif.id} → ${justificatif.status} (YouSign: ${verification.status})`,
     );
+    await this.documentGate.tryAdvanceContract(justificatif.contractId);
   }
 
   private async handleVerificationFailed(

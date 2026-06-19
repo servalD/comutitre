@@ -63,7 +63,7 @@ export type DocumentStatus =
   | 'expired'
   | 'missing'
 
-export type SupportType = 'physical_card'
+export type SupportType = 'physical_card' | 'phone' | 'watch'
 
 export type SupportStatus =
   | 'active'
@@ -186,12 +186,90 @@ export interface Support {
   type: SupportType
   status: SupportStatus
   publicKey: string | null
+  walletAddress: string | null
+  supportCommitment: string | null
   activatedAt: string | null
   revokedAt: string | null
   expiresAt: string | null
   lastUsedAt: string | null
   createdAt: string
   updatedAt: string
+}
+
+export type TransportRightStatus = 'active' | 'suspended' | 'expired' | 'revoked'
+
+export interface TransportRight {
+  id: string
+  mobilityIdentityId: string
+  contractId: string
+  productType: string
+  status: TransportRightStatus
+  validFrom: string
+  validTo: string
+  rightCommitment: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProofEvent {
+  id: string
+  mobilityIdentityId: string
+  transportRightId: string
+  supportId: string | null
+  type: string
+  eventHash: string
+  previousHash: string | null
+  payload: Record<string, unknown> | null
+  createdAt: string
+}
+
+export type ValidationResult = 'accepted' | 'rejected' | 'anomaly'
+
+export interface ValidationEvent {
+  id: string
+  mobilityIdentityId: string
+  transportRightId: string
+  supportId: string
+  stationId: string
+  validatorId: string
+  result: ValidationResult
+  reasonCode: string | null
+  occurredAt: string
+  createdAt: string
+}
+
+export type AnomalyStatus = 'open' | 'in_review' | 'closed'
+
+export interface AnomalyCase {
+  id: string
+  mobilityIdentityId: string
+  transportRightId: string
+  supportId: string
+  type: string
+  severity: string
+  status: AnomalyStatus
+  summary: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ActivateSupportResult {
+  support: Support
+  proofEvent: ProofEvent
+}
+
+export interface ValidateJourneyResult {
+  validation: ValidationEvent
+  anomaly: AnomalyCase | null
+}
+
+export interface DynamicExternalJwtResult {
+  externalJwt: string
+  externalUserId: string
+  expiresIn: number
+  issuer: string
+  audience: string
+  jwksUrl: string
 }
 
 export interface TimelineEvent {
@@ -281,6 +359,28 @@ export interface CreateSupportPayload {
   type?: SupportType
   status?: SupportStatus
   contractId?: string
+}
+
+export interface CreateTransportRightPayload {
+  contractId: string
+  productType: string
+  validFrom: string
+  validTo: string
+}
+
+export interface ActivateSupportPayload {
+  transportRightId: string
+  type: SupportType
+  walletAddress?: string
+  publicKey?: string
+}
+
+export interface ValidateJourneyPayload {
+  transportRightId: string
+  supportId: string
+  stationId: string
+  validatorId: string
+  occurredAt?: string
 }
 
 export interface DeclareFoundSupportPayload {

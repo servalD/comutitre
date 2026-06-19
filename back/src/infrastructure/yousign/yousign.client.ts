@@ -1,6 +1,34 @@
+import { randomUUID } from 'crypto';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Env } from '../config/env.validation';
+
+/** Basenames reconnus par YouSign sandbox (sans extension). */
+const IDENTITY_SANDBOX_BASENAMES = new Set([
+  'pending_id_document_verification',
+  'verified_id_document_verification',
+  'verified_anonymized_id_document_verification',
+  'verified_anonymised_id_document_verification',
+  'failed_id_document_verification',
+  'failed_anonymized_id_document_verification',
+  'failed_anonymised_id_document_verification',
+  'inconclusive_id_document_verification',
+  'inconclusive_anonymized_id_document_verification',
+  'inconclusive_anonymised_id_document_verification',
+]);
+
+const PROOF_OF_ADDRESS_SANDBOX_BASENAMES = new Set([
+  'pending_proof_of_address_verification',
+  'verified_proof_of_address_verification',
+  'verified_anonymized_proof_of_address_verification',
+  'verified_anonymised_proof_of_address_verification',
+  'failed_proof_of_address_verification',
+  'failed_anonymized_proof_of_address_verification',
+  'failed_anonymised_proof_of_address_verification',
+  'inconclusive_proof_of_address_verification',
+  'inconclusive_anonymized_proof_of_address_verification',
+  'inconclusive_anonymised_proof_of_address_verification',
+]);
 
 export interface YouSignVerificationResult {
   id: string;
@@ -56,13 +84,53 @@ export class YousignClient {
     return sanitized.length > 0 ? sanitized : 'document.pdf';
   }
 
+  private basenameWithoutExtension(filename: string): string {
+    const base = filename.split(/[/\\]/).pop() ?? filename;
+    const dot = base.lastIndexOf('.');
+    return (dot > 0 ? base.slice(0, dot) : base).toLowerCase();
+  }
+
+  /**
+   * Sandbox : seuls les noms de fichiers documentés par YouSign déclenchent une simulation.
+   * Tout autre nom est refusé localement (comportement attendu côté YouSign).
+   */
+  private rejectUnrecognizedSandboxFilename(
+    uploadName: string,
+    allowedBasenames: Set<string>,
+  ): YouSignVerificationResult | null {
+    if (!this.isSandbox()) return null;
+
+    const basename = this.basenameWithoutExtension(uploadName);
+    if (allowedBasenames.has(basename)) return null;
+
+    this.logger.warn(
+      `YouSign sandbox: filename "${uploadName}" not recognized — rejecting as failed (use verified_*_verification.* to simulate success)`,
+    );
+    return {
+      id: `sandbox-local-${randomUUID()}`,
+      status: 'failed',
+      statusCodes: ['IDDV_1103'],
+    };
+  }
+
+  private isLocalSandboxResult(id: string): boolean {
+    return id.startsWith('sandbox-local-');
+  }
+
   private async postVerification(
     path: string,
     fileBuffer: Buffer,
     filename: string,
     params: { firstName: string; lastName: string },
+    allowedSandboxBasenames: Set<string>,
   ): Promise<YouSignVerificationResult> {
     const uploadName = this.verificationFilename(filename);
+    const sandboxReject = this.rejectUnrecognizedSandboxFilename(
+      uploadName,
+      allowedSandboxBasenames,
+    );
+    if (sandboxReject) return sandboxReject;
+
     const form = new FormData();
     form.append('file', new Blob([new Uint8Array(fileBuffer)]), uploadName);
     if (params.firstName) form.append('first_name', params.firstName);
@@ -107,6 +175,7 @@ export class YousignClient {
       fileBuffer,
       filename,
       params,
+      IDENTITY_SANDBOX_BASENAMES,
     );
   }
 
@@ -120,12 +189,16 @@ export class YousignClient {
       fileBuffer,
       filename,
       params,
+      PROOF_OF_ADDRESS_SANDBOX_BASENAMES,
     );
   }
 
   async getIdentityDocumentVerification(
     verificationId: string,
   ): Promise<YouSignVerificationResult> {
+    if (this.isLocalSandboxResult(verificationId)) {
+      throw new Error('Local sandbox verification is terminal');
+    }
     const res = await fetch(
       `${this.baseUrl}/verifications/identity_documents/${verificationId}`,
       { headers: this.jsonHeaders() },
@@ -146,6 +219,9 @@ export class YousignClient {
   async getProofOfAddressVerification(
     verificationId: string,
   ): Promise<YouSignVerificationResult> {
+    if (this.isLocalSandboxResult(verificationId)) {
+      throw new Error('Local sandbox verification is terminal');
+    }
     const res = await fetch(
       `${this.baseUrl}/verifications/proof_of_address/${verificationId}`,
       { headers: this.jsonHeaders() },

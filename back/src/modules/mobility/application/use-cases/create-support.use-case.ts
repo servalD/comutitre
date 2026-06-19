@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from '../../../users/domain/user';
+import { SupportStatus } from '../../domain/enums/support-status.enum';
 import { Support } from '../../domain/support';
 import { SupportRepository } from '../../domain/support.repository';
 import { CreateSupportRequest } from '../dto/create-support.request';
@@ -24,6 +25,12 @@ export class CreateSupportUseCase {
       mobilityIdentityId,
       'canManageSupport',
     );
+
+    if (request.status === SupportStatus.ACTIVE) {
+      throw new BadRequestException(
+        'Active supports must be created through the activation flow',
+      );
+    }
 
     const support = await this.supportRepository.create({
       mobilityIdentityId,

@@ -1,0 +1,31 @@
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-light);
+}
+
+.option {
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.option:hover {
+  color: var(--color-interaction);
+}
+
+.optionActive {
+  background: var(--color-white);
+  color: var(--color-interaction);
+  box-shadow: var(--shadow-sm);
+}

@@ -21,6 +21,7 @@ export abstract class RelationshipRepository {
     accountId: string,
     mobilityIdentityId: string,
   ): Promise<Relationship[]>;
+  abstract hasActiveOwner(mobilityIdentityId: string): Promise<boolean>;
   abstract create(params: CreateRelationshipParams): Promise<Relationship>;
   abstract revoke(id: string): Promise<Relationship>;
 }

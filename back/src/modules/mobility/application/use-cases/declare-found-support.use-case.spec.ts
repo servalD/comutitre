@@ -47,6 +47,8 @@ function makeSupport(status: SupportStatus, mobilityIdentityId = 'identity-1') {
     SupportType.PHYSICAL_CARD,
     status,
     null,
+    null,
+    null,
     NOW,
     null,
     new Date('2030-01-01T00:00:00.000Z'),

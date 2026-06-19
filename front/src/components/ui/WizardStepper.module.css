@@ -1,0 +1,83 @@
+.stepper {
+  width: 100%;
+  padding: 0 var(--space-sm);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.stepWrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.stepWrapper:last-child {
+  flex: 0;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.active {
+  width: 18px;
+  height: 18px;
+  background: var(--color-interaction);
+  border-color: var(--color-interaction);
+  box-shadow: 0 0 0 4px rgba(25, 114, 210, 0.2);
+}
+
+.done {
+  width: 16px;
+  height: 16px;
+  background: var(--color-interaction);
+  border-color: var(--color-interaction);
+}
+
+.check {
+  width: 10px;
+  height: 10px;
+  color: var(--color-white);
+}
+
+.connector {
+  flex: 1;
+  height: 2px;
+  background: var(--color-border);
+  margin: 0 2px;
+  min-width: 8px;
+}
+
+.connectorDone {
+  background: var(--color-interaction);
+}
+
+@media (min-width: 768px) {
+  .dot {
+    width: 16px;
+    height: 16px;
+  }
+
+  .active {
+    width: 20px;
+    height: 20px;
+  }
+
+  .done {
+    width: 18px;
+    height: 18px;
+  }
+}

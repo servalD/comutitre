@@ -22,6 +22,7 @@ export interface SubscriptionAnswers {
   hasScholarship?: boolean
   travelHabit?: TravelHabit
   socialRightLevel?: SocialRightLevel
+  liberteSupport?: 'passe' | 'telephone'
   hasNavigoCard?: boolean
 }
 
@@ -30,13 +31,14 @@ export type QuestionId =
   | 'has_scholarship'
   | 'travel_habit'
   | 'social_right_level'
+  | 'liberte_support'
   | 'has_navigo_card'
 
 export interface SubscriptionQuestion {
   id: QuestionId
   label: string
   hint?: string
-  options: { value: string; label: string; description?: string }[]
+  options: { value: string; label: string; description?: string; disabled?: boolean; disabledReason?: string }[]
 }
 
 export interface SubscriptionRecommendation {
@@ -55,4 +57,6 @@ export interface SubscriptionRecommendation {
 export interface AdvisorStep {
   questions: SubscriptionQuestion[]
   canRecommend: boolean
+  isBlocked?: boolean
+  blockMessage?: string
 }

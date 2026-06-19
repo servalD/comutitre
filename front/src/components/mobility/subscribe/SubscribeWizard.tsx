@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import type { MobilityIdentity } from '../../../domain/types/mobility'
 import {
   buildRecommendation,
@@ -6,6 +7,10 @@ import {
   createSubscriptionContext,
   getAdvisorStep,
 } from '../../../domain/subscription-advisor/advisor'
+import {
+  applyAdvisorAnswer,
+  getAdvisorSelectedValue,
+} from '../../../domain/subscription-advisor/advisor-answers'
 import type {
   QuestionId,
   SubscriptionAnswers,
@@ -24,6 +29,7 @@ interface SubscribeWizardProps {
 }
 
 export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
+  const { t } = useTranslation('mobility')
   const context = useMemo(
     () =>
       createSubscriptionContext({
@@ -55,61 +61,23 @@ export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
     if (step.questions.length > 0) return null
     if (step.canRecommend) return null
     if (answers.isEnrolled === false) {
-      return 'Sans scolarité ou inscription, aucun forfait Imagine R ne correspond à cette situation.'
+      return t('wizard.notEnrolledError')
     }
     try {
       buildRecommendation(context, answers)
       return null
     } catch (err) {
-      return err instanceof Error ? err.message : 'Situation non couverte.'
+      return err instanceof Error ? err.message : t('wizard.notCovered')
     }
-  }, [context, answers, step])
+  }, [context, answers, step, t])
 
   function applyAnswer(questionId: QuestionId, value: string) {
     setError(null)
-    setAnswers((prev) => {
-      const next = { ...prev }
-      switch (questionId) {
-        case 'is_enrolled':
-          next.isEnrolled = value === 'yes'
-          if (!next.isEnrolled) next.hasScholarship = undefined
-          break
-        case 'has_scholarship':
-          next.hasScholarship = value === 'yes'
-          break
-        case 'travel_habit':
-          next.travelHabit = value as SubscriptionAnswers['travelHabit']
-          if (value !== 'social_rights') next.socialRightLevel = undefined
-          break
-        case 'social_right_level':
-          next.socialRightLevel = value as SubscriptionAnswers['socialRightLevel']
-          break
-        case 'has_navigo_card':
-          next.hasNavigoCard = value === 'yes'
-          break
-      }
-      return next
-    })
+    setAnswers((prev) => applyAdvisorAnswer(prev, questionId, value))
   }
 
   function getSelectedValue(questionId: QuestionId): string | undefined {
-    switch (questionId) {
-      case 'is_enrolled':
-        if (answers.isEnrolled === undefined) return undefined
-        return answers.isEnrolled ? 'yes' : 'no'
-      case 'has_scholarship':
-        if (answers.hasScholarship === undefined) return undefined
-        return answers.hasScholarship ? 'yes' : 'no'
-      case 'travel_habit':
-        return answers.travelHabit
-      case 'social_right_level':
-        return answers.socialRightLevel
-      case 'has_navigo_card':
-        if (answers.hasNavigoCard === undefined) return undefined
-        return answers.hasNavigoCard ? 'yes' : 'no'
-      default:
-        return undefined
-    }
+    return getAdvisorSelectedValue(answers, questionId)
   }
 
   async function handleSubscribe() {
@@ -138,7 +106,7 @@ export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
 
       setDone(true)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Souscription impossible')
+      setError(err instanceof ApiError ? err.message : t('wizard.subscribeError'))
     } finally {
       setSubmitting(false)
     }
@@ -148,10 +116,9 @@ export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
     return (
       <Card className={styles.subscribe}>
         <p className={styles.success}>
-          <span aria-hidden="true">✅</span> Dossier créé — déposez les justificatifs dans
-          l’onglet Documents.
+          <span aria-hidden="true">✅</span> {t('wizard.success')}
         </p>
-        <Button onClick={onCancel}>Retour à la fiche</Button>
+        <Button onClick={onCancel}>{t('subscribe.backToDetail')}</Button>
       </Card>
     )
   }
@@ -161,9 +128,12 @@ export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
   return (
     <div className={styles.subscribe}>
       <p className={styles.intro}>
-        Nous vous guidons vers le forfait adapté à <strong>{identity.firstName}</strong>{' '}
-        ({identity.calculatedAge} ans). Répondez aux questions — pas besoin de connaître le
-        nom des passes à l’avance.
+        <Trans
+          i18nKey="wizard.intro"
+          ns="mobility"
+          values={{ name: identity.firstName, age: identity.calculatedAge }}
+          components={{ strong: <strong /> }}
+        />
       </p>
 
       {currentQuestion ? (
@@ -205,11 +175,11 @@ export function SubscribeWizard({ identity, onCancel }: SubscribeWizardProps) {
       <div className={styles.actions}>
         {recommendation ? (
           <Button onClick={handleSubscribe} disabled={submitting}>
-            {submitting ? 'Création…' : 'Confirmer et ouvrir le dossier'}
+            {submitting ? t('wizard.creating') : t('wizard.confirmOpen')}
           </Button>
         ) : null}
         <Button variant="ghost" onClick={onCancel}>
-          Annuler
+          {t('common:actions.cancel')}
         </Button>
       </div>
     </div>

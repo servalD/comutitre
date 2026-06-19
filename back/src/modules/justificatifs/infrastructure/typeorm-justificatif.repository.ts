@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { Justificatif, JustificatifStatus } from '../domain/justificatif';
+import {
+  Justificatif,
+  JustificatifStatus,
+  JustificatifType,
+} from '../domain/justificatif';
 import { JustificatifRepository } from '../domain/justificatif.repository';
 import { JustificatifOrmEntity } from './justificatif.orm-entity';
 
@@ -31,6 +35,18 @@ export class TypeOrmJustificatifRepository extends JustificatifRepository {
       order: { createdAt: 'DESC' },
     });
     return entities.map((e) => this.toDomain(e));
+  }
+
+  async findByContractIdAndType(
+    contractId: string,
+    type: JustificatifType,
+  ): Promise<Justificatif | null> {
+    const entities = await this.orm.find({
+      where: { contractId, type },
+      order: { createdAt: 'DESC' },
+      take: 1,
+    });
+    return entities[0] ? this.toDomain(entities[0]) : null;
   }
 
   async findByYousignVerificationId(
