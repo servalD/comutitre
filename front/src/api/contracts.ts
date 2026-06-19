@@ -73,6 +73,16 @@ export interface ConfirmPaymentResponse {
   mobilityIdentityId?: string | null;
 }
 
+export interface CreateCheckoutSessionResponse {
+  mode: 'mock' | 'checkout';
+  sessionId: string | null;
+  url: string;
+}
+
+export interface CreateCheckoutSessionPayload {
+  payMode: 'quarterly' | 'monthly';
+}
+
 export interface ConfirmValidationResponse {
   status: string;
   alreadyValidated: boolean;
@@ -137,6 +147,18 @@ export const contractsApi = {
       `/contracts/${contractId}/payment/confirm`,
       token,
       { method: 'POST', body: '{}' },
+    );
+  },
+
+  createCheckoutSession(
+    token: string,
+    contractId: string,
+    payload: CreateCheckoutSessionPayload,
+  ): Promise<CreateCheckoutSessionResponse> {
+    return request<CreateCheckoutSessionResponse>(
+      `/contracts/${contractId}/payment/checkout-session`,
+      token,
+      { method: 'POST', body: JSON.stringify(payload) },
     );
   },
 

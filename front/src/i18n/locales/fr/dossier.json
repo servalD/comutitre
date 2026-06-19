@@ -23,18 +23,24 @@
   },
   "paiement": {
     "title": "Paiement",
-    "choosePayMode": "Choisissez votre mode de paiement",
-    "fourTimes": "Paiement en 4 fois",
-    "fourInstalments": "4 prélèvements de 96,00 €",
-    "monthly": "Prélèvement mensuel",
-    "twelveInstalments": "12 prélèvements de 32,00 €",
-    "paymentInfo": "Informations de paiement",
+    "choosePayMode": "Choisissez votre préférence de règlement",
+    "fourTimes": "Règlement annuel sécurisé",
+    "fourInstalments": "Paiement ponctuel sur Checkout",
+    "monthly": "Préférence mensuelle",
+    "twelveInstalments": "Enregistrée pour le dossier",
+    "paymentInfo": "Paiement via Stripe Checkout",
     "cardNumber": "Numéro de carte",
     "expiry": "Date d'expiration",
-    "secure": "Paiement sécurisé (simulation)",
+    "secure": "Aucune donnée carte ou wallet n'est stockée ici",
     "annualTotal": "Total annuel",
-    "payerNote": "Le payeur sera débité chaque mois",
-    "pay": "Payer {{amount}}"
+    "payerNote": "Le paiement est finalisé sur Stripe Checkout",
+    "pay": "Continuer vers Stripe - {{amount}}",
+    "checkoutTitle": "Redirection vers Stripe Checkout",
+    "checkoutInfo": "Carte bancaire et crypto/stablecoin peuvent être proposés selon la configuration Stripe.",
+    "redirecting": "Redirection...",
+    "cancelled": "Le paiement a été annulé. Vous pouvez relancer Checkout.",
+    "offline": "Une connexion internet est requise pour finaliser le paiement.",
+    "error": "Le paiement n'a pas pu être démarré."
   },
   "validation": {
     "steps": {

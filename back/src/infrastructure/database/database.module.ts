@@ -16,6 +16,7 @@ import { TimelineEventOrmEntity } from '../../modules/mobility/infrastructure/ti
 import { TransportRightOrmEntity } from '../../modules/mobility/infrastructure/transport-right.orm-entity';
 import { ValidationEventOrmEntity } from '../../modules/mobility/infrastructure/validation-event.orm-entity';
 import { RecoveryRequestOrmEntity } from '../../modules/auth/infrastructure/recovery-request.orm-entity';
+import { ContractPaymentOrmEntity } from '../../modules/payments/infrastructure/contract-payment.orm-entity';
 import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entity';
 
 @Module({
@@ -45,6 +46,7 @@ import { UserOrmEntity } from '../../modules/users/infrastructure/user.orm-entit
           SubscriptionContractOrmEntity,
           CgvuAcceptanceOrmEntity,
           JustificatifOrmEntity,
+          ContractPaymentOrmEntity,
           RecoveryRequestOrmEntity,
         ],
         migrations: [__dirname + '/migrations/*.{ts,js}'],

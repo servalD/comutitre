@@ -23,18 +23,24 @@
   },
   "paiement": {
     "title": "Payment",
-    "choosePayMode": "Choose your payment method",
-    "fourTimes": "Pay in 4 instalments",
-    "fourInstalments": "4 payments of €96.00",
-    "monthly": "Monthly direct debit",
-    "twelveInstalments": "12 payments of €32.00",
-    "paymentInfo": "Payment information",
+    "choosePayMode": "Choose your payment preference",
+    "fourTimes": "Secure annual payment",
+    "fourInstalments": "One-time payment through Checkout",
+    "monthly": "Monthly preference",
+    "twelveInstalments": "Saved on the application",
+    "paymentInfo": "Payment through Stripe Checkout",
     "cardNumber": "Card number",
     "expiry": "Expiry date",
-    "secure": "Secure payment (simulation)",
+    "secure": "No card or wallet data is stored here",
     "annualTotal": "Annual total",
-    "payerNote": "The payer will be charged each month",
-    "pay": "Pay {{amount}}"
+    "payerNote": "Payment is completed on Stripe Checkout",
+    "pay": "Continue to Stripe - {{amount}}",
+    "checkoutTitle": "Redirect to Stripe Checkout",
+    "checkoutInfo": "Card and crypto/stablecoin payment methods can appear depending on your Stripe configuration.",
+    "redirecting": "Redirecting...",
+    "cancelled": "Payment was cancelled. You can restart Checkout.",
+    "offline": "An internet connection is required to complete payment.",
+    "error": "Payment could not be started."
   },
   "validation": {
     "steps": {

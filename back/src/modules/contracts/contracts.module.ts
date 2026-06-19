@@ -9,6 +9,7 @@ import { CgvuAcceptanceOrmEntity } from './infrastructure/cgvu-acceptance.orm-en
 import { ContractOrmEntity } from './infrastructure/contract.orm-entity';
 import { TypeOrmCgvuAcceptanceRepository } from './infrastructure/typeorm-cgvu-acceptance.repository';
 import { TypeOrmContractRepository } from './infrastructure/typeorm-contract.repository';
+import { ConfirmContractPaymentUseCase } from './application/use-cases/confirm-contract-payment.use-case';
 import { ConfirmMockPaymentUseCase } from './application/use-cases/confirm-mock-payment.use-case';
 import { ConfirmMockValidationUseCase } from './application/use-cases/confirm-mock-validation.use-case';
 import { CreateContractUseCase } from './application/use-cases/create-contract.use-case';
@@ -40,10 +41,15 @@ import { ContractsController } from './presentation/contracts.controller';
     GetCgvuPreviewUseCase,
     SignContractUseCase,
     GetSignatureStatusUseCase,
+    ConfirmContractPaymentUseCase,
     ConfirmMockPaymentUseCase,
     ConfirmMockValidationUseCase,
     ContractSignatureSyncService,
   ],
-  exports: [ContractRepository, CgvuAcceptanceRepository],
+  exports: [
+    ContractRepository,
+    CgvuAcceptanceRepository,
+    ConfirmContractPaymentUseCase,
+  ],
 })
 export class ContractsModule {}

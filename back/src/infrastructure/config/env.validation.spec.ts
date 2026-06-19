@@ -102,4 +102,42 @@ describe('validateEnv', () => {
       }),
     ).toThrow(/SIRENE_API_BEARER_TOKEN/);
   });
+
+  it('defaults Stripe payments to deterministic mock mode', () => {
+    const config = validateEnv(baseConfig);
+
+    expect(config.STRIPE_PAYMENT_MODE).toBe('mock');
+    expect(config.STRIPE_API_KEY).toBe('');
+    expect(config.STRIPE_WEBHOOK_SECRET).toBe('');
+  });
+
+  it('requires Stripe credentials when checkout mode is enabled', () => {
+    expect(() =>
+      validateEnv({
+        ...baseConfig,
+        STRIPE_PAYMENT_MODE: 'checkout',
+      }),
+    ).toThrow(/STRIPE_API_KEY/);
+
+    expect(() =>
+      validateEnv({
+        ...baseConfig,
+        STRIPE_PAYMENT_MODE: 'checkout',
+        STRIPE_API_KEY: 'rk_test_123',
+      }),
+    ).toThrow(/STRIPE_WEBHOOK_SECRET/);
+  });
+
+  it('accepts Stripe checkout mode with configured credentials', () => {
+    const config = validateEnv({
+      ...baseConfig,
+      STRIPE_PAYMENT_MODE: 'checkout',
+      STRIPE_API_KEY: 'rk_test_123',
+      STRIPE_WEBHOOK_SECRET: 'whsec_test_123',
+    });
+
+    expect(config.STRIPE_PAYMENT_MODE).toBe('checkout');
+    expect(config.STRIPE_API_KEY).toBe('rk_test_123');
+    expect(config.STRIPE_WEBHOOK_SECRET).toBe('whsec_test_123');
+  });
 });

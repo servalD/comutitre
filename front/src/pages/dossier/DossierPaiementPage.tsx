@@ -13,15 +13,6 @@ import styles from './DossierPaiementPage.module.css'
 
 type PayMode = 'quarterly' | 'monthly'
 
-function CardPayIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2" />
-      <path d="M2 10h20" stroke="currentColor" strokeWidth="2" />
-    </svg>
-  )
-}
-
 function LockIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -36,12 +27,36 @@ export function DossierPaiementPage() {
   const { t } = useTranslation('dossier')
   const [searchParams] = useSearchParams()
   const contractId = searchParams.get('contractId') ?? ''
+  const checkoutStatus = searchParams.get('checkout')
   const { token } = useAuth()
   const [payMode, setPayMode] = useState<PayMode>('quarterly')
   const [contract, setContract] = useState<ContractResponse | null>(null)
   const [loading, setLoading] = useState(!!contractId && !!token)
   const [paying, setPaying] = useState(false)
-  const [payError, setPayError] = useState<string | null>(null)
+  const [payError, setPayError] = useState<string | null>(() =>
+    checkoutStatus === 'cancel' ? t('paiement.cancelled') : null,
+  )
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator === 'undefined' ? true : navigator.onLine,
+  )
+
+  useEffect(() => {
+    function handleOnline() {
+      setIsOnline(true)
+    }
+
+    function handleOffline() {
+      setIsOnline(false)
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   useEffect(() => {
     if (!token || !contractId) return
@@ -80,19 +95,20 @@ export function DossierPaiementPage() {
 
   async function handlePay() {
     if (!token || !contractId) return
+    if (!isOnline) {
+      setPayError(t('paiement.offline'))
+      return
+    }
+
     setPaying(true)
     setPayError(null)
     try {
-      const result = await contractsApi.confirmPayment(token, contractId)
-      if (result.mobilityIdentityId) {
-        navigate(`/foyer/${result.mobilityIdentityId}`)
-      } else {
-        navigate(`/dossier/validation?contractId=${contractId}`)
-      }
+      const result = await contractsApi.createCheckoutSession(token, contractId, {
+        payMode,
+      })
+      window.location.assign(result.url)
     } catch (err) {
-      setPayError(
-        err instanceof Error ? err.message : 'Le paiement n\u2019a pas pu être confirmé.',
-      )
+      setPayError(err instanceof Error ? err.message : t('paiement.error'))
       setPaying(false)
     }
   }
@@ -102,14 +118,14 @@ export function DossierPaiementPage() {
     : 'Imagine R Junior'
   const beneficiaryName = contract
     ? `${contract.holderFirstName ?? ''} ${contract.holderLastName ?? ''}`.trim()
-    : '…'
+    : '...'
 
   if (loading) {
     return (
       <AppLayout activeTab="accueil">
         <div className={styles.page}>
           <PageHeader title={t('paiement.title')} backTo="/dossier" />
-          <p>Chargement…</p>
+          <p>Chargement...</p>
         </div>
       </AppLayout>
     )
@@ -170,29 +186,13 @@ export function DossierPaiementPage() {
 
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>{t('paiement.paymentInfo')}</h2>
-              <div className={styles.cardForm}>
-                <div className={styles.formField}>
-                  <label className={styles.fieldLabel} htmlFor="cardNumber">{t('paiement.cardNumber')}</label>
-                  <div className={styles.inputWrap}>
-                    <span className={styles.inputIcon} aria-hidden="true"><CardPayIcon /></span>
-                    <input
-                      id="cardNumber"
-                      type="text"
-                      className={styles.input}
-                      placeholder="1234 5678 9012 3456"
-                      maxLength={19}
-                    />
-                  </div>
+              <div className={styles.checkoutPanel}>
+                <div className={styles.checkoutIcon} aria-hidden="true">
+                  <LockIcon />
                 </div>
-                <div className={styles.formRow}>
-                  <div className={styles.formField}>
-                    <label className={styles.fieldLabel} htmlFor="expiry">{t('paiement.expiry')}</label>
-                    <input id="expiry" type="text" className={styles.input} placeholder="MM / AA" maxLength={7} />
-                  </div>
-                  <div className={styles.formField}>
-                    <label className={styles.fieldLabel} htmlFor="cvv">CVV</label>
-                    <input id="cvv" type="text" className={styles.input} placeholder="123" maxLength={4} />
-                  </div>
+                <div>
+                  <p className={styles.checkoutTitle}>{t('paiement.checkoutTitle')}</p>
+                  <p className={styles.checkoutText}>{t('paiement.checkoutInfo')}</p>
                 </div>
               </div>
 
@@ -225,14 +225,19 @@ export function DossierPaiementPage() {
         </div>
 
         <div className={styles.footer}>
+          {!isOnline ? (
+            <p className={styles.payError} role="alert">
+              {t('paiement.offline')}
+            </p>
+          ) : null}
           {payError ? (
             <p className={styles.payError} role="alert">
               {payError}
             </p>
           ) : null}
-          <Button fullWidth disabled={paying || !token || !contractId} onClick={() => void handlePay()}>
+          <Button fullWidth disabled={paying || !token || !contractId || !isOnline} onClick={() => void handlePay()}>
             <LockIcon />
-            {paying ? 'Confirmation…' : t('paiement.pay', { amount: '384 €' })}
+            {paying ? t('paiement.redirecting') : t('paiement.pay', { amount: '384 €' })}
           </Button>
         </div>
       </div>

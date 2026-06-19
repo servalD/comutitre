@@ -9,6 +9,7 @@ import { ContractsModule } from './modules/contracts/contracts.module';
 import { ExternalApisModule } from './modules/external-apis/external-apis.module';
 import { JustificatifsModule } from './modules/justificatifs/justificatifs.module';
 import { MobilityModule } from './modules/mobility/mobility.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { RagModule } from './modules/rag/rag.module';
 import { UsersModule } from './modules/users/users.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
@@ -29,6 +30,7 @@ import { HealthController } from './health.controller';
     ExternalApisModule,
     MobilityModule,
     ContractsModule,
+    PaymentsModule,
     JustificatifsModule,
     WebhooksModule,
     RagModule,

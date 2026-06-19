@@ -158,6 +158,14 @@ export const envSchema = z
     YOUSIGN_WEBHOOK_SECRET: z.string().default(''),
     YOUSIGN_DELIVERY_MODE: z.enum(['email', 'none']).default('none'),
 
+    // Stripe Checkout. Default stays mock so the hackathon demo is deterministic
+    // without a configured Stripe account or webhook tunnel.
+    STRIPE_PAYMENT_MODE: z.enum(['mock', 'checkout']).default('mock'),
+    STRIPE_API_KEY: z.string().default(''),
+    STRIPE_WEBHOOK_SECRET: z.string().default(''),
+    STRIPE_SUCCESS_URL: z.union([z.string().url(), z.literal('')]).default(''),
+    STRIPE_CANCEL_URL: z.union([z.string().url(), z.literal('')]).default(''),
+
     // Mistral AI — powers the RAG chatbot (embeddings + chat). The key may be
     // injected via MISTRAL_API_KEY_FILE (Docker/Swarm secret) thanks to the
     // _FILE expansion above. Optional so the app still boots without it; the
@@ -169,6 +177,25 @@ export const envSchema = z
     MISTRAL_VISION_MODEL: z.string().default('pixtral-12b-2409'),
   })
   .superRefine((config, ctx) => {
+    if (config.STRIPE_PAYMENT_MODE === 'checkout') {
+      if (!config.STRIPE_API_KEY.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['STRIPE_API_KEY'],
+          message: 'STRIPE_API_KEY is required when Stripe checkout is enabled',
+        });
+      }
+
+      if (!config.STRIPE_WEBHOOK_SECRET.trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['STRIPE_WEBHOOK_SECRET'],
+          message:
+            'STRIPE_WEBHOOK_SECRET is required when Stripe checkout is enabled',
+        });
+      }
+    }
+
     if (config.FRANCECONNECT_MODE === 'sandbox') {
       if (config.NODE_ENV === 'production') {
         ctx.addIssue({
