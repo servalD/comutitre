@@ -1,0 +1,214 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.stepperWrap {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 900px) {
+  .layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-xl);
+  }
+
+  .main {
+    flex: 1;
+  }
+
+  .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.context {
+  font-size: 0.9375rem;
+  color: var(--color-anthracite);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.pdfCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.pdfCard:hover {
+  border-color: var(--color-interaction);
+  background: var(--color-bg-light);
+}
+
+.pdfCard:focus-visible {
+  outline: 3px solid var(--color-idfm-blue);
+  outline-offset: 2px;
+}
+
+.pdfCard > svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.pdfIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: #FEE2E2;
+  color: #DC2626;
+  flex-shrink: 0;
+}
+
+.pdfIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.pdfInfo {
+  flex: 1;
+}
+
+.pdfTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-anthracite);
+  margin: 0 0 3px;
+}
+
+.pdfSize {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9375rem;
+  color: var(--color-anthracite);
+  cursor: pointer;
+  user-select: none;
+  padding: var(--space-sm) 0;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-interaction);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.yousignBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 12px 16px;
+  background: var(--color-bg-light);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.yousignBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--color-anthracite);
+}
+
+.yousignBadge svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-green);
+}
+
+.yousignBrand {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.recap {
+  background: var(--color-white);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.recapTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-anthracite);
+  margin: 0 0 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.recapRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.recapLabel {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.recapValue {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-anthracite);
+  text-align: right;
+}
+
+.footer {
+  max-width: 420px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .footer button {
+    width: auto;
+    min-width: 280px;
+  }
+}

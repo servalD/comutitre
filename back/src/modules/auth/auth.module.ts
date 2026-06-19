@@ -13,6 +13,7 @@ import { LoginWithCredentialsUseCase } from './application/use-cases/login-with-
 import { AppJwtService } from './infrastructure/app-jwt.service';
 import { CompositeTokenVerifier } from './infrastructure/composite-token-verifier';
 import { DynamicTokenVerifier } from './infrastructure/dynamic-token-verifier';
+import { DynamicExternalJwtService } from './infrastructure/dynamic-external-jwt.service';
 import { FranceConnectService } from './infrastructure/franceconnect.service';
 import { AuthController } from './presentation/auth.controller';
 import { FranceConnectPublicCallbackController } from './presentation/franceconnect-public-callback.controller';
@@ -36,6 +37,7 @@ import { FranceConnectPublicCallbackController } from './presentation/franceconn
   providers: [
     AppJwtService,
     DynamicTokenVerifier,
+    DynamicExternalJwtService,
     FranceConnectService,
     { provide: TokenVerifier, useClass: CompositeTokenVerifier },
     AuthenticateBearerUseCase,

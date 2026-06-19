@@ -10,6 +10,10 @@ import type {
   Profile,
   RelationshipType,
   SupportStatus,
+  SupportType,
+  TransportRightStatus,
+  ValidationResult,
+  AnomalyStatus,
 } from '../domain/types/mobility'
 
 export const profileLabels: Record<Profile, string> = {
@@ -91,6 +95,31 @@ export const supportStatusLabels: Record<SupportStatus, string> = {
   expired: 'Expiree',
   pending_activation: 'En attente',
   support_non_reclame: 'Non reclamee',
+}
+
+export const supportTypeLabels: Record<SupportType, string> = {
+  physical_card: 'Carte physique',
+  phone: 'Telephone',
+  watch: 'Montre',
+}
+
+export const transportRightStatusLabels: Record<TransportRightStatus, string> = {
+  active: 'Actif',
+  suspended: 'Suspendu',
+  expired: 'Expire',
+  revoked: 'Revoque',
+}
+
+export const validationResultLabels: Record<ValidationResult, string> = {
+  accepted: 'Acceptee',
+  rejected: 'Refusee',
+  anomaly: 'Anomalie',
+}
+
+export const anomalyStatusLabels: Record<AnomalyStatus, string> = {
+  open: 'Ouverte',
+  in_review: 'En revue',
+  closed: 'Cloturee',
 }
 
 export const timelineEventLabels: Record<string, string> = {

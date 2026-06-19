@@ -1,0 +1,40 @@
+.nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    flex: 1;
+    justify-content: center;
+  }
+
+  .link {
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+    white-space: nowrap;
+  }
+
+  .link:hover {
+    color: var(--color-interaction);
+    background: var(--color-bg-light);
+  }
+
+  .active {
+    color: var(--color-interaction);
+    background: var(--color-bg-medium);
+    font-weight: 600;
+  }
+
+  .disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { mobilityApi } from '../../api/mobility-api'
 import { ApiError } from '../../api/http-client'
 import {
@@ -13,6 +13,9 @@ const ADDED_PERSON_RELATIONSHIPS = ['payer', 'legal_guardian'] as const
 
 export function AddIdentityPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const returnTo =
+    (location.state as { from?: string } | null)?.from ?? '/mobility'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,7 +36,7 @@ export function AddIdentityPage() {
         })
       }
 
-      navigate(`/mobility/${identity.id}`, { replace: true })
+      navigate(returnTo, { replace: true })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Création impossible')
     } finally {
@@ -43,7 +46,7 @@ export function AddIdentityPage() {
 
   return (
     <div className={styles.page}>
-      <Link to="/mobility" className={styles.back}>
+      <Link to={returnTo} className={styles.back}>
         <span aria-hidden="true">←</span> Retour
       </Link>
       <header className={styles.header}>

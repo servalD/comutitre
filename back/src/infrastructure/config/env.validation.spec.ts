@@ -24,6 +24,18 @@ describe('validateEnv', () => {
     expect(config.FRANCECONNECT_FALLBACK_TO_MOCK).toBe(true);
   });
 
+  it('uses a public FranceConnect sandbox callback by default', () => {
+    const config = validateEnv({
+      ...baseConfig,
+      ...sandboxCredentials,
+      FRANCECONNECT_MODE: 'sandbox',
+    });
+
+    expect(config.FRANCECONNECT_REDIRECT_URI).toBe(
+      'http://localhost:3000/callback',
+    );
+  });
+
   it('parses FranceConnect fallback flag as a real boolean', () => {
     const config = validateEnv({
       ...baseConfig,
@@ -45,6 +57,19 @@ describe('validateEnv', () => {
     ).toThrow(/FRANCECONNECT_REDIRECT_URI/);
   });
 
+  it('rejects FranceConnect sandbox mode with the obsolete v1 issuer', () => {
+    expect(() =>
+      validateEnv({
+        ...baseConfig,
+        ...sandboxCredentials,
+        FRANCECONNECT_MODE: 'sandbox',
+        FRANCECONNECT_ISSUER_URL:
+          'https://fcp.integ01.dev-franceconnect.fr/api/v1',
+        FRANCECONNECT_REDIRECT_URI: 'http://localhost:3000/callback',
+      }),
+    ).toThrow(/FRANCECONNECT_ISSUER_URL/);
+  });
+
   it('rejects FranceConnect sandbox mode without local integration credentials', () => {
     expect(() =>
       validateEnv({
@@ -53,6 +78,19 @@ describe('validateEnv', () => {
         FRANCECONNECT_REDIRECT_URI: 'http://localhost:3000/callback',
       }),
     ).toThrow(/FRANCECONNECT_CLIENT_ID/);
+  });
+
+  it('rejects the legacy service-provider-example client in current sandbox mode', () => {
+    expect(() =>
+      validateEnv({
+        ...baseConfig,
+        FRANCECONNECT_MODE: 'sandbox',
+        FRANCECONNECT_CLIENT_ID:
+          '211286433e39cce01db448d80181bdfd005554b19cd51b3fe7943f6b3b86ab6e',
+        FRANCECONNECT_CLIENT_SECRET: 'legacy-public-secret-for-tests',
+        FRANCECONNECT_REDIRECT_URI: 'http://localhost:3000/login-callback',
+      }),
+    ).toThrow(/legacy FranceConnect service-provider-example client_id/);
   });
 
   it('rejects Sirene live mode without a bearer token', () => {

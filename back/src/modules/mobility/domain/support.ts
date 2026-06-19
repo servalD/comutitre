@@ -9,6 +9,8 @@ export class Support {
     public readonly type: SupportType,
     public readonly status: SupportStatus,
     public readonly publicKey: string | null,
+    public readonly walletAddress: string | null,
+    public readonly supportCommitment: string | null,
     public readonly activatedAt: Date | null,
     public readonly revokedAt: Date | null,
     public readonly expiresAt: Date | null,

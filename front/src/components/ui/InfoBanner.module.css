@@ -1,0 +1,23 @@
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--color-bg-medium);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.banner svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-interaction);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.banner p {
+  font-size: 14px;
+  color: var(--color-anthracite);
+  line-height: 1.45;
+}

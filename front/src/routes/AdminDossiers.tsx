@@ -9,12 +9,14 @@ import { mobilityApi } from '../api/mobility-api';
 import MobileShell from '../components/MobileShell';
 import { useAuth } from '../contexts/AuthContext';
 import {
+  anomalyStatusLabels,
   foundSupportDecisionLabels,
   foundSupportFinalStatusLabels,
   foundSupportNotificationLabels,
   supportStatusLabels,
 } from '../constants/labels';
 import type {
+  AnomalyCase,
   FoundSupportCase,
   FoundSupportClosure,
   FoundSupportDecision,
@@ -55,6 +57,12 @@ function foundDecisionPillClass(decision: FoundSupportDecision): string {
   return ui.pillNeutral;
 }
 
+function anomalyPillClass(status: AnomalyCase['status']): string {
+  if (status === 'closed') return ui.pillOk;
+  if (status === 'in_review') return ui.pillPending;
+  return ui.pillFail;
+}
+
 function compactId(value: string | null): string {
   if (!value) return 'Non disponible';
   return value.length > 12 ? `${value.slice(0, 8)}...` : value;
@@ -89,6 +97,8 @@ function AdminDossiersContent({ token }: { token: string }) {
     action: 'validate' | 'refuse';
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [anomalies, setAnomalies] = useState<AnomalyCase[]>([]);
+  const [anomaliesLoading, setAnomaliesLoading] = useState(true);
 
   const [supportId, setSupportId] = useState('');
   const [agencyId, setAgencyId] = useState('agence-defense');
@@ -103,6 +113,15 @@ function AdminDossiersContent({ token }: { token: string }) {
   const [withdrawalProofReference, setWithdrawalProofReference] = useState('');
   const [foundError, setFoundError] = useState<string | null>(null);
 
+  const loadAnomalies = () => {
+    setAnomaliesLoading(true);
+    mobilityApi
+      .listOpenAnomalies()
+      .then(setAnomalies)
+      .catch(() => setAnomalies([]))
+      .finally(() => setAnomaliesLoading(false));
+  };
+
   const load = () => {
     setLoading(true);
     justificatifsApi
@@ -110,6 +129,7 @@ function AdminDossiersContent({ token }: { token: string }) {
       .then(setItems)
       .catch(() => {})
       .finally(() => setLoading(false));
+    loadAnomalies();
   };
 
   useEffect(() => {
@@ -118,6 +138,11 @@ function AdminDossiersContent({ token }: { token: string }) {
       .then(setItems)
       .catch(() => {})
       .finally(() => setLoading(false));
+    void mobilityApi
+      .listOpenAnomalies()
+      .then(setAnomalies)
+      .catch(() => setAnomalies([]))
+      .finally(() => setAnomaliesLoading(false));
   }, [token]);
 
   function toggleRiskFlag(flag: FoundSupportRiskFlag) {
@@ -220,6 +245,49 @@ function AdminDossiersContent({ token }: { token: string }) {
       activeTab="admin"
     >
       <div className={ui.screenBody}>
+        <div className={ui.profileCard}>
+          <p className={ui.sectionLabel}>Anti-fraude demo</p>
+          <div className={ui.profileCardTitle}>
+            Validations impossibles en fenetre courte
+          </div>
+          {anomaliesLoading ? (
+            <p className={ui.hint}>Chargement des anomalies...</p>
+          ) : anomalies.length === 0 ? (
+            <p className={ui.hint}>Aucune anomalie ouverte.</p>
+          ) : (
+            anomalies.map((anomaly) => (
+              <div key={anomaly.id} className={ui.forfaitItem}>
+                <div className={ui.forfaitTop}>
+                  <span className={ui.forfaitName}>{anomaly.summary}</span>
+                  <span
+                    className={`${ui.statusPill} ${anomalyPillClass(
+                      anomaly.status,
+                    )}`}
+                  >
+                    {anomalyStatusLabels[anomaly.status]}
+                  </span>
+                </div>
+                <div className={ui.summaryRow}>
+                  <span className={ui.summaryKey}>Droit</span>
+                  <span className={ui.mono}>
+                    {compactId(anomaly.transportRightId)}
+                  </span>
+                </div>
+                <div className={ui.summaryRow}>
+                  <span className={ui.summaryKey}>Support</span>
+                  <span className={ui.mono}>{compactId(anomaly.supportId)}</span>
+                </div>
+                <div className={ui.summaryRow}>
+                  <span className={ui.summaryKey}>Ouverte le</span>
+                  <span className={ui.summaryVal}>
+                    {new Date(anomaly.createdAt).toLocaleString('fr-FR')}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
         <div className={ui.profileCard}>
           <p className={ui.sectionLabel}>Objet trouve billettique</p>
           <div className={ui.profileCardTitle}>

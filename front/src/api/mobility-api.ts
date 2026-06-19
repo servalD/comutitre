@@ -3,21 +3,30 @@ import { tokenStorage } from '../auth/token-storage'
 import type {
   CloseFoundSupportPayload,
   Contract,
+  ActivateSupportPayload,
+  ActivateSupportResult,
+  AnomalyCase,
   CreateContractPayload,
   DeclareFoundSupportPayload,
   CreateDocumentPayload,
   CreateMobilityIdentityPayload,
   CreateRelationshipPayload,
   CreateSupportPayload,
+  CreateTransportRightPayload,
   Document,
+  DynamicExternalJwtResult,
   FoundSupportCase,
   FoundSupportClosure,
   MobilityIdentity,
   MobilityIdentityWithRelationships,
+  ProofEvent,
   Support,
   TimelineEvent,
+  TransportRight,
   UpdateMobilityIdentityPayload,
   Relationship,
+  ValidateJourneyPayload,
+  ValidateJourneyResult,
 } from '../domain/types/mobility'
 
 const baseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api'
@@ -90,6 +99,43 @@ export const mobilityApi = {
     payload: CreateSupportPayload,
   ): Promise<Support> {
     return http.post(`/mobility-identities/${identityId}/supports`, payload)
+  },
+
+  listTransportRights(identityId: string): Promise<TransportRight[]> {
+    return http.get(`/mobility-identities/${identityId}/transport-rights`)
+  },
+
+  createTransportRight(
+    identityId: string,
+    payload: CreateTransportRightPayload,
+  ): Promise<TransportRight> {
+    return http.post(`/mobility-identities/${identityId}/transport-rights`, payload)
+  },
+
+  activateSupport(
+    identityId: string,
+    payload: ActivateSupportPayload,
+  ): Promise<ActivateSupportResult> {
+    return http.post(`/mobility-identities/${identityId}/supports/activate`, payload)
+  },
+
+  validateJourney(
+    identityId: string,
+    payload: ValidateJourneyPayload,
+  ): Promise<ValidateJourneyResult> {
+    return http.post(`/mobility-identities/${identityId}/validations`, payload)
+  },
+
+  listProofEvents(identityId: string): Promise<ProofEvent[]> {
+    return http.get(`/mobility-identities/${identityId}/proof-events`)
+  },
+
+  listOpenAnomalies(): Promise<AnomalyCase[]> {
+    return http.get('/anomaly-cases')
+  },
+
+  issueDynamicExternalJwt(): Promise<DynamicExternalJwtResult> {
+    return http.post('/auth/dynamic/external-jwt')
   },
 
   getTimeline(identityId: string): Promise<TimelineEvent[]> {

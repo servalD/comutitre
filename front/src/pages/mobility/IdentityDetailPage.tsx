@@ -10,15 +10,18 @@ import type {
   Contract,
   Document,
   MobilityIdentity,
+  ProofEvent,
   Relationship,
   Support,
   TimelineEvent,
+  TransportRight,
 } from '../../domain/types/mobility'
 import { ContractList } from '../../components/mobility/ContractList'
 import { DocumentList } from '../../components/mobility/DocumentList'
 import { SupportList } from '../../components/mobility/SupportList'
 import { TimelineList } from '../../components/mobility/TimelineList'
 import { RelationshipList } from '../../components/mobility/RelationshipList'
+import { MultiSupportDemoPanel } from '../../components/mobility/MultiSupportDemoPanel'
 import { CreateDocumentForm } from '../../components/mobility/forms/CreateDocumentForm'
 import { CreateSupportForm } from '../../components/mobility/forms/CreateSupportForm'
 import { CreateRelationshipForm } from '../../components/mobility/forms/CreateRelationshipForm'
@@ -50,6 +53,8 @@ export function IdentityDetailPage() {
   const [contracts, setContracts] = useState<Contract[]>([])
   const [documents, setDocuments] = useState<Document[]>([])
   const [supports, setSupports] = useState<Support[]>([])
+  const [transportRights, setTransportRights] = useState<TransportRight[]>([])
+  const [proofEvents, setProofEvents] = useState<ProofEvent[]>([])
   const [timeline, setTimeline] = useState<TimelineEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -70,6 +75,8 @@ export function IdentityDetailPage() {
           contractsData,
           documentsData,
           supportsData,
+          transportRightsData,
+          proofEventsData,
           timelineData,
         ] = await Promise.all([
           mobilityApi.getIdentity(identityId),
@@ -77,6 +84,10 @@ export function IdentityDetailPage() {
           mobilityApi.listContracts(identityId),
           mobilityApi.listDocuments(identityId),
           mobilityApi.listSupports(identityId),
+          mobilityApi
+            .listTransportRights(identityId)
+            .catch(() => [] as TransportRight[]),
+          mobilityApi.listProofEvents(identityId).catch(() => [] as ProofEvent[]),
           mobilityApi.getTimeline(identityId),
         ])
 
@@ -88,6 +99,8 @@ export function IdentityDetailPage() {
         setContracts(contractsData)
         setDocuments(documentsData)
         setSupports(supportsData)
+        setTransportRights(transportRightsData)
+        setProofEvents(proofEventsData)
         setTimeline(timelineData)
         setError(null)
       } catch (err) {
@@ -217,8 +230,16 @@ export function IdentityDetailPage() {
                 refresh()
               }}
             />
+            <MultiSupportDemoPanel
+              identityId={id}
+              contracts={contracts}
+              supports={supports}
+              rights={transportRights}
+              proofEvents={proofEvents}
+              onRefresh={refresh}
+            />
             {supports.length === 0 ? (
-              <EmptyState icon="💳" title="Aucune carte" />
+              <EmptyState icon="💳" title="Aucun support" />
             ) : (
               <SupportList supports={supports} />
             )}

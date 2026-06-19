@@ -2,34 +2,46 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  border-radius: 999px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
   font-size: 0.8125rem;
   font-weight: 600;
   white-space: nowrap;
 }
 
+.icon svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .neutral {
-  background: var(--color-bg-medium);
-  color: var(--color-anthracite);
+  color: var(--color-text-muted);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
 }
 
 .success {
-  background: #e6f4ed;
   color: var(--color-green);
+  background: var(--color-green-bg);
+  border: 1px solid rgba(0, 125, 68, 0.25);
 }
 
-.warning {
-  background: #fff4e5;
-  color: #b35c00;
+.warning,
+.pending {
+  color: var(--color-orange);
+  background: var(--color-orange-bg);
+  border: 1px solid rgba(243, 146, 36, 0.35);
 }
 
 .danger {
   background: #fdeaea;
   color: var(--color-red);
+  border: 1px solid rgba(197, 38, 37, 0.25);
 }
 
 .info {
   background: var(--color-bg-medium);
   color: var(--color-interaction);
+  border: 1px solid var(--color-border);
 }

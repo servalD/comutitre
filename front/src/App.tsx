@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import type { ReactNode } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { AppShell } from './components/layout/AppShell'
 import { RagChatbot } from './components/RagChatbot'
@@ -16,6 +17,17 @@ import { AddIdentityPage } from './pages/mobility/AddIdentityPage'
 import { IdentityDetailPage } from './pages/mobility/IdentityDetailPage'
 import { MobilityHubPage } from './pages/mobility/MobilityHubPage'
 import { SubscribePage } from './pages/mobility/SubscribePage'
+import { MonDossierPage } from './pages/MonDossierPage'
+import { MonEspacePage } from './pages/MonEspacePage'
+import { MonFoyerPage } from './pages/MonFoyerPage'
+import { NouvelleSouscriptionPage } from './pages/NouvelleSouscriptionPage'
+import { AidePage } from './pages/AidePage'
+import { FichePersonnePage } from './pages/FichePersonnePage'
+import { AjouterPersonnePage } from './pages/AjouterPersonnePage'
+import { DossierSignaturePage } from './pages/dossier/DossierSignaturePage'
+import { DossierPaiementPage } from './pages/dossier/DossierPaiementPage'
+import { DossierValidationPage } from './pages/dossier/DossierValidationPage'
+import { DossierConfirmationPage } from './pages/dossier/DossierConfirmationPage'
 import {
   homeForZone,
   loginForZone,
@@ -46,7 +58,7 @@ function PublicRoute({
   children,
 }: {
   zone: AuthZone
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const { token, isLoading } = useAuth()
 
@@ -96,6 +108,19 @@ export default function App() {
               </PublicRoute>
             }
           />
+
+          {/* ── Écrans maquette (features/design/views) ── */}
+          <Route path="/espace" element={<MonEspacePage />} />
+          <Route path="/dossier" element={<MonDossierPage />} />
+          <Route path="/dossier/signature" element={<DossierSignaturePage />} />
+          <Route path="/dossier/paiement" element={<DossierPaiementPage />} />
+          <Route path="/dossier/validation" element={<DossierValidationPage />} />
+          <Route path="/dossier/confirmation" element={<DossierConfirmationPage />} />
+          <Route path="/foyer" element={<MonFoyerPage />} />
+          <Route path="/foyer/ajouter" element={<AjouterPersonnePage />} />
+          <Route path="/foyer/:id" element={<FichePersonnePage />} />
+          <Route path="/aide" element={<AidePage />} />
+          <Route path="/souscription/nouvelle" element={<NouvelleSouscriptionPage />} />
 
           {/* ── Mobilité : auth ── */}
           <Route path="/auth/callback" element={<AuthCallback zone="mobility" />} />

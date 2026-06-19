@@ -12,7 +12,7 @@ export function CreateSupportForm({
 }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState<SupportStatus>('active')
+  const [status, setStatus] = useState<SupportStatus>('pending_activation')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -43,7 +43,6 @@ export function CreateSupportForm({
           value={status}
           onChange={(e) => setStatus(e.target.value as SupportStatus)}
         >
-          <option value="active">Active</option>
           <option value="pending_activation">En attente</option>
           <option value="lost">Perdue</option>
           <option value="stolen">Volée</option>
